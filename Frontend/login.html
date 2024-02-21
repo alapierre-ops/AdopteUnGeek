@@ -7,29 +7,19 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="res/css/index.css"/>
+    <link rel="stylesheet" type="text/css" href="res/css/login.css"/>
 </head>
 <body>
     <div id="content"></div>
-
-    <div id="modalConfirmDelete" class="modal">
-        <div class="modal-content">
-            <h4>Supprimer</h4>
-            <p>Etes vous sûr de vouloir supprimer <span id="spanDeleteObject"></span> ?</p>
-        </div>
-        <div class="modal-footer">
-            <button class="modal-close waves-effect waves-green btn-flat" id="btnDelete">Oui</button>
-        </div>
-    </div>
 
     <script type="application/ecmascript" src="app/tools.js"></script>
     <script type="application/ecmascript" src="app/model/userClass.js"></script>
     <script type="application/ecmascript" src="app/model/model.js"></script>
     <script type="application/ecmascript" src="app/services/usersAPI.js"></script>
     <script type="application/ecmascript" src="app/services/usersRoutes.js"></script>
-    <script type="application/ecmascript" src="app/controllers/index.js"></script>
+    <script type="application/ecmascript" src="app/controllers/login.js"></script>
     <script type="application/ecmascript" src="app/controllers/basecontroller.js"></script>
 
-    <script>navigate("index")</script>
+    <script>navigate("login")</script>
 </body>
 </html>

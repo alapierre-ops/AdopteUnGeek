@@ -1,4 +1,4 @@
-class IndexController{
+class LoginController{
     constructor() {
         const apiUrl = 'http://localhost:3333/users';
         this.usersRoutes = new UsersRoutes(apiUrl);
@@ -181,4 +181,4 @@ class IndexController{
     }
 }
 
-window.indexController = new IndexController()
+window.loginController = new LoginController()
