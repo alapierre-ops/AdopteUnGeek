@@ -70,6 +70,7 @@ class LoginController{
         try {
             await this.usersRoutes.signUp(nickname, email, password);
             alert('User signed up successfully!');
+            window.location.href = 'index.html';
         } catch (error) {
             console.error('Failed to sign up user:', error.message);
             alert('Failed to sign up user. Please try again.');
@@ -130,7 +131,7 @@ class LoginController{
             this.usersRoutes.verifyToken(token)
                 .then(() => {
                     console.log("token is valid")
-                    this.showLogoutButton();
+                    window.location.href = 'index.html';
                     return true
                 })
                 .catch(() => {
