@@ -86,7 +86,6 @@ class LoginController{
             alert('Failed to log in. Please enter an email.');
             return
         }
-        this.checkPassword(password)
 
         console.log("Form submitted:", email, password);
 
