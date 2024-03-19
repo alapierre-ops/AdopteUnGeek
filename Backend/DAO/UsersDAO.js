@@ -39,23 +39,24 @@ module.exports = class UsersDAO extends dao{
     }
 
     async authenticate(email, password) {
-        console.log(email + password)
+        console.log("Authenticate: " + email + " " + password)
         const userRecord = await this.db.query(`SELECT * FROM Users WHERE email=$1`, [email]);
         if (userRecord.rows.length === 0) {
-            console.log('no user with this email')
-            return null;
+            console.log("Authenticate: no user with this email")
+            return {err: "404"};
         }
-        console.log("user found")
+        console.log("Authenticate: user found")
 
         const hashedPassword = userRecord.rows[0].password;
         const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
         if (isPasswordCorrect) {
-            console.log("correct password")
+            console.log("isPasswordCorrect: correct password")
             const token = jwt.sign({ userId: userRecord.rows[0].id }, "secretKey");
-            console.log("back token : " + token)
-            return { user: userRecord.rows[0], token: token };
+            console.log("Authenticate: back token : " + token)
+            return { user: userRecord.rows[0], token: token};
         } else {
-            return null;
+            console.log("isPasswordCorrect: incorrect password")
+            return {err: "401"};
         }
     }
 

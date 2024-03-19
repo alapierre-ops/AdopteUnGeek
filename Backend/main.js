@@ -12,7 +12,7 @@ const photosServices = require("./Services/PhotosServices")
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: false })) // URLEncoded form data
-app.use(bodyParser.json()) // application/json
+app.use(bodyParser.json())
 app.use(cors())
 app.use(morgan('dev'));
 app.use(cookieParser())

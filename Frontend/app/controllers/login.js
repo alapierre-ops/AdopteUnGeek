@@ -51,15 +51,15 @@ class LoginController{
         const password = formData.get('password');
 
         if(!nickname){
-            alert('Failed to sign up user. Please enter a nickname.');
+            alert('Veuillez entrer votre pseudonyme');
             return
         }
         if(!email){
-            alert('Failed to sign up user. Please enter an email.');
+            alert('Veuillez entrer votre email.');
             return
         }
         if(!password){
-            alert('Failed to sign up user. Please enter a password.');
+            alert('Veuillez entrer votre mot de passe.');
             return
         }
         if(!this.checkPassword(password))
@@ -67,25 +67,34 @@ class LoginController{
 
         console.log("Form submitted:", nickname, email, password);
 
-        try {
-            await this.usersRoutes.signUp(nickname, email, password);
-            alert('User signed up successfully!');
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Failed to sign up user:', error.message);
-            alert('Failed to sign up user. Please try again.');
-        }
+        this.usersRoutes.signUp(nickname, email, password)
+            .then(res => {
+                console.log("handleSignUp(): No error detected")
+                console.log("Putting the token in place")
+                sessionStorage.setItem("token", res.token)
+                window.location.href = 'index.html';
+                this.isUserLoggedIn()
+            })
+            .catch(err => {
+                console.log("handleSignUp(): Error detected")
+                if (err === 500) {
+                    alert("Erreur lors de la connection au serveur. Veuillez réessayer plus tard.")
+                }
+                else if (err === 409) {
+                    alert("Un compte existe déjà avec cette adresse mail. Veuillez vous connecter.")
+                }
+                else {
+                    console.error('Failed to log user in:', err.message);
+                    alert('Erreur lors de la connexion, veuillez réessayer');
+                }
+            })
     }
-    async handleLogIn(event) {
+    async handleLogIn(event){
         event.preventDefault();
         const formData = new FormData(event.target);
         const email = formData.get('email');
         const password = formData.get('password');
 
-        if(!email){
-            alert('Failed to log in. Please enter an email.');
-            return
-        }
 
         console.log("Form submitted:", email, password);
 
@@ -93,33 +102,37 @@ class LoginController{
             .then(res => {
                 console.log("Putting the token in place")
                 sessionStorage.setItem("token", res.token)
-                alert('User logged in successfully!');
+                window.location.href = 'index.html';
                 console.log("Token : " + res.token)
                 console.log("Token : " + sessionStorage.getItem("token"))
                 this.isUserLoggedIn()
             })
             .catch(err => {
-                console.log(err)
-                if (err === 401) {
-                    alert("Adresse e-mail ou mot de passe incorrect")
-                } else {
-                    console.error('Failed to log user in:', err.message);
-                    alert('Failed to log user in. Please try again.');
+                if (err === 500) {
+                    alert("Erreur lors de la connection au serveur. Veuillez réessayer plus tard")
+                }
+                else if (err === 401) {
+                    alert("Adresse e-mail ou mot de passe incorrect.")
+                }
+                else if (err === 404) {
+                    alert("Aucun compte n'est lié à cette adresse mail")
+                }
+                else {
+                    console.error('Failed to sign user in:', err.message);
                 }
             })
     }
 
     async handleLogout() {
         console.log("handleLogOut")
-
         try {
             sessionStorage.removeItem("token")
             alert('User logged out successfully!');
             console.log("handleLogout -> hide logOut")
             this.hideLogoutButton()
         } catch (error) {
-            console.log('Failed to log out user', error.message);
-            alert('Failed to log out user. Please try again.');
+            console.log('Erreur lors de la déconnexion. ', error.message);
+            alert('Erreur lors de la déconnexion, veuillez réessayer plus tard.');
         }
     }
 
@@ -148,19 +161,19 @@ class LoginController{
 
     checkPassword(password){
         if (password.length < 8) {
-            alert('Password should be at least 8 characters long.');
+            alert('Votre mot de passe doit contenir minimum 8 charatères.');
             return false;
         }
         if (!/\d/.test(password)) {
-            alert('Password should contain at least one number.');
+            alert('Votre mot de passe doit contenir au moins un chiffre.');
             return false;
         }
         if (!/[A-Z]/.test(password)) {
-            alert('Password should contain at least one uppercase letter.');
+            alert('Votre mot de passe doit contenir au moins une majuscule.');
             return false;
         }
         if (!/[^a-zA-Z0-9]/.test(password)) {
-            alert('Password should contain at least one special character.');
+            alert('Votre mot de passe doit contenir au moins un charactère spécial');
             return false;
         }
         return true

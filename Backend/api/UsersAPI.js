@@ -74,14 +74,19 @@ module.exports = (app, svc) => {
         console.log('back logIn')
         try {
             const response = await svc.dao.authenticate(email, password);
-            if (!response.user) {
-                return res.status(401).json({ message: "Invalid credentials" });
+            if (response.err === "404") {
+                return res.status(404).json({ message: "Aucun utilisateur avec cette adresse email" });
             }
-            console.log("usersAPI res: " + response.token)
-            return res.status(200).json({ message: "Login successful", user: response.user, token: response.token });
+            else if (response.err === "401") {
+                return res.status(401).json({ message: "Identifiants invalides" });
+            }
+            if (!response.err) {
+                console.log("usersAPI res: " + response.token)
+                return res.status(200).json({message: "Connexion réussie", user: response.user, token: response.token});
+            }
         } catch (e) {
             console.error(e);
-            return res.status(500).json({ message: "Internal server error" });
+            return res.status(500).json({ message: "Erreur interne, veuillez réessayer plus tard" });
         }
     });
 
@@ -90,13 +95,13 @@ module.exports = (app, svc) => {
         try {
             const existingUser = await svc.dao.getByEmail(email);
             if (existingUser) {
-                return res.status(409).json({ message: "You already have an account, please log in" });
+                return res.status(409).json({ message: "Un compte existe déjà avec cette adresse mail. Veuillez vous connecter." });
             }
             await svc.dao.signUp(nickname, email, password);
-            return res.status(201).json({ message: "User registered successfully" });
+            return res.status(201).json({ message: "Votre compte a été créé avec succès."});
         } catch (e) {
             console.error(e);
-            return res.status(500).json({ message: "Internal server error" });
+            return res.status(500).json({ message: "Erreur interne, veuillez réessayer plus tard." });
         }
     });
 }

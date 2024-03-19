@@ -26,18 +26,22 @@ class UsersRoutes {
     }
 
     async signUp(nickname, email, password) {
-        const response = await fetch(`${this.apiUrl}/auth/signup`, {
-            method: 'POST',
+        return new Promise((resolve, reject) => fetch(`${this.apiUrl}/auth/signup`, {
+            method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nickname, email, password })
-        });
-        if (!response.ok) {
-            console.log(response.status);
-            throw new Error(`Failed to sign up: ${response.status}`);
-        }
-        return true;
+            body: JSON.stringify({ email, password })
+        }).then(res => {
+            if (res.status === 201) {
+                console.log("signUp(): No error detected")
+                resolve(res.json())
+            } else {
+                console.log("signUp(): Error detected")
+                reject(res.status)
+                throw new Error(`Failed to sign up: ${res.status}`)
+            }
+        }).catch(err => reject(err)))
     }
 
     logIn(email, password) {
