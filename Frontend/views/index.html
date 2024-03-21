@@ -19,9 +19,12 @@
 
     <div class="person">
         <i class="far fa-thumbs-down" id="skipIcon"></i>
-        <div class="image">
-            <img src="../img/thispersondoesnotexist.jpg" alt="main picture" class="indexPic">
-            <div class="Nom" id="userName"></div>
+        <div class="image-container">
+            <img src="../img/thispersondoesnotexist.jpg" alt="main picture">
+            <div class="text-container">
+                <h4 id="userName"></h4>
+                <p id="userBio"></p>
+            </div>
         </div>
         <i class="far fa-thumbs-up" id="likeIcon"></i>
     </div>
@@ -39,6 +42,5 @@
     <script type="application/ecmascript" src="../app/services/usersAPI.js"></script>
     <script type="application/ecmascript" src="../app/services/usersRoutes.js"></script>
     <script type="application/ecmascript" src="../app/controllers/index.js"></script>
-    <script type="application/ecmascript" src="../app/controllers/basecontroller.js"></script>
 </body>
 </html>

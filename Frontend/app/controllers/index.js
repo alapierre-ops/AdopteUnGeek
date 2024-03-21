@@ -14,7 +14,7 @@ class IndexController {
                 await this.getUserInfo(this.userID);
             }
         } catch (error) {
-            console.error("initialize():", error);
+            console.error("initialize(): ", error);
         }
     }
 
@@ -24,6 +24,7 @@ class IndexController {
             const nextUser = await this.usersRoutes.getNextUser(userID);
             console.log("getUserInfo(): nextUser == ", nextUser[0].nickname)
             document.getElementById('userName').textContent = nextUser[0].nickname;
+            document.getElementById('userBio').textContent = nextUser[0].bio;
         } catch (error) {
             console.error("getUserInfo():", error);
         }
