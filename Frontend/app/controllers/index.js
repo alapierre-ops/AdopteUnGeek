@@ -2,10 +2,33 @@ class IndexController {
     constructor() {
         const apiUrl = 'http://localhost:3333/users';
         this.usersRoutes = new UsersRoutes(apiUrl);
-        this.isUserLoggedIn();
+        this.initialize();
         this.bindFooter();
         this.bindHeader();
     }
+
+    async initialize() {
+        try {
+            this.userID = await this.isUserLoggedIn();
+            if (this.userID) {
+                await this.getUserInfo(this.userID);
+            }
+        } catch (error) {
+            console.error("initialize():", error);
+        }
+    }
+
+    async getUserInfo(userID) {
+        try {
+            console.log("getUserInfo(): userID == ", userID);
+            const nextUser = await this.usersRoutes.getNextUser(userID);
+            console.log("getUserInfo(): nextUser == ", nextUser[0].nickname)
+            document.getElementById('userName').textContent = nextUser[0].nickname;
+        } catch (error) {
+            console.error("getUserInfo():", error);
+        }
+    }
+
 
     bindFooter(){
         const indexIcon = document.getElementById('indexIcon');
@@ -20,11 +43,11 @@ class IndexController {
         const settingsIcon = document.getElementById('settingsIcon');
         settingsIcon.addEventListener('click', this.goToSettings.bind(this));
 
-        console.log("binding footer icons")
+        console.log("bindFooter(): binding footer icons")
     }
 
     bindHeader(){
-        console.log("binding header icons")
+        console.log("bindHeader(): binding header icons")
 
         const profileIcon = document.getElementById('profileIcon');
         profileIcon.addEventListener('click', this.goToProfile.bind(this));
@@ -33,54 +56,66 @@ class IndexController {
         filterIcon.addEventListener('click', this.goToFilters.bind(this));
     }
 
-    isUserLoggedIn() {
+    async isUserLoggedIn() {
         const token = sessionStorage.getItem('token');
-        console.log("isUserLoggedIn ? Token: " + token)
+        console.log("isUserLoggedIn(): Token:", token);
         if (token) {
-            this.usersRoutes.verifyToken(token)
-                .then(() => {
-                    console.log("token is valid")
-                    return true
-                })
-                .catch(() => {
-                    console.log('Token expired or invalid. User is not logged in.');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return false
-                });
+            try {
+                const { userId } = await this.usersRoutes.verifyToken(token);
+                console.log("isUserLoggedIn(): token is valid, user ID:", userId);
+                return userId;
+            } catch (error) {
+                console.log("isUserLoggedIn():", error);
+                console.log('isUserLoggedIn(): Token expired or invalid. User is not logged in.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+                throw new Error('Token expired or invalid');
+            }
         } else {
-            console.log("token is empty")
+            console.log("isUserLoggedIn(): token is empty");
             window.location.href = 'login.html';
-            return false
+            throw new Error('Token is missing');
         }
     }
 
     goToIndex(){
-        console.log("going to index")
+        console.log("goToIndex(): going to index")
         window.location.href = 'index.html';
     }
 
     goToLikes(){
-        console.log("going to likes")
+        console.log("goToLikes(): going to likes")
         window.location.href = 'likes.html';
     }
     goToMessages(){
-        console.log("going to messages")
+        console.log("goToMessages(): going to messages")
         window.location.href = 'messages.html';
     }
     goToSettings(){
-        console.log("going to settings")
-        window.location.href = 'settings.html';
+        console.log("goToSettings(): going to settings")
+        this.handleLogout();
+        //window.location.href = 'settings.html';
     }
 
     goToProfile(){
-        console.log("going to profile")
+        console.log("goToProfile(): going to profile")
         window.location.href = 'profile.html';
     }
 
     goToFilters(){
-        console.log("going to filters")
+        console.log("goToFilters(): going to filters")
         //window.location.href = 'settings.html';
+    }
+
+    async handleLogout() {
+        console.log("handleLogOut")
+        try {
+            sessionStorage.removeItem("token")
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.log('Erreur lors de la déconnexion. ', error.message);
+            alert('Erreur lors de la déconnexion, veuillez réessayer plus tard.');
+        }
     }
 }
 

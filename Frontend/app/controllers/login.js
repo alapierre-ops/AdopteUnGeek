@@ -5,20 +5,7 @@ class LoginController{
         this.bindSignUpForm();
         this.bindLogInForm();
         this.bindFormSwitch();
-        this.bindLogoutButton();
         this.isUserLoggedIn();
-    }
-
-    hideLogoutButton() {
-        const logoutButton = document.getElementById('logoutButton');
-        logoutButton.style.display = 'none';
-        console.log("logout button hidden")
-    }
-
-    showLogoutButton() {
-        const logoutButton = document.getElementById('logoutButton');
-        logoutButton.style.display = 'block';
-        console.log("logout button displayed")
     }
 
     bindSignUpForm() {
@@ -36,11 +23,6 @@ class LoginController{
         const dontHaveAccount = document.getElementById('dontHaveAccount');
         alreadyAccount.addEventListener('click', this.toggleForms.bind(this));
         dontHaveAccount.addEventListener('click', this.toggleForms.bind(this));
-    }
-
-    bindLogoutButton() {
-        const logoutButton = document.getElementById('logoutButton');
-        logoutButton.addEventListener('click', this.handleLogout.bind(this));
     }
 
     async handleSignUp(event) {
@@ -123,39 +105,24 @@ class LoginController{
             })
     }
 
-    async handleLogout() {
-        console.log("handleLogOut")
-        try {
-            sessionStorage.removeItem("token")
-            alert('User logged out successfully!');
-            console.log("handleLogout -> hide logOut")
-            this.hideLogoutButton()
-        } catch (error) {
-            console.log('Erreur lors de la déconnexion. ', error.message);
-            alert('Erreur lors de la déconnexion, veuillez réessayer plus tard.');
-        }
-    }
-
-    isUserLoggedIn() {
+    async isUserLoggedIn() {
         const token = sessionStorage.getItem('token');
-        console.log("isUserLoggedIn ? Token: " + token)
+        console.log("isUserLoggedIn() : Token: " + token);
         if (token) {
-            this.usersRoutes.verifyToken(token)
-                .then(() => {
-                    console.log("token is valid")
-                    window.location.href = 'index.html';
-                    return true
-                })
-                .catch(() => {
-                    console.log('Token expired or invalid. User is not logged in.');
-                    localStorage.removeItem('token');
-                    this.hideLogoutButton();
-                    return false
-                });
+            try {
+                const { userId } = await this.usersRoutes.verifyToken(token);
+                console.log("isUserLoggedIn() : token is valid, user ID : " + userId);
+                window.location.href = 'index.html'
+                return userId;
+            } catch (error) {
+                console.log(error)
+                console.log('isUserLoggedIn() : Token expired or invalid. User is not logged in.');
+                localStorage.removeItem('token');
+                throw new Error('Token expired or invalid');
+            }
         } else {
-            console.log("token is empty")
-            this.hideLogoutButton();
-            return false
+            console.log("token is empty");
+            throw new Error('Token is missing');
         }
     }
 

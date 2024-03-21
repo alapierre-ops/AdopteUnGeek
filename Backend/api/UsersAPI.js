@@ -1,9 +1,11 @@
 const jwt = require('jsonwebtoken')
+const {verify} = require("jsonwebtoken");
 
 module.exports = (app, svc) => {
     app.get("/users", async (req, res) => {
         res.json(await svc.dao.getAll())
     })
+
     app.get("/users/:id", async (req, res) => {
         try {
             const users = await svc.dao.getById(req.params.id)
@@ -13,6 +15,7 @@ module.exports = (app, svc) => {
             return res.json(users)
         } catch (e) { res.status(400).end() }
     })
+
     app.post("/users/add", (req, res) => {
         const users = req.body
         if (!svc.isValid(users))  {
@@ -25,6 +28,7 @@ module.exports = (app, svc) => {
                 res.status(500).end()
             })
     })
+
     app.delete("/users/:id", async (req, res) => {
         const users = await svc.dao.getById(req.params.id)
         if (users === undefined) {
@@ -37,6 +41,7 @@ module.exports = (app, svc) => {
                 res.status(500).end()
             })
     })
+
     app.put("/users", async (req, res) => {
         const users = req.body
         if ((users.id === undefined) || (users.id == null) || (!svc.isValid(users))) {
@@ -62,7 +67,9 @@ module.exports = (app, svc) => {
 
         try {
             const decoded = jwt.verify(token, "secretKey");
-            return res.status(200).json({ message: "Token is valid", decoded });
+            const userId = decoded.userId
+            console.log("verify : userId = " + userId)
+            return res.status(200).json({ message: "Token is valid", decoded, userId: userId });
         } catch (error) {
             console.error("Error verifying token:", error);
             return res.status(401).json({ message: "Token is invalid" });
@@ -104,4 +111,23 @@ module.exports = (app, svc) => {
             return res.status(500).json({ message: "Erreur interne, veuillez réessayer plus tard." });
         }
     });
+
+    app.get("/users/nextUser/:id", async (req, res) => {
+        try {
+            console.log("nextUser/:id : id == " +req.params.id)
+            const user = await svc.dao.getNext(req.params.id)
+            console.log("nextUser/:id == ", user)
+            if (!user) {
+                console.log("nextUser/:id : user is empty")
+                return res.status(301).end()
+            }
+            if (!user === undefined) {
+                console.log("nextUser/:id : user is undefined")
+                return res.status(407).end()
+            }
+            return res.json(user)
+        } catch (e) {
+            console.log(e)
+            res.status(400).end() }
+    })
 }
