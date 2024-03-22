@@ -60,7 +60,7 @@ body {
     margin-right: 5vw;
 }
 
-.text-container {
+.textContainer {
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -70,11 +70,26 @@ body {
     padding: 20px;
 }
 
+.largeTextContainer {
+    height: calc(126% - 10vw);
+}
 
-.text-container h4 {
+
+.textContainer h4 {
     margin-top: 0;
 }
 
-.text-container p {
+.textContainer p {
     margin-bottom: 0;
+}
+
+.textContainer.hidden {
+    display: none;
+}
+
+.userFirstRow{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
 }

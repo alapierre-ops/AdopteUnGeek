@@ -3,8 +3,7 @@ class IndexController {
         const apiUrl = 'http://localhost:3333/users';
         this.usersRoutes = new UsersRoutes(apiUrl);
         this.initialize();
-        this.bindFooter();
-        this.bindHeader();
+        this.addEventListeners();
     }
 
     async initialize() {
@@ -25,9 +24,29 @@ class IndexController {
             console.log("getUserInfo(): nextUser == ", nextUser[0].nickname)
             document.getElementById('userName').textContent = nextUser[0].nickname;
             document.getElementById('userBio').textContent = nextUser[0].bio;
+
+            const currentDate = new Date();
+            const birthdate = new Date(nextUser[0].birthdate);
+            const differenceMs = currentDate - birthdate;
+            const nextUserAge = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
+            document.getElementById('userAge').textContent = nextUserAge + " ans";
         } catch (error) {
             console.error("getUserInfo():", error);
         }
+    }
+
+    addEventListeners(){
+        this.bindFooter()
+        this.bindHeader()
+
+        const textContainer = document.getElementById('textContainer');
+        textContainer.addEventListener('click', function (){
+            textContainer.classList.toggle("largeTextContainer");
+        });
+        const imageContainer = document.getElementById('imageContainer');
+        imageContainer.addEventListener('click', function (){
+            textContainer.classList.toggle("hidden");
+        });
     }
 
 
