@@ -48,9 +48,48 @@ body {
     margin: 0 10px;
 }
 
-.indexPic{
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-container img {
+    display: block;
     height: 85vh;
     margin-left: 5vw;
     margin-right: 5vw;
+}
 
+.textContainer {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: calc(100% - 10vw);
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+}
+
+.largeTextContainer {
+    height: calc(126% - 10vw);
+}
+
+
+.textContainer h4 {
+    margin-top: 0;
+}
+
+.textContainer p {
+    margin-bottom: 0;
+}
+
+.textContainer.hidden {
+    display: none;
+}
+
+.userFirstRow{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
 }

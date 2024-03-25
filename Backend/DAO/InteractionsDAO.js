@@ -1,8 +1,8 @@
 const dao = require('./dao')
 
-module.exports = class MatchsDAO extends dao{
+module.exports = class InteractionsDAO extends dao{
     constructor(db) {
-        super(db,"matchs")
+        super(db,"interactions")
     }
     delete(id) {
         return this.db.query(`DELETE FROM ${this.tablename} WHERE id=$1`, [id])
@@ -21,13 +21,13 @@ module.exports = class MatchsDAO extends dao{
                 .catch(e => reject(e)))
     }
 
-    insert(matchs) {
-        return this.db.query("INSERT INTO matchs(date, IDuser1, IDuser2) VALUES ($1,$2,$3)",
-            [matchs.date, matchs.IDuser1, matchs.IDuser2])
+    insert(interactions) {
+        return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
+            [interactions.date, interactions.userWhoInteracted, interactions.userShown, interactions.liked])
     }
 
-    update(matchs) {
-        return this.db.query("UPDATE matchs SET date=$2,email=$3,IDuser1=$4,IDuser2=$5 WHERE id=$1",
-            [matchs.id, matchs.date, matchs.IDuser1, matchs.ID2])
+    add(date, userWhoInteracted, userShown, liked) {
+        return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
+            [date, userWhoInteracted, userShown, liked])
     }
 }

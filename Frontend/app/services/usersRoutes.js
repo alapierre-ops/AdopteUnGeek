@@ -1,6 +1,7 @@
 class UsersRoutes {
     constructor(apiUrl) {
-        this.apiUrl = apiUrl;
+        console.log("UsersRoute : apiUrl == " + apiUrl)
+        this.apiUrl = apiUrl+"/users";
     }
 
     async insert(userAccount) {
@@ -14,15 +15,6 @@ class UsersRoutes {
         if (!response.ok) {
             throw new Error(`Failed to insert user account: ${response.status}`);
         }
-    }
-
-    async search(email) {
-        const response = await fetch(`${this.apiUrl}/${email}`);
-        if (!response.ok) {
-            throw new Error(`Failed to search for username: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.total > 0;
     }
 
     async signUp(nickname, email, password) {
@@ -72,20 +64,22 @@ class UsersRoutes {
         if (!response.ok) {
             throw new Error(`Failed to verify token: ${response.status}`);
         }
-        return await response.json();
+        return await response.json()
     }
 
-    async logOut(token) {
-        const response = await fetch(`${this.apiUrl}/auth/logout`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+    async getNextUser(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/nextUser/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch user: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
         });
-        if (!response.ok) {
-            throw new Error(`Failed to log out: ${response.status}`);
-        }
-        return true;
     }
 }
