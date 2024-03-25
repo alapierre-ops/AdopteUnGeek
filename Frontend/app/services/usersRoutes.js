@@ -1,6 +1,7 @@
 class UsersRoutes {
     constructor(apiUrl) {
-        this.apiUrl = apiUrl;
+        console.log("UsersRoute : apiUrl == " + apiUrl)
+        this.apiUrl = apiUrl+"/users";
     }
 
     async insert(userAccount) {

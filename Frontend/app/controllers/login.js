@@ -1,6 +1,6 @@
 class LoginController{
     constructor() {
-        const apiUrl = 'http://localhost:3333/users';
+        const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
         this.bindSignUpForm();
         this.bindLogInForm();

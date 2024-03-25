@@ -1,7 +1,8 @@
 class IndexController {
     constructor() {
-        const apiUrl = 'http://localhost:3333/users';
+        const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
+        this.interactionsRoutes = new InteractionsRoutes(apiUrl);
         this.initialize();
         this.addEventListeners();
     }
@@ -10,23 +11,23 @@ class IndexController {
         try {
             this.userID = await this.isUserLoggedIn();
             if (this.userID) {
-                await this.getUserInfo(this.userID);
+                await this.getUserInfo();
             }
         } catch (error) {
             console.error("initialize(): ", error);
         }
     }
 
-    async getUserInfo(userID) {
+    async getUserInfo() {
         try {
-            console.log("getUserInfo(): userID == ", userID);
-            const nextUser = await this.usersRoutes.getNextUser(userID);
-            console.log("getUserInfo(): nextUser == ", nextUser[0].nickname)
-            document.getElementById('userName').textContent = nextUser[0].nickname;
-            document.getElementById('userBio').textContent = nextUser[0].bio;
+            console.log("getUserInfo(): userID == ", this.userID);
+            this.nextUser = await this.usersRoutes.getNextUser(this.userID);
+            console.log("getUserInfo(): nextUser == ", this.nextUser[0].nickname)
+            document.getElementById('userName').textContent = this.nextUser[0].nickname;
+            document.getElementById('userBio').textContent = this.nextUser[0].bio;
 
             const currentDate = new Date();
-            const birthdate = new Date(nextUser[0].birthdate);
+            const birthdate = new Date(this.nextUser[0].birthdate);
             const differenceMs = currentDate - birthdate;
             const nextUserAge = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
             document.getElementById('userAge').textContent = nextUserAge + " ans";
@@ -47,6 +48,11 @@ class IndexController {
         imageContainer.addEventListener('click', function (){
             textContainer.classList.toggle("hidden");
         });
+
+        const likeButton = document.getElementById('likeIcon');
+        likeButton.addEventListener('click', () => this.addInteraction(true));
+        const skipButton = document.getElementById('skipIcon');
+        skipButton.addEventListener('click', () => this.addInteraction(false));
     }
 
 
@@ -96,6 +102,11 @@ class IndexController {
             window.location.href = 'login.html';
             throw new Error('Token is missing');
         }
+    }
+
+    addInteraction(liked){
+        this.interactionsRoutes.addInteraction(this.userID, this.nextUser[0].id, liked)
+            .then((r => this.getUserInfo(this.userID)))
     }
 
     goToIndex(){

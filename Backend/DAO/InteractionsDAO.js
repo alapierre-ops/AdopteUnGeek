@@ -22,12 +22,12 @@ module.exports = class InteractionsDAO extends dao{
     }
 
     insert(interactions) {
-        return this.db.query("INSERT INTO interactions(userWhoInteracted, userShown, liked, date) VALUES ($1,$2,$3,$4)",
-            [interactions.userWhoInteracted, interactions.userShown, interactions.liked, interactions.date])
+        return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
+            [interactions.date, interactions.userWhoInteracted, interactions.userShown, interactions.liked])
     }
 
-    update(interactions) {
-        return this.db.query("UPDATE interactions SET date=$2,email=$3,IDuser1=$4,IDuser2=$5 WHERE id=$1",
-            [interactions.id, interactions.date, interactions.IDuser1, interactions.ID2])
+    add(date, userWhoInteracted, userShown, liked) {
+        return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
+            [date, userWhoInteracted, userShown, liked])
     }
 }

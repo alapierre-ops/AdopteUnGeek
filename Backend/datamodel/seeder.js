@@ -7,9 +7,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
     return new Promise(async (resolve, reject) => {
         try {
             await interactionsService.dao.db.query("CREATE TABLE interactions(id SERIAL PRIMARY KEY, date DATE, userWhoInteracted INTEGER, userShown INTEGER, liked BOOLEAN )")
-            for (let i = 0; i < 25; i++) {
-                await interactionsService.dao.insert(new Interactions("2000-01-01", "0", "0", false))
-            }
+            await interactionsService.dao.insert(new Interactions("2000-01-01", "0", "0", false))
             await usersService.dao.db.query("CREATE TABLE users(id SERIAL PRIMARY KEY, nickname TEXT, email TEXT, phoneNumber TEXT, password TEXT, bio TEXT, birthdate DATE, gender TEXT, links TEXT, tags TEXT )")
             for (let i = 0; i < 25; i++) {
                 await usersService.dao.insert(new Users("nickname" + i, "email" + i, "060000000" + i, "password" + i, "bio" + i, "2000-01-01", "gender" + i, "links" + i, "tags" + i))
