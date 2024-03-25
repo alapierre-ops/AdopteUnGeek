@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Adopte un Geek</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/profile.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div id="form">
+        <h3>A propos de vous</h3>
+        <form>
+            <label for="gender">Genre :</label><br>
+            <select id="gender" name="gender" class="browser-default" required>
+                <option value="male">Homme</option>
+                <option value="female">Femme</option>
+            </select><br>
+            <label for="interestedIn">Genre recherché :</label><br>
+            <select id="interestedIn" name="interestedIn" class="browser-default" required>
+                <option value="male">Homme</option>
+                <option value="female">Femme</option>
+                <option value="both">Tout</option>
+            </select><br><br>
+            <label for="birthdate">Date de naissance :</label><br>
+            <input type="date" id="birthdate" name="birthdate" required><br>
+            <label for="bio">Bio :</label><br>
+            <textarea id="bio" name="bio" rows="4" required></textarea><br>
+            <button type="submit">Valider</button>
+        </form>
+    </div>
+</div>
+
+<script type="application/ecmascript" src="../app/tools.js"></script>
+<script type="application/ecmascript" src="../app/model/model.js"></script>
+<script type="application/ecmascript" src="../app/services/usersRoutes.js"></script>
+<script type="application/ecmascript" src="../app/controllers/profile.js"></script>
+
+</body>
+</html>
