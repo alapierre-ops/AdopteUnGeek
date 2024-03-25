@@ -33,6 +33,7 @@ class IndexController {
             document.getElementById('userAge').textContent = nextUserAge + " ans";
         } catch (error) {
             console.error("getUserInfo():", error);
+            alert("No more available users. You swiped on everyone.")
         }
     }
 

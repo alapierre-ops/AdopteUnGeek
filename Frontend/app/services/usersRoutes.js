@@ -73,7 +73,8 @@ class UsersRoutes {
                 .then(res => {
                     if (res.ok) {
                         resolve(res.json());
-                    } else {
+                    }
+                    else {
                         reject(res.status);
                         throw new Error(`Failed to fetch user: ${res.status}`);
                     }
