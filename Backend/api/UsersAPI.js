@@ -130,4 +130,23 @@ module.exports = (app, svc) => {
             console.log(e)
             res.status(400).end() }
     })
+
+    app.patch("/users/:id", async (req, res) => {
+        const userId = req.params.id;
+        const userData = req.body;
+        if (!userId || !svc.isValid(userData)) {
+            return res.status(400).end();
+        }
+        const existingUser = await svc.dao.getById(userId);
+        if (!existingUser) {
+            return res.status(404).end();
+        }
+        const updatedUser = { ...existingUser, ...userData };
+        svc.dao.update(userId, updatedUser)
+            .then(_ => res.status(200).end())
+            .catch(e => {
+                console.log(e);
+                res.status(500).end();
+            });
+    });
 }

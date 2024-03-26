@@ -82,4 +82,44 @@ class UsersRoutes {
                 .catch(err => reject(err));
         });
     }
+
+    async getUser(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch user: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    async updateUser(userId, userData) {
+        console.log("updateUser(): userId == " + userId + " userData == " + userData)
+        try {
+            const response = await fetch(`${this.apiUrl}/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+            if (!response.ok) {
+                return { error: response.statusText };
+            }
+            if (response.status !== 204) {
+                return await response.json();
+            } else {
+                return { success: true };
+            }
+        } catch (error) {
+            console.error('Error updating user:', error.message);
+            return { error: error.message };
+        }
+    }
 }

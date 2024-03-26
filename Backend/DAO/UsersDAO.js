@@ -37,10 +37,6 @@ module.exports = class UsersDAO extends dao {
             [users.nickname, users.email, users.phoneNumber, users.password, users.bio, users.birthdate, users.gender, users.links, users.tags])
     }
 
-    update(users) {
-        return this.db.query("UPDATE users SET nickname=$2,email=$3,phoneNumber=$4,password=$5,bio=$6,birthdate=$7,gender=$8,links=$9,tags=$10 WHERE id=$1",
-            [users.id, users.nickname, users.email, users.phoneNumber, users.password, users.bio, users.birthdate, users.gender, users.links, users.tags])
-    }
 
     async authenticate(email, password) {
         console.log("Authenticate: " + email + " " + password)
@@ -71,7 +67,6 @@ module.exports = class UsersDAO extends dao {
             [nickname, email, hashedPassword])
     }
 
-
     async getNext(id) {
         return new Promise((resolve, reject) =>
             this.db.query(`SELECT * FROM users
@@ -83,5 +78,10 @@ module.exports = class UsersDAO extends dao {
             LIMIT 1`, [id])
                 .then(res => resolve(res.rows))
                 .catch(e => reject(e)))
+    }
+
+    update(id, userData) {
+        return this.db.query("UPDATE users SET nickname=$2, email=$3, phoneNumber=$4, password=$5, bio=$6, birthdate=$7, gender=$8, links=$9, tags=$10 WHERE id=$1",
+            [id, userData.nickname, userData.email, userData.phoneNumber, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags])
     }
 }
