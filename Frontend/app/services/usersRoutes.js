@@ -118,8 +118,10 @@ class UsersRoutes {
                 return { success: true };
             }
         } catch (error) {
-            console.error('Error updating user:', error.message);
-            return { error: error.message };
+            if(error.message !== "JSON.parse: unexpected end of data at line 1 column 1 of the JSON data"){
+                console.error('Error updating user:', error.message);
+                return { error: error.message };
+            }
         }
     }
 }

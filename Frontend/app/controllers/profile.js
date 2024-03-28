@@ -19,7 +19,32 @@ class ProfileController {
 
     addEventListeners(){
         const form = document.getElementById('form');
-        form.addEventListener('submit', this.handleConfirm.bind(this));
+        form.addEventListener('submit', this.handleNext.bind(this));
+
+        const photoForm = document.getElementById('photoForm');
+        photoForm.addEventListener('submit', this.handleConfirm.bind(this));
+
+        const tags = document.querySelectorAll('.tag');
+        tags.forEach(tag => {
+            tag.addEventListener('click', this.toggleTag.bind(this, tag));
+        });
+    }
+
+    toggleTag(tag) {
+        if (this.selectedTags.includes(tag.textContent)) {
+            this.selectedTags = this.selectedTags.filter(t => t !== tag.textContent);
+            tag.classList.remove('selected');
+            console.log("tag removed")
+        } else {
+            if (this.selectedTags.length < 5) {
+                this.selectedTags.push(tag.textContent);
+                tag.classList.add('selected');
+                console.log("tag added")
+
+            } else {
+                alert('Vous ne pouvez sélectionner que 5 tags.');
+            }
+        }
     }
 
     async getUserInfo() {
@@ -44,31 +69,54 @@ class ProfileController {
             }
 
             document.getElementById('bio').textContent = this.currentUser.bio;
-            document.getElementById('birthdate').value = this.currentUser.birthdate.substring(0, 10);
+            document.getElementById('birthdate').value = this.currentUser.birthdate ? this.currentUser.birthdate.substring(0, 10) : "";
+
+            this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+            this.colorSelectedTags();
+
 
         } catch (error) {
             console.error("getUserInfo():", error);
         }
     }
 
-    async handleConfirm(event) {
+    colorSelectedTags(){
+        const tags = document.querySelectorAll('.tag');
+        tags.forEach(tag => {
+            if (this.selectedTags.includes(tag.textContent)) {
+                tag.classList.add('selected');
+                console.log("tag added : " + tag.textContent);
+            }
+        });
+    }
+
+    async handleNext(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        const updatedUserData = {
+        this.updatedUserData = {
             gender: formData.get('gender'),
             bio: formData.get('bio'),
             interestedIn: formData.get('interestedIn'),
-            birthdate: formData.get('birthdate')
+            birthdate: formData.get('birthdate'),
         };
-        console.log("handleConfirm(): birthdate == " + updatedUserData.birthdate);
+        console.log("handleConfirm(): birthdate == " + this.updatedUserData.birthdate);
+        document.getElementById('firstForm').style.display = 'none';
+        document.getElementById('photoForm').style.display = 'block';
+    }
+
+    async handleConfirm(event) {
+        event.preventDefault();
+        //this.updatedUserData.photoFile = document.getElementById('photoInput').files[0];
+        this.updatedUserData.tags = this.selectedTags.join(',')
+        //console.log("handleConfirm(): photo == " + this.updatedUserData.photoFile);
+        console.log("handleConfirm(): data == " + this.updatedUserData);
         try {
-            const updatedUser = await this.usersRoutes.updateUser(this.userID, updatedUserData);
-            console.log('User updated successfully:', updatedUser);
-            window.location.href = 'index.html';
+            await this.usersRoutes.updateUser(this.userID, this.updatedUserData);
+            console.log('User updated successfully');
+            window.location.href = "index.html"
         } catch (error) {
             console.error('Failed to update user:', error.message);
         }
-
     }
 
     async isUserLoggedIn() {

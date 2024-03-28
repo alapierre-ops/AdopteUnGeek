@@ -143,10 +143,11 @@ module.exports = (app, svc) => {
         }
         const updatedUser = { ...existingUser, ...userData };
         svc.dao.update(userId, updatedUser)
-            .then(_ => res.status(200).end())
+            .then(_ => res.status(204).end())
             .catch(e => {
                 console.log(e);
                 res.status(500).end();
             });
+
     });
 }

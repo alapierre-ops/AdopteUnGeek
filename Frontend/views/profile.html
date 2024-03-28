@@ -13,7 +13,7 @@
 <div class="container">
     <div id="form">
         <h3>A propos de vous</h3>
-        <form>
+        <form id="firstForm">
             <label for="gender">Genre :</label><br>
             <select id="gender" name="gender" class="browser-default" required>
                 <option value="male">Homme</option>
@@ -32,7 +32,24 @@
             <textarea id="bio" name="bio" rows="4" required></textarea><br>
             <button type="submit">Valider</button>
         </form>
+        <form id="photoForm" class="photoForm">
+            <label for="photoInput">Choisissez votre photo préférée :</label>
+            <input type="file" id="photoInput" name="photo" accept="image/png, image/jpeg" required />
+
+            <label for="selectedTags">Tags (sélectionnez jusqu'à 5) :</label><br>
+            <div id="tagContainer">
+                <div class="tag">Jeu de rôle</div>
+                <div class="tag">Programmation</div>
+                <div class="tag">Science-fiction</div>
+                <div class="tag">Manga</div>
+                <div class="tag">Anime</div>
+            </div>
+            <input type="hidden" id="selectedTags">
+
+            <button type="submit">Valider</button>
+        </form>
     </div>
+
 </div>
 
 <script type="application/ecmascript" src="../app/tools.js"></script>
