@@ -101,6 +101,7 @@ class UsersRoutes {
 
     async updateUser(userId, userData) {
         console.log("updateUser(): userId == " + userId + " userData == " + userData)
+        await this.updatePhotos(userId, userData.photo);
         try {
             const response = await fetch(`${this.apiUrl}/${userId}`, {
                 method: 'PATCH',
@@ -123,5 +124,47 @@ class UsersRoutes {
                 return { error: error.message };
             }
         }
+    }
+
+    async updatePhotos(userId, photo) {
+        console.log("updateUser(): userId == " + userId + " photo == " + photo)
+        try {
+            const response = await fetch(`${this.apiUrl}/${userId}/photo`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'image/jpeg'
+                },
+                body: photo
+            });
+            if (!response.ok) {
+                return { error: response.statusText };
+            }
+            if (response.status !== 204) {
+                return await response.json();
+            } else {
+                return { success: true };
+            }
+        } catch (error) {
+            if(error.message !== "JSON.parse: unexpected end of data at line 1 column 1 of the JSON data"){
+                console.error('Error updating photo:', error.message);
+                return { error: error.message };
+            }
+        }
+    }
+
+    async getUserPhotos(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/${userID}/photos`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch user: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
     }
 }

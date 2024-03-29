@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken')
-const {verify} = require("jsonwebtoken");
 
 module.exports = (app, svc) => {
     app.get("/users", async (req, res) => {
@@ -150,4 +149,35 @@ module.exports = (app, svc) => {
             });
 
     });
+
+    app.patch("/users/:id/photo", async (req, res) => {
+        const userId = req.params.id;
+        const photo = req.body;
+        fs.writeFileSync("test.jpeg", photo)
+
+        if (!userId) {
+            return res.status(400).end();
+        }
+        const existingUser = await svc.dao.getById(userId);
+        if (!existingUser) {
+            return res.status(404).end();
+        }
+        svc.dao.addPhoto(userId, photo)
+            .then(_ => res.status(204).end())
+            .catch(e => {
+                console.log(e);
+                res.status(500).end();
+            });
+    });
+
+    app.get("/users/:id/photos", async (req, res) => {
+        try {
+        const photo = await svc.dao.getPhotos(req.params.id)
+            if (photo === undefined) {
+                return res.status(404).end()
+            }
+            res.setHeader('Content-Type', 'image/jpeg')
+            res.send(photo)
+        } catch (e) { res.status(400).end() }
+    })
 }

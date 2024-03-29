@@ -60,11 +60,12 @@ class ProfileController {
                 document.getElementById('gender').options.item(2).selected = true;
             }
 
-            if(this.currentUser.interestedIn === "male"){
+            console.log("interestedin == " + this.currentUser.interestedin)
+            if(this.currentUser.interestedin === "male"){
                 document.getElementById('interestedIn').options.item(0).selected = true;
-            } else if(this.currentUser.interestedIn === "female" || !this.currentUser.interestedIn){
+            } else if(this.currentUser.interestedin === "female" || !this.currentUser.interestedin){
                 document.getElementById('interestedIn').options.item(1).selected = true;
-            } else if(this.currentUser.interestedIn === "both"){
+            } else if(this.currentUser.interestedin === "both"){
                 document.getElementById('interestedIn').options.item(2).selected = true;
             }
 
@@ -73,8 +74,6 @@ class ProfileController {
 
             this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
             this.colorSelectedTags();
-
-
         } catch (error) {
             console.error("getUserInfo():", error);
         }
@@ -96,7 +95,7 @@ class ProfileController {
         this.updatedUserData = {
             gender: formData.get('gender'),
             bio: formData.get('bio'),
-            interestedIn: formData.get('interestedIn'),
+            interestedin: formData.get('interestedin'),
             birthdate: formData.get('birthdate'),
         };
         console.log("handleConfirm(): birthdate == " + this.updatedUserData.birthdate);
@@ -106,18 +105,20 @@ class ProfileController {
 
     async handleConfirm(event) {
         event.preventDefault();
-        //this.updatedUserData.photoFile = document.getElementById('photoInput').files[0];
-        this.updatedUserData.tags = this.selectedTags.join(',')
-        //console.log("handleConfirm(): photo == " + this.updatedUserData.photoFile);
-        console.log("handleConfirm(): data == " + this.updatedUserData);
+
+        this.updatedUserData.photo = document.getElementById('photoInput').files[0];
+        this.updatedUserData.tags = this.selectedTags.join(',');
+
         try {
             await this.usersRoutes.updateUser(this.userID, this.updatedUserData);
             console.log('User updated successfully');
-            window.location.href = "index.html"
+            window.location.href = "index.html";
         } catch (error) {
             console.error('Failed to update user:', error.message);
         }
     }
+
+
 
     async isUserLoggedIn() {
         const token = sessionStorage.getItem('token');
