@@ -154,10 +154,11 @@ class UsersRoutes {
 
     async getUserPhotos(userID) {
         return new Promise((resolve, reject) => {
+            console.log("getUserPhotos(): userID == " + userID)
             fetch(`${this.apiUrl}/${userID}/photos`)
                 .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
+                    if (res.status === 200) {
+                        resolve(res.body);
                     }
                     else {
                         reject(res.status);

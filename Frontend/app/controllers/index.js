@@ -22,11 +22,10 @@ class IndexController {
         try {
             console.log("getUserInfo(): userID == ", this.userID);
             this.nextUser = await this.usersRoutes.getNextUser(this.userID);
-            this.nextUserPhoto = await this.usersRoutes.getUserPhotos(this.userID);
             console.log("getUserInfo(): nextUser == ", this.nextUser[0].nickname)
             document.getElementById('userName').textContent = this.nextUser[0].nickname;
             document.getElementById('userBio').textContent = this.nextUser[0].bio;
-            document.getElementById('imageContainer').src = this.nextUserPhoto
+            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.nextUser[0].id + "/photos";
 
             const currentDate = new Date();
             const birthdate = new Date(this.nextUser[0].birthdate);

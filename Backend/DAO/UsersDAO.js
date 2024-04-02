@@ -69,13 +69,13 @@ module.exports = class UsersDAO extends dao {
 
     async getNext(id) {
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT * FROM users
-            WHERE id NOT IN (
-                SELECT userShown FROM interactions
-                WHERE userWhoInteracted = $1
-            )
-            AND id != $1
-            LIMIT 1`, [id])
+            this.db.query(`SELECT u.*, p.photo_data
+                           FROM users u LEFT JOIN photos p ON u.id = p.user_id
+                            WHERE u.id NOT IN (
+                            SELECT userShown FROM interactions
+                            WHERE userWhoInteracted = $1)
+                            AND u.id != $1 AND p.photo_data IS NOT NULL
+                            LIMIT 1`, [id])
                 .then(res => resolve(res.rows))
                 .catch(e => reject(e)))
     }
