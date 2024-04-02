@@ -171,7 +171,6 @@ module.exports = (app, svc) => {
     });
 
     app.get("/users/:id/photos", async (req, res) => {
-        let img;
         try {
             const photo = await svc.dao.getPhotos(req.params.id)
             if (photo === undefined) {
@@ -183,7 +182,7 @@ module.exports = (app, svc) => {
             const centerY = imgJpeg.bitmap.height / 2 - 512;
             imgJpeg.crop(centerX, centerY, 1024, 1024)
 
-            const photoBinary = await imgJpeg.getBufferAsync("image/jpeg") //imgJpeg.encodeJPEG(80)
+            const photoBinary = await imgJpeg.getBufferAsync("image/jpeg")
 
             res.setHeader('Content-Type', 'image/jpeg')
             res.send(photoBinary)
@@ -191,5 +190,18 @@ module.exports = (app, svc) => {
             console.log("Error sending cropped photo: " + e)
             res.status(400).end()
         }
+    })
+
+    app.delete("/users/:id/photos", async (req, res) => {
+        const photo = await svc.dao.getPhotos(req.params.id)
+        if (photo === undefined) {
+            return res.status(404).end()
+        }
+        svc.dao.deletePhoto(req.params.id)
+            .then(_ => res.status(200).end())
+            .catch(e => {
+                console.log(e)
+                res.status(500).end()
+            })
     })
 }

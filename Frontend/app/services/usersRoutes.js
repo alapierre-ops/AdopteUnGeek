@@ -152,7 +152,7 @@ class UsersRoutes {
         }
     }
 
-    async getUserPhotos(userID) {
+    /*async getUserPhotos(userID) {
         return new Promise((resolve, reject) => {
             console.log("getUserPhotos(): userID == " + userID)
             fetch(`${this.apiUrl}/${userID}/photos`)
@@ -167,5 +167,5 @@ class UsersRoutes {
                 })
                 .catch(err => reject(err));
         });
-    }
+    }*/
 }

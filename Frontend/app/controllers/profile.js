@@ -112,7 +112,7 @@ class ProfileController {
         try {
             await this.usersRoutes.updateUser(this.userID, this.updatedUserData);
             console.log('User updated successfully');
-            window.location.href = "index.html";
+            window.location.href = "preview.html";
         } catch (error) {
             console.error('Failed to update user:', error.message);
         }

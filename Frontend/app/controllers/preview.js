@@ -1,8 +1,7 @@
-class IndexController {
+class PreviewController {
     constructor() {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
-        this.interactionsRoutes = new InteractionsRoutes(apiUrl);
         this.initialize();
         this.addEventListeners();
     }
@@ -21,20 +20,19 @@ class IndexController {
     async getUserInfo() {
         try {
             console.log("getUserInfo(): userID == ", this.userID);
-            this.nextUser = await this.usersRoutes.getNextUser(this.userID);
-            console.log("getUserInfo(): nextUser == ", this.nextUser[0].nickname)
-            document.getElementById('userName').textContent = this.nextUser[0].nickname;
-            document.getElementById('userBio').textContent = this.nextUser[0].bio;
-            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.nextUser[0].id + "/photos";
+            this.currentUser = await this.usersRoutes.getUser(this.userID);
+            console.log("getUserInfo(): currentUser == ", this.currentUser.nickname)
+            document.getElementById('userName').textContent = this.currentUser.nickname;
+            document.getElementById('userBio').textContent = this.currentUser.bio;
+            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.currentUser.id + "/photos";
 
             const currentDate = new Date();
-            const birthdate = new Date(this.nextUser[0].birthdate);
+            const birthdate = new Date(this.currentUser.birthdate);
             const differenceMs = currentDate - birthdate;
-            const nextUserAge = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
-            document.getElementById('userAge').textContent = nextUserAge + " ans";
+            const age = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
+            document.getElementById('userAge').textContent = age + " ans";
         } catch (error) {
             console.error("getUserInfo():", error);
-            alert("No more available users. You swiped on everyone.")
         }
     }
 
@@ -51,10 +49,10 @@ class IndexController {
             textContainer.classList.toggle("hidden");
         });
 
-        const likeButton = document.getElementById('likeIcon');
-        likeButton.addEventListener('click', () => this.addInteraction(true));
-        const skipButton = document.getElementById('skipIcon');
-        skipButton.addEventListener('click', () => this.addInteraction(false));
+        const confirmButton = document.getElementById('confirmButton');
+        confirmButton.addEventListener('click', () => window.location.href = "index.html");
+        const editButton = document.getElementById('editButton');
+        editButton.addEventListener('click', () => window.location.href = "profile.html");
     }
 
 
@@ -106,11 +104,6 @@ class IndexController {
         }
     }
 
-    addInteraction(liked){
-        this.interactionsRoutes.addInteraction(this.userID, this.nextUser[0].id, liked)
-            .then((r => this.getUserInfo(this.userID)))
-    }
-
     goToIndex(){
         console.log("goToIndex(): going to index")
         window.location.href = 'index.html';
@@ -132,7 +125,7 @@ class IndexController {
 
     goToProfile(){
         console.log("goToProfile(): going to profile")
-        window.location.href = 'preview.html';
+        window.location.href = 'profile.html';
     }
 
     goToFilters(){
@@ -153,4 +146,4 @@ class IndexController {
 }
 
 
-window.indexController = new IndexController()
+window.previewController = new PreviewController()

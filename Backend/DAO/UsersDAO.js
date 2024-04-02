@@ -98,10 +98,14 @@ module.exports = class UsersDAO extends dao {
         return new Promise((resolve, reject) =>
             this.db.query(`SELECT photo_data FROM photos WHERE user_id=$1`, [id])
                 .then(res => {
-                    resolve(res.rows[1].photo_data);
+                    console.log(res)
+                    resolve(res.rows[0].photo_data);
                 })
                 .catch(e => reject(e))
         );
     }
 
+    deletePhoto(id) {
+        return this.db.query(`DELETE FROM photos WHERE user_id=$1`, [id])
+    }
 }
