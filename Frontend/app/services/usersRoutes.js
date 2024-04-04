@@ -101,7 +101,6 @@ class UsersRoutes {
 
     async updateUser(userId, userData) {
         console.log("updateUser(): userId == " + userId + " userData == " + userData)
-        await this.updatePhotos(userId, userData.photo);
         try {
             const response = await fetch(`${this.apiUrl}/${userId}`, {
                 method: 'PATCH',
@@ -127,7 +126,12 @@ class UsersRoutes {
     }
 
     async updatePhotos(userId, photo) {
-        console.log("updateUser(): userId == " + userId + " photo == " + photo)
+        console.log("updatePhotos(): userId == " + userId + " photo == " + photo)
+
+        await fetch(`${this.apiUrl}/${userId}/photos`, {
+            method: 'DELETE',
+        });
+
         try {
             const response = await fetch(`${this.apiUrl}/${userId}/photo`, {
                 method: 'PATCH',
@@ -152,20 +156,21 @@ class UsersRoutes {
         }
     }
 
-    /*async getUserPhotos(userID) {
+    async getUserPhotos(userID) {
         return new Promise((resolve, reject) => {
             console.log("getUserPhotos(): userID == " + userID)
             fetch(`${this.apiUrl}/${userID}/photos`)
-                .then(res => {
+                .then(async res => {
                     if (res.status === 200) {
-                        resolve(res.body);
+                        const blob = await res.blob();
+                        resolve(URL.createObjectURL(blob));
                     }
                     else {
                         reject(res.status);
-                        throw new Error(`Failed to fetch user: ${res.status}`);
+                        throw new Error(`Failed to fetch photos: ${res.status}`);
                     }
                 })
                 .catch(err => reject(err));
         });
-    }*/
+    }
 }

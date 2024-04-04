@@ -103,3 +103,9 @@ button[type="submit"]:hover {
     background-color: #4CAF50;
     color: white;
 }
+
+#preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin: 10px auto 5px auto;
+}

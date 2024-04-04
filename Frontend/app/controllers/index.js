@@ -130,9 +130,20 @@ class IndexController {
         //window.location.href = 'settings.html';
     }
 
-    goToProfile(){
-        console.log("goToProfile(): going to profile")
-        window.location.href = 'preview.html';
+    goToProfile() {
+        this.usersRoutes.getUserPhotos(this.userID)
+            .then(res => {
+                if (!res) {
+                    console.log("goToProfile(): Profile not complete, can't preview");
+                    window.location.href = 'profile.html';
+                } else {
+                    window.location.href = 'preview.html';
+                }
+            })
+                .catch(e => {
+                    console.log("Error fetching user photos:", e)
+                    window.location.href = 'profile.html';
+                })
     }
 
     goToFilters(){

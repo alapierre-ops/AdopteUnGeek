@@ -90,7 +90,7 @@ module.exports = class UsersDAO extends dao {
             [id, photo])
     }
     updatePhoto(id, photo) {
-        return this.db.query("UPDATE photos (user_id, photo_data) VALUES ($1, $2)",
+        return this.db.query("UPDATE photos SET photo_data = $2 WHERE user_id = $1",
             [id, photo])
     }
 

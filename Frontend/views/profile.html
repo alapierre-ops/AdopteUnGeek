@@ -34,7 +34,8 @@
         </form>
         <form id="photoForm" class="photoForm">
             <label for="photoInput">Choisissez votre photo préférée :</label>
-            <input type="file" id="photoInput" name="photo" accept="image/jpeg" required />
+            <input type="file" id="photoInput" name="photo" accept="image/*" />
+            <img id="preview" src="#" alt="Preview" style="display: none;" />
 
             <label for="selectedTags">Tags (sélectionnez jusqu'à 5) :</label><br>
             <div id="tagContainer">
