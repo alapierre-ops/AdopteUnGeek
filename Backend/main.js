@@ -11,8 +11,9 @@ const messagesServices = require("./Services/MessagesServices")
 const photosServices = require("./Services/PhotosServices")
 
 const app = express()
-app.use(bodyParser.urlencoded({ extended: false })) // URLEncoded form data
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(bodyParser.raw({type: "image/*", limit: "10mb"}))
 app.use(cors())
 app.use(morgan('dev'));
 app.use(cookieParser())

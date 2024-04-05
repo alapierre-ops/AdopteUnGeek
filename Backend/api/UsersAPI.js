@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
-const {verify} = require("jsonwebtoken");
+const jimp = require('jimp')
+const {rows} = require("pg/lib/defaults");
 
 module.exports = (app, svc) => {
     app.get("/users", async (req, res) => {
@@ -129,5 +130,71 @@ module.exports = (app, svc) => {
         } catch (e) {
             console.log(e)
             res.status(400).end() }
+    })
+
+    app.patch("/users/:id", async (req, res) => {
+        const userId = req.params.id;
+        const userData = req.body;
+        if (!userId || !svc.isValid(userData)) {
+            return res.status(400).end();
+        }
+        const existingUser = await svc.dao.getById(userId);
+        if (!existingUser) {
+            return res.status(404).end();
+        }
+        const updatedUser = { ...existingUser, ...userData };
+        svc.dao.update(userId, updatedUser)
+            .then(_ => res.status(204).end())
+            .catch(e => {
+                console.log(e);
+                res.status(500).end();
+            });
+
+    });
+
+    app.patch("/users/:id/photo", async (req, res) => {
+        const userId = req.params.id;
+        const photo = req.body;
+
+        if (!userId) {
+            return res.status(400).end();
+        }
+        svc.dao.addPhoto(userId, photo)
+            .then(_ => res.status(204).end())
+            .catch(e => {
+                console.log(e);
+                res.status(500).end();
+            })
+    });
+
+    app.get("/users/:id/photos", async (req, res) => {
+        try {
+            const photo = await svc.dao.getPhotos(req.params.id)
+            if (photo === undefined) {
+                return res.status(404).end()
+            }
+
+            let imgJpeg = await jimp.read(photo)
+            const centerX = imgJpeg.bitmap.width / 2 - 512;
+            const centerY = imgJpeg.bitmap.height / 2 - 512;
+            imgJpeg.crop(centerX, centerY, 1024, 1024)
+
+            const photoBinary = await imgJpeg.getBufferAsync("image/jpeg")
+
+            res.setHeader('Content-Type', 'image/jpeg')
+            res.send(photoBinary)
+        } catch (e) {
+            console.log("Error sending cropped photo: " + e)
+            res.status(400).end()
+        }
+    })
+
+    app.delete("/users/:id/photos", async (req, res) => {
+        svc.dao.deletePhoto(req.params.id)
+            .then(_ => res.status(200).end())
+            .catch(e => {
+                console.log(e)
+                res.status(500).end()
+            })
     })
 }

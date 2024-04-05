@@ -54,7 +54,7 @@ class LoginController{
                 console.log("handleSignUp(): No error detected")
                 console.log("Putting the token in place")
                 sessionStorage.setItem("token", res.token)
-                window.location.href = 'index.html';
+                window.location.href = 'profile.html';
                 this.isUserLoggedIn()
             })
             .catch(err => {

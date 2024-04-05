@@ -37,10 +37,6 @@ module.exports = class UsersDAO extends dao {
             [users.nickname, users.email, users.phoneNumber, users.password, users.bio, users.birthdate, users.gender, users.links, users.tags])
     }
 
-    update(users) {
-        return this.db.query("UPDATE users SET nickname=$2,email=$3,phoneNumber=$4,password=$5,bio=$6,birthdate=$7,gender=$8,links=$9,tags=$10 WHERE id=$1",
-            [users.id, users.nickname, users.email, users.phoneNumber, users.password, users.bio, users.birthdate, users.gender, users.links, users.tags])
-    }
 
     async authenticate(email, password) {
         console.log("Authenticate: " + email + " " + password)
@@ -71,17 +67,45 @@ module.exports = class UsersDAO extends dao {
             [nickname, email, hashedPassword])
     }
 
-
     async getNext(id) {
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT * FROM users
-            WHERE id NOT IN (
-                SELECT userShown FROM interactions
-                WHERE userWhoInteracted = $1
-            )
-            AND id != $1
-            LIMIT 1`, [id])
+            this.db.query(`SELECT u.*, p.photo_data
+                           FROM users u LEFT JOIN photos p ON u.id = p.user_id
+                            WHERE u.id NOT IN (
+                            SELECT userShown FROM interactions
+                            WHERE userWhoInteracted = $1)
+                            AND u.id != $1 AND p.photo_data IS NOT NULL
+                            LIMIT 1`, [id])
                 .then(res => resolve(res.rows))
                 .catch(e => reject(e)))
+    }
+
+    update(id, userData) {
+        return this.db.query("UPDATE users SET nickname=$2, email=$3, phoneNumber=$4, password=$5, bio=$6, birthdate=$7, gender=$8, links=$9, tags=$10, interestedIn=$11 WHERE id=$1",
+            [id, userData.nickname, userData.email, userData.phoneNumber, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn])
+    }
+
+    addPhoto(id, photo) {
+        return this.db.query("INSERT INTO photos (user_id, photo_data) VALUES ($1, $2)",
+            [id, photo])
+    }
+    updatePhoto(id, photo) {
+        return this.db.query("UPDATE photos SET photo_data = $2 WHERE user_id = $1",
+            [id, photo])
+    }
+
+    getPhotos(id) {
+        return new Promise((resolve, reject) =>
+            this.db.query(`SELECT photo_data FROM photos WHERE user_id=$1`, [id])
+                .then(res => {
+                    console.log(res)
+                    resolve(res.rows[0].photo_data);
+                })
+                .catch(e => reject(e))
+        );
+    }
+
+    deletePhoto(id) {
+        return this.db.query(`DELETE FROM photos WHERE user_id=$1`, [id])
     }
 }

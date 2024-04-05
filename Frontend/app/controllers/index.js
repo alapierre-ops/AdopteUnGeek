@@ -25,6 +25,7 @@ class IndexController {
             console.log("getUserInfo(): nextUser == ", this.nextUser[0].nickname)
             document.getElementById('userName').textContent = this.nextUser[0].nickname;
             document.getElementById('userBio').textContent = this.nextUser[0].bio;
+            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.nextUser[0].id + "/photos";
 
             const currentDate = new Date();
             const birthdate = new Date(this.nextUser[0].birthdate);
@@ -42,7 +43,9 @@ class IndexController {
         this.bindHeader()
 
         const textContainer = document.getElementById('textContainer');
-        textContainer.addEventListener('click', function (){
+        textContainer.addEventListener('click', () => {
+            document.getElementById('tagContainer').classList.toggle("hidden")
+            this.showTags();
             textContainer.classList.toggle("largeTextContainer");
         });
         const imageContainer = document.getElementById('imageContainer');
@@ -105,9 +108,30 @@ class IndexController {
         }
     }
 
+    showTags(){
+        const tagContainer = document.getElementById('tagContainer');
+
+        if(document.getElementById('textContainer').className === "textContainer largeTextContainer"){
+            while (tagContainer.firstChild) {
+                tagContainer.removeChild(tagContainer.firstChild);
+            }
+        }
+        else{
+            const tags = this.nextUser.tags ? this.nextUser.tags.split(',') : [];
+            tags.forEach(tag => {
+                const tagElement = document.createElement('div');
+                tagElement.textContent = tag;
+                tagElement.classList.add('tag');
+                tagContainer
+                    .appendChild(document.createElement('div')
+                        .appendChild(tagElement));
+            });
+        }
+    }
+
     addInteraction(liked){
         this.interactionsRoutes.addInteraction(this.userID, this.nextUser[0].id, liked)
-            .then((r => this.getUserInfo(this.userID)))
+            .then(() => this.getUserInfo(this.userID))
     }
 
     goToIndex(){
@@ -129,9 +153,20 @@ class IndexController {
         //window.location.href = 'settings.html';
     }
 
-    goToProfile(){
-        console.log("goToProfile(): going to profile")
-        window.location.href = 'profile.html';
+    goToProfile() {
+        this.usersRoutes.getUserPhotos(this.userID)
+            .then(res => {
+                if (!res) {
+                    console.log("goToProfile(): Profile not complete, can't preview");
+                    window.location.href = 'profile.html';
+                } else {
+                    window.location.href = 'preview.html';
+                }
+            })
+                .catch(e => {
+                    console.log("Error fetching user photos:", e)
+                    window.location.href = 'profile.html';
+                })
     }
 
     goToFilters(){
