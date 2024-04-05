@@ -44,6 +44,7 @@ class IndexController {
 
         const textContainer = document.getElementById('textContainer');
         textContainer.addEventListener('click', () => {
+            document.getElementById('tagContainer').classList.toggle("hidden")
             this.showTags();
             textContainer.classList.toggle("largeTextContainer");
         });
@@ -130,7 +131,7 @@ class IndexController {
 
     addInteraction(liked){
         this.interactionsRoutes.addInteraction(this.userID, this.nextUser[0].id, liked)
-            .then((r => this.getUserInfo(this.userID)))
+            .then(() => this.getUserInfo(this.userID))
     }
 
     goToIndex(){

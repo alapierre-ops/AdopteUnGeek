@@ -42,13 +42,13 @@ class PreviewController {
 
         const textContainer = document.getElementById('textContainer');
         textContainer.addEventListener('click', () => {
+            document.getElementById('tagContainer').classList.toggle("hidden")
             this.showTags();
             textContainer.classList.toggle("largeTextContainer");
         });
         const imageContainer = document.getElementById('imageContainer');
         imageContainer.addEventListener('click', function () {
             textContainer.classList.toggle("hidden");
-
         });
 
         const confirmButton = document.getElementById('confirmButton');

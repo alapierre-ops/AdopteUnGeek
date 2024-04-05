@@ -94,12 +94,16 @@ body {
     padding-right: 10px;
 }
 
-#tagContainer {
+.tagContainer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     margin-left: auto;
     margin-right: auto;
     margin-top: 10px;
+}
+
+.hidden{
+    display: none;
 }
 
 .tag{
