@@ -41,18 +41,41 @@ class PreviewController {
         this.bindHeader()
 
         const textContainer = document.getElementById('textContainer');
-        textContainer.addEventListener('click', function (){
+        textContainer.addEventListener('click', () => {
+            this.showTags();
             textContainer.classList.toggle("largeTextContainer");
         });
         const imageContainer = document.getElementById('imageContainer');
-        imageContainer.addEventListener('click', function (){
+        imageContainer.addEventListener('click', function () {
             textContainer.classList.toggle("hidden");
+
         });
 
         const confirmButton = document.getElementById('confirmButton');
         confirmButton.addEventListener('click', () => window.location.href = "index.html");
         const editButton = document.getElementById('editButton');
         editButton.addEventListener('click', () => window.location.href = "profile.html");
+    }
+
+    showTags(){
+        const tagContainer = document.getElementById('tagContainer');
+
+        if(document.getElementById('textContainer').className === "textContainer largeTextContainer"){
+            while (tagContainer.firstChild) {
+                tagContainer.removeChild(tagContainer.firstChild);
+            }
+        }
+        else{
+            const tags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+            tags.forEach(tag => {
+                const tagElement = document.createElement('div');
+                tagElement.textContent = tag;
+                tagElement.classList.add('tag');
+                tagContainer
+                    .appendChild(document.createElement('div')
+                        .appendChild(tagElement));
+            });
+        }
     }
 
 
