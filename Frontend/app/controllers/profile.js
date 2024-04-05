@@ -121,13 +121,26 @@ class ProfileController {
     async handleNext(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
+
+        const birthdateString = formData.get('birthdate');
+        const [year, month, day] = birthdateString.split('-').map(Number);
+        const birthdate = new Date(year, month - 1, day);  //January is 0
+        const currentDate = new Date();
+
+        const eighteenYearsAgo = new Date(currentDate.getFullYear() - 18, currentDate.getMonth(), currentDate.getDate());
+        if (birthdate > eighteenYearsAgo) {
+            alert("L'âge minimum requis est de 18 ans.");
+            return
+        }
+
+
         this.updatedUserData = {
             gender: formData.get('gender'),
             bio: formData.get('bio'),
             interestedin: formData.get('interestedIn'),
             birthdate: formData.get('birthdate'),
         };
-        console.log("handleConfirm(): user == " + this.updatedUserData);
+        console.log("handleConfirm(): userBirthdate == " + this.updatedUserData.birthdate);
         document.getElementById('firstForm').style.display = 'none';
         document.getElementById('photoForm').style.display = 'block';
 
