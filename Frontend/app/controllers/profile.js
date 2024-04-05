@@ -98,6 +98,7 @@ class ProfileController {
 
     colorSelectedTags(){
         this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+        console.log("Selected tags: " + this.selectedTags)
         const tags = document.querySelectorAll('.tag');
         tags.forEach(tag => {
             if (this.selectedTags.includes(tag.textContent)) {
@@ -137,7 +138,7 @@ class ProfileController {
         this.updatedUserData = {
             gender: formData.get('gender'),
             bio: formData.get('bio'),
-            interestedin: formData.get('interestedIn'),
+            interestedIn: formData.get('interestedIn'),
             birthdate: formData.get('birthdate'),
         };
         console.log("handleConfirm(): userBirthdate == " + this.updatedUserData.birthdate);

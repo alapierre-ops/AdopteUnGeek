@@ -117,7 +117,8 @@ class IndexController {
             }
         }
         else{
-            const tags = this.nextUser.tags ? this.nextUser.tags.split(',') : [];
+            const tags = this.nextUser[0].tags ? this.nextUser[0].tags.split(',') : [];
+            console.log("showTags(): " + tags)
             tags.forEach(tag => {
                 const tagElement = document.createElement('div');
                 tagElement.textContent = tag;
