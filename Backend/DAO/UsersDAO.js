@@ -76,7 +76,7 @@ module.exports = class UsersDAO extends dao {
                             WHERE userWhoInteracted = $1)
                             AND u.id != $1 AND p.photo_data IS NOT NULL
                             LIMIT 1`, [id])
-                .then(res => resolve(res.rows))
+                .then(res => resolve(res.rows[0]))
                 .catch(e => reject(e)))
     }
 

@@ -68,6 +68,11 @@ body {
     width: calc(100% - 10vw);
     background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
+
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
 }
 
 .largeTextContainer {
@@ -128,4 +133,14 @@ body {
 
 .category-option:hover {
     text-decoration: underline;
+}
+
+.user-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-grid img{
+    height: 40vh;
 }

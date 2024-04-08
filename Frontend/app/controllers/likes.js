@@ -34,46 +34,62 @@ class LikesController {
 
             const userGrid = document.getElementById('userGrid');
 
-            users.forEach(user => {
-                const personDiv = document.createElement('div');
-                personDiv.classList.add('person');
+            const usersPerRow = 3;
 
-                const imageContainer = document.createElement('div');
-                imageContainer.classList.add('image-container');
+            for (let i = 0; i < users.length; i += usersPerRow) {
+                const row = document.createElement('div');
+                row.classList.add('user-row');
 
-                const img = document.createElement('img');
-                img.alt = 'main picture';
-                img.src = "http://localhost:3333/users/" + user.id + "/photos";
+                for (let j = i; j < i + usersPerRow && j < users.length; j++) {
+                    const user = users[j];
 
-                const textContainer = document.createElement('div');
-                textContainer.classList.add('textContainer');
+                    const personDiv = document.createElement('div');
+                    personDiv.classList.add('person');
 
-                const userFirstRow = document.createElement('div');
-                userFirstRow.classList.add('userFirstRow');
+                    const imageContainer = document.createElement('div');
+                    imageContainer.classList.add('image-container');
 
-                const userName = document.createElement('h4');
-                userName.textContent = user.nickname;
+                    const img = document.createElement('img');
+                    img.alt = 'main picture';
+                    img.src = "http://localhost:3333/users/" + user.id + "/photos";
 
-                const userAge = document.createElement('h4');
-                const currentDate = new Date();
-                const birthdate = new Date(user.birthdate);
-                const differenceMs = currentDate - birthdate;
-                const age = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
-                userAge.textContent = age + " ans";
+                    const textContainer = document.createElement('div');
+                    textContainer.classList.add('textContainer');
 
-                userFirstRow.appendChild(userName);
-                userFirstRow.appendChild(userAge);
+                    const userFirstRow = document.createElement('div');
+                    userFirstRow.classList.add('userFirstRow');
 
-                textContainer.appendChild(userFirstRow);
-                imageContainer.appendChild(img);
-                imageContainer.appendChild(textContainer);
-                personDiv.appendChild(imageContainer);
-                userGrid.appendChild(personDiv);
-            });
+                    const userName = document.createElement('h4');
+                    userName.textContent = user.nickname;
+
+                    const userAge = document.createElement('h4');
+                    const currentDate = new Date();
+                    const birthdate = new Date(user.birthdate);
+                    const differenceMs = currentDate - birthdate;
+                    const age = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
+                    userAge.textContent = age + " ans";
+
+                    userFirstRow.appendChild(userName);
+                    userFirstRow.appendChild(userAge);
+                    textContainer.appendChild(userFirstRow);
+                    imageContainer.appendChild(img);
+                    imageContainer.appendChild(textContainer);
+                    personDiv.appendChild(imageContainer);
+                    row.appendChild(personDiv);
+
+                    personDiv.addEventListener('click', () => {
+                        window.location.href = `index.html?${user.id}`;
+                    });
+                }
+
+                userGrid.appendChild(row);
+            }
         } catch (error) {
             console.error('Error fetching liked users:', error);
         }
     }
+
+
 
     async isUserLoggedIn() {
         const token = sessionStorage.getItem('token');
