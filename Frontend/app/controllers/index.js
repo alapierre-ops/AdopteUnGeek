@@ -130,7 +130,14 @@ class IndexController {
         }
     }
 
-    addInteraction(liked){
+    async addInteraction(liked){
+        try{
+            await this.usersRoutes.getUserPhotos(this.userID)
+        }
+        catch (e) {
+            alert("Vous devez compléter votre profil avant de continuer");
+            window.location.href = "profile.html"
+        }
         this.interactionsRoutes.addInteraction(this.userID, this.nextUser[0].id, liked)
             .then(() => this.getUserInfo(this.userID))
     }

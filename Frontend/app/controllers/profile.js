@@ -19,10 +19,13 @@ class ProfileController {
 
     addEventListeners(){
         const form = document.getElementById('form');
-        form.addEventListener('submit', this.handleNext.bind(this));
-
-        const photoForm = document.getElementById('photoForm');
-        photoForm.addEventListener('submit', this.handleConfirm.bind(this));
+        form.addEventListener('submit', function(event) {
+            if (event.target.id === 'photoForm') {
+                this.handleConfirm(event);
+            } else {
+                this.handleNext(event);
+            }
+        }.bind(this));
 
         const photoInput = document.getElementById('photoInput');
         photoInput.addEventListener('change', this.handlePhotoInputChange.bind(this));
@@ -47,6 +50,7 @@ class ProfileController {
 
 
     toggleTag(tag) {
+        this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
         if (this.selectedTags.includes(tag.textContent)) {
             this.selectedTags = this.selectedTags.filter(t => t !== tag.textContent);
             tag.classList.remove('selected');
@@ -141,7 +145,7 @@ class ProfileController {
             interestedIn: formData.get('interestedIn'),
             birthdate: formData.get('birthdate'),
         };
-        console.log("handleConfirm(): userBirthdate == " + this.updatedUserData.birthdate);
+        console.log("handleNext(): userBirthdate == " + this.updatedUserData.birthdate);
         document.getElementById('firstForm').style.display = 'none';
         document.getElementById('photoForm').style.display = 'block';
 

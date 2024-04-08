@@ -114,3 +114,18 @@ body {
     display: inline-block;
     text-align: center;
 }
+
+.category-options {
+    display: flex;
+}
+
+.category-option {
+    margin: 10px 30px 10px 30px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.category-option:hover {
+    text-decoration: underline;
+}

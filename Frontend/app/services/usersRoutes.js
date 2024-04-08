@@ -23,7 +23,7 @@ class UsersRoutes {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ nickname, email, password })
         }).then(res => {
             if (res.status === 201) {
                 console.log("signUp(): No error detected")
@@ -65,6 +65,22 @@ class UsersRoutes {
             throw new Error(`Failed to verify token: ${response.status}`);
         }
         return await response.json()
+    }
+
+    async getLikedMe(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/getLikedMe/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch users: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
     }
 
     async getNextUser(userID) {

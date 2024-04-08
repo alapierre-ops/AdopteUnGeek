@@ -80,6 +80,29 @@ module.exports = class UsersDAO extends dao {
                 .catch(e => reject(e)))
     }
 
+    async getLikedMe(id) {
+        return new Promise((resolve, reject) =>
+            this.db.query(`SELECT u.*, p.photo_data
+                       FROM users u 
+                       LEFT JOIN photos p ON u.id = p.user_id
+                       WHERE u.id IN (
+                           SELECT userWhoInteracted 
+                           FROM interactions
+                           WHERE userShown = $1
+                           AND liked = true
+                       )`, [id])
+                .then(res => {
+                    const filteredUsers = res.rows.map(row => ({
+                        id: row.id,
+                        nickname: row.nickname,
+                        birthdate: row.birthdate
+                    }));
+                    resolve(filteredUsers);
+                })
+                .catch(e => reject(e)))
+    }
+
+
     update(id, userData) {
         return this.db.query("UPDATE users SET nickname=$2, email=$3, phoneNumber=$4, password=$5, bio=$6, birthdate=$7, gender=$8, links=$9, tags=$10, interestedIn=$11 WHERE id=$1",
             [id, userData.nickname, userData.email, userData.phoneNumber, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn])
