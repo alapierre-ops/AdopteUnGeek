@@ -6,42 +6,90 @@ class LikesController {
     }
 
     async initialize(){
+        this.addEventListeners();
         try {
             this.userID = await this.isUserLoggedIn();
             if (this.userID) {
-                this.changeCategory("")
+                this.getUsers("")
             }
         } catch (error) {
             console.error("initialize(): ", error);
         }
     }
 
-    changeCategory(category){
-        if(!category || category === "likedMe"){
-            this.getLikedMe()
-        }
+    addEventListeners(){
+        this.bindFooter()
+        this.bindHeader()
+
+        const likedByMe = document.getElementById('likedByMe');
+        likedByMe.addEventListener('click', () => {
+            this.getUsers("iLiked")
+        });
+
+        const likedByOthers = document.getElementById('likedByOthers');
+        likedByOthers.addEventListener('click', () => {
+            this.getUsers("likedMe")
+        });
+
+        const matches = document.getElementById('matches');
+        matches.addEventListener('click', () => {
+            this.getUsers("matches")
+        });
     }
 
-    async getLikedMe(){
-        try {
-            const users = await this.usersRoutes.getLikedMe(this.userID);
-            console.log("getLikedMe(): ", users)
 
-            if(users.length === 0){
-                alert("Vous n'avez pas encore reçu de like")
-                this.changeCategory("iLiked")
+    bindFooter(){
+        const indexIcon = document.getElementById('indexIcon');
+        indexIcon.addEventListener('click', this.goToIndex.bind(this));
+
+        const heartIcon = document.getElementById('heartIcon');
+        heartIcon.addEventListener('click', this.goToLikes.bind(this));
+
+        const messagesIcon = document.getElementById('messagesIcon');
+        messagesIcon.addEventListener('click', this.goToMessages.bind(this));
+
+        const settingsIcon = document.getElementById('settingsIcon');
+        settingsIcon.addEventListener('click', this.goToSettings.bind(this));
+
+        console.log("bindFooter(): binding footer icons")
+    }
+
+    bindHeader(){
+        console.log("bindHeader(): binding header icons")
+
+        const profileIcon = document.getElementById('profileIcon');
+        profileIcon.addEventListener('click', this.goToProfile.bind(this));
+
+        const filterIcon = document.getElementById('filterIcon');
+        filterIcon.addEventListener('click', this.goToFilters.bind(this));
+    }
+
+    async getUsers(category){
+        try {
+            const userGrid = document.getElementById('userGrid');
+            userGrid.innerHTML = '';
+            if(!category || category === "likedMe"){
+                this.users = await this.usersRoutes.getLikedMe(this.userID);
             }
 
-            const userGrid = document.getElementById('userGrid');
+            if(category === "iLiked"){
+                this.users = await this.usersRoutes.getILiked(this.userID);
+            }
+
+            if(category === "matches"){
+                this.users = await this.usersRoutes.getMatches(this.userID);
+            }
+
+            console.log("getUsers(): ", this.users)
 
             const usersPerRow = 3;
 
-            for (let i = 0; i < users.length; i += usersPerRow) {
+            for (let i = 0; i < this.users.length; i += usersPerRow) {
                 const row = document.createElement('div');
                 row.classList.add('user-row');
 
-                for (let j = i; j < i + usersPerRow && j < users.length; j++) {
-                    const user = users[j];
+                for (let j = i; j < i + usersPerRow && j < this.users.length; j++) {
+                    const user = this.users[j];
 
                     const personDiv = document.createElement('div');
                     personDiv.classList.add('person');
@@ -85,7 +133,7 @@ class LikesController {
                 userGrid.appendChild(row);
             }
         } catch (error) {
-            console.error('Error fetching liked users:', error);
+            console.error('Error fetching users:', error);
         }
     }
 
@@ -110,6 +158,56 @@ class LikesController {
             console.log("isUserLoggedIn(): token is empty");
             window.location.href = 'login.html';
             throw new Error('Token is missing');
+        }
+    }
+
+    goToIndex(){
+        console.log("goToIndex(): going to index")
+        window.location.href = 'index.html';
+    }
+
+    goToLikes(){
+        console.log("goToLikes(): going to likes")
+        window.location.href = 'likes.html';
+    }
+    goToMessages(){
+        console.log("goToMessages(): going to messages")
+        window.location.href = 'messages.html';
+    }
+    goToSettings(){
+        console.log("goToSettings(): going to settings")
+        this.handleLogout();
+    }
+
+    goToProfile() {
+        this.usersRoutes.getUserPhotos(this.userID)
+            .then(res => {
+                if (!res) {
+                    console.log("goToProfile(): Profile not complete, can't preview");
+                    window.location.href = 'profile.html';
+                } else {
+                    window.location.href = `index.html?me`;
+                }
+            })
+            .catch(e => {
+                console.log("Error fetching user photos:", e)
+                window.location.href = 'profile.html';
+            })
+    }
+
+    goToFilters(){
+        console.log("goToFilters(): going to filters")
+        //window.location.href = 'settings.html';
+    }
+
+    async handleLogout() {
+        console.log("handleLogOut")
+        try {
+            sessionStorage.removeItem("token")
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.log('Erreur lors de la déconnexion. ', error.message);
+            alert('Erreur lors de la déconnexion, veuillez réessayer plus tard.');
         }
     }
 }

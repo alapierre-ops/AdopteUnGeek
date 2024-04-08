@@ -83,6 +83,38 @@ class UsersRoutes {
         });
     }
 
+    async getILiked(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/getILiked/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch users: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    async getMatches(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/getMatches/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch users: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
     async getNextUser(userID) {
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/nextUser/${userID}`)

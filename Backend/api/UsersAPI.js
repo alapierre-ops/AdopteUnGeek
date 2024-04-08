@@ -13,6 +13,26 @@ module.exports = (app, svc) => {
         } catch (e) { res.status(400).end() }
     })
 
+    app.get("/users/getILiked/:id", async (req, res) => {
+        try {
+            const users = await svc.dao.getILiked(req.params.id)
+            if (users === undefined) {
+                return res.status(404).end()
+            }
+            return res.json(users)
+        } catch (e) { res.status(400).end() }
+    })
+
+    app.get("/users/getMatches/:id", async (req, res) => {
+        try {
+            const users = await svc.dao.getMatches(req.params.id)
+            if (users === undefined) {
+                return res.status(404).end()
+            }
+            return res.json(users)
+        } catch (e) { res.status(400).end() }
+    })
+
     app.get("/users/:id", async (req, res) => {
         try {
             const users = await svc.dao.getById(req.params.id)
