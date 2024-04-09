@@ -19,10 +19,13 @@ class ProfileController {
 
     addEventListeners(){
         const form = document.getElementById('form');
-        form.addEventListener('submit', this.handleNext.bind(this));
-
-        const photoForm = document.getElementById('photoForm');
-        photoForm.addEventListener('submit', this.handleConfirm.bind(this));
+        form.addEventListener('submit', function(event) {
+            if (event.target.id === 'photoForm') {
+                this.handleConfirm(event);
+            } else {
+                this.handleNext(event);
+            }
+        }.bind(this));
 
         const photoInput = document.getElementById('photoInput');
         photoInput.addEventListener('change', this.handlePhotoInputChange.bind(this));
@@ -47,6 +50,7 @@ class ProfileController {
 
 
     toggleTag(tag) {
+        this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
         if (this.selectedTags.includes(tag.textContent)) {
             this.selectedTags = this.selectedTags.filter(t => t !== tag.textContent);
             tag.classList.remove('selected');
@@ -98,6 +102,7 @@ class ProfileController {
 
     colorSelectedTags(){
         this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+        console.log("Selected tags: " + this.selectedTags)
         const tags = document.querySelectorAll('.tag');
         tags.forEach(tag => {
             if (this.selectedTags.includes(tag.textContent)) {
@@ -137,10 +142,10 @@ class ProfileController {
         this.updatedUserData = {
             gender: formData.get('gender'),
             bio: formData.get('bio'),
-            interestedin: formData.get('interestedIn'),
+            interestedIn: formData.get('interestedIn'),
             birthdate: formData.get('birthdate'),
         };
-        console.log("handleConfirm(): userBirthdate == " + this.updatedUserData.birthdate);
+        console.log("handleNext(): userBirthdate == " + this.updatedUserData.birthdate);
         document.getElementById('firstForm').style.display = 'none';
         document.getElementById('photoForm').style.display = 'block';
 
@@ -160,7 +165,7 @@ class ProfileController {
         try {
             await this.usersRoutes.updateUser(this.userID, this.updatedUserData);
             console.log('User updated successfully');
-            window.location.href = "preview.html";
+            window.location.href = "index.html?me";
         } catch (error) {
             console.error('Failed to update user: ', error.message);
         }

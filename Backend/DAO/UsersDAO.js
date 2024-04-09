@@ -76,9 +76,83 @@ module.exports = class UsersDAO extends dao {
                             WHERE userWhoInteracted = $1)
                             AND u.id != $1 AND p.photo_data IS NOT NULL
                             LIMIT 1`, [id])
-                .then(res => resolve(res.rows))
+                .then(res => resolve(res.rows[0]))
                 .catch(e => reject(e)))
     }
+
+    async getLikedMe(id) {
+        return new Promise((resolve, reject) =>
+            this.db.query(`SELECT u.*, p.photo_data
+                       FROM users u 
+                       LEFT JOIN photos p ON u.id = p.user_id
+                       WHERE u.id IN (
+                           SELECT userWhoInteracted 
+                           FROM interactions
+                           WHERE userShown = $1
+                           AND liked = true
+                       )`, [id])
+                .then(res => {
+                    const filteredUsers = res.rows.map(row => ({
+                        id: row.id,
+                        nickname: row.nickname,
+                        birthdate: row.birthdate
+                    }));
+                    resolve(filteredUsers);
+                })
+                .catch(e => reject(e)))
+    }
+
+    async getILiked(id) {
+        return new Promise((resolve, reject) =>
+            this.db.query(`SELECT u.*, p.photo_data
+                       FROM users u 
+                       LEFT JOIN photos p ON u.id = p.user_id
+                       WHERE u.id IN (
+                           SELECT userShown 
+                           FROM interactions
+                           WHERE userWhoInteracted = $1
+                           AND liked = true
+                       )`, [id])
+                .then(res => {
+                    const filteredUsers = res.rows.map(row => ({
+                        id: row.id,
+                        nickname: row.nickname,
+                        birthdate: row.birthdate
+                    }));
+                    resolve(filteredUsers);
+                })
+                .catch(e => reject(e)))
+    }
+
+    async getMatches(id) {
+        return new Promise((resolve, reject) =>
+            this.db.query(`SELECT u.*, p.photo_data
+                   FROM users u 
+                   LEFT JOIN photos p ON u.id = p.user_id
+                   WHERE u.id IN (
+                       SELECT userShown 
+                       FROM interactions
+                       WHERE userWhoInteracted = $1
+                       AND liked = true
+                   )
+                   AND u.id IN (
+                       SELECT userWhoInteracted 
+                       FROM interactions
+                       WHERE userShown = $1
+                       AND liked = true
+                   )`, [id])
+                .then(res => {
+                    const matchedUsers = res.rows.map(row => ({
+                        id: row.id,
+                        nickname: row.nickname,
+                        birthdate: row.birthdate
+                    }));
+                    resolve(matchedUsers);
+                })
+                .catch(e => reject(e)))
+    }
+
+
 
     update(id, userData) {
         return this.db.query("UPDATE users SET nickname=$2, email=$3, phoneNumber=$4, password=$5, bio=$6, birthdate=$7, gender=$8, links=$9, tags=$10, interestedIn=$11 WHERE id=$1",

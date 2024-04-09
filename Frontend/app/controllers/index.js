@@ -11,24 +11,81 @@ class IndexController {
         try {
             this.userID = await this.isUserLoggedIn();
             if (this.userID) {
-                await this.getUserInfo();
+                const url = window.location.href;
+                const regex = /\?(\d+|me)/; // Update regex to match user ID or "me"
+                const match = regex.exec(url);
+                const userID = match ? match[1] : null;
+                if(userID === 'me') {
+                    const skipIcon = document.getElementById('skipIcon');
+                    const likeIcon = document.getElementById('likeIcon');
+
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Modifier';
+                    editButton.classList.add('editButton');
+
+                    const continueButton = document.createElement('button');
+                    continueButton.textContent = 'Continuer';
+                    continueButton.classList.add('msgButton');
+
+                    skipIcon.parentNode.replaceChild(editButton, skipIcon);
+                    likeIcon.parentNode.replaceChild(continueButton, likeIcon);
+
+                    editButton.addEventListener('click', () => window.location.href = "profile.html");
+                    continueButton.addEventListener('click', () => window.location.href = "index.html");
+
+                    console.log('User is viewing their own profile');
+                    this.getUserInfo(this.userID);
+
+                } else if(userID) {
+                    const skipIcon = document.getElementById('skipIcon');
+                    const likeIcon = document.getElementById('likeIcon');
+
+                    const backButton = document.createElement('button');
+                    backButton.textContent = 'Retour';
+                    backButton.classList.add('backButton');
+
+                    const msgButton = document.createElement('button');
+                    msgButton.textContent = 'Discuter';
+                    msgButton.classList.add('msgButton');
+
+                    skipIcon.parentNode.replaceChild(backButton, skipIcon);
+                    likeIcon.parentNode.replaceChild(msgButton, likeIcon);
+
+                    backButton.addEventListener('click', () => window.location.href = `likes.html`);
+                    msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
+
+                    this.getUserInfo(userID);
+                    console.log('User ID:', userID);
+
+                } else {
+                    this.getUserInfo();
+                }
             }
         } catch (error) {
             console.error("initialize(): ", error);
         }
     }
 
-    async getUserInfo() {
+
+    async getUserInfo(userID) {
         try {
-            console.log("getUserInfo(): userID == ", this.userID);
-            this.nextUser = await this.usersRoutes.getNextUser(this.userID);
-            console.log("getUserInfo(): nextUser == ", this.nextUser[0].nickname)
-            document.getElementById('userName').textContent = this.nextUser[0].nickname;
-            document.getElementById('userBio').textContent = this.nextUser[0].bio;
-            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.nextUser[0].id + "/photos";
+            if(!userID){
+                console.log("getUserInfo(): userID == ", this.userID);
+                this.nextUser = await this.usersRoutes.getNextUser(this.userID);
+                if(!this.nextUser.nickname){
+                    alert("No more available users. You swiped on everyone.")
+                }
+            }
+            else{
+                this.nextUser = await this.usersRoutes.getUser(userID)
+            }
+            console.log("getUserInfo(): nextUser == ", this.nextUser.nickname)
+            document.getElementById('userName').textContent = this.nextUser.nickname;
+            document.getElementById('userBio').textContent = this.nextUser.bio;
+            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.nextUser.id + "/photos";
 
             const currentDate = new Date();
-            const birthdate = new Date(this.nextUser[0].birthdate);
+            const birthdate = new Date(this.nextUser.birthdate);
             const differenceMs = currentDate - birthdate;
             const nextUserAge = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
             document.getElementById('userAge').textContent = nextUserAge + " ans";
@@ -118,6 +175,7 @@ class IndexController {
         }
         else{
             const tags = this.nextUser.tags ? this.nextUser.tags.split(',') : [];
+            console.log("showTags(): " + tags)
             tags.forEach(tag => {
                 const tagElement = document.createElement('div');
                 tagElement.textContent = tag;
@@ -129,8 +187,15 @@ class IndexController {
         }
     }
 
-    addInteraction(liked){
-        this.interactionsRoutes.addInteraction(this.userID, this.nextUser[0].id, liked)
+    async addInteraction(liked){
+        try{
+            await this.usersRoutes.getUserPhotos(this.userID)
+        }
+        catch (e) {
+            alert("Vous devez compléter votre profil avant de continuer");
+            window.location.href = "profile.html"
+        }
+        this.interactionsRoutes.addInteraction(this.userID, this.nextUser.id, liked)
             .then(() => this.getUserInfo(this.userID))
     }
 
@@ -150,7 +215,6 @@ class IndexController {
     goToSettings(){
         console.log("goToSettings(): going to settings")
         this.handleLogout();
-        //window.location.href = 'settings.html';
     }
 
     goToProfile() {
@@ -160,7 +224,7 @@ class IndexController {
                     console.log("goToProfile(): Profile not complete, can't preview");
                     window.location.href = 'profile.html';
                 } else {
-                    window.location.href = 'preview.html';
+                    window.location.href = `index.html?me`;
                 }
             })
                 .catch(e => {

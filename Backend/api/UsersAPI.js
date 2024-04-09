@@ -3,8 +3,34 @@ const jimp = require('jimp')
 const {rows} = require("pg/lib/defaults");
 
 module.exports = (app, svc) => {
-    app.get("/users", async (req, res) => {
-        res.json(await svc.dao.getAll())
+    app.get("/users/getLikedMe/:id", async (req, res) => {
+        try {
+            const users = await svc.dao.getLikedMe(req.params.id)
+            if (users === undefined) {
+                return res.status(404).end()
+            }
+            return res.json(users)
+        } catch (e) { res.status(400).end() }
+    })
+
+    app.get("/users/getILiked/:id", async (req, res) => {
+        try {
+            const users = await svc.dao.getILiked(req.params.id)
+            if (users === undefined) {
+                return res.status(404).end()
+            }
+            return res.json(users)
+        } catch (e) { res.status(400).end() }
+    })
+
+    app.get("/users/getMatches/:id", async (req, res) => {
+        try {
+            const users = await svc.dao.getMatches(req.params.id)
+            if (users === undefined) {
+                return res.status(404).end()
+            }
+            return res.json(users)
+        } catch (e) { res.status(400).end() }
     })
 
     app.get("/users/:id", async (req, res) => {
