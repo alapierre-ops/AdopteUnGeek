@@ -68,6 +68,7 @@ class LikesController {
         try {
             const userGrid = document.getElementById('userGrid');
             userGrid.innerHTML = '';
+
             if(!category || category === "likedMe"){
                 this.users = await this.usersRoutes.getLikedMe(this.userID);
             }

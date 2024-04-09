@@ -2,6 +2,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
+    justify-content: space-between;
 }
 
 .header {
@@ -122,10 +124,11 @@ body {
 
 .category-options {
     display: flex;
+    margin-top: 10px;
 }
 
 .category-option {
-    margin: 10px 30px 10px 30px;
+    margin: 10px 30px;
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -143,4 +146,34 @@ body {
 
 .user-grid img{
     height: 40vh;
+}
+
+.user-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.loading-spinner {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.image-container.loading img {
+    visibility: hidden;
 }
