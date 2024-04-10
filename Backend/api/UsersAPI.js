@@ -142,7 +142,8 @@ module.exports = (app, svc) => {
     app.get("/users/nextUser/:id", async (req, res) => {
         try {
             console.log("nextUser/:id : id == " +req.params.id)
-            const user = await svc.dao.getNext(req.params.id)
+            const currentUser = await svc.dao.getById(req.params.id)
+            const user = await svc.dao.getNext(currentUser)
             console.log("nextUser/:id == ", user)
             if (!user) {
                 console.log("nextUser/:id : user is empty")

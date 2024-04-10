@@ -67,17 +67,28 @@ module.exports = class UsersDAO extends dao {
             [nickname, email, hashedPassword])
     }
 
-    async getNext(id) {
+    async getNext(user) {
+        let interestedInClause = '';
+        if (user.interestedin === 'male' || user.interestedin === 'female') {
+            interestedInClause = `AND u.gender = '${user.interestedin}'`;
+        }
         return new Promise((resolve, reject) =>
             this.db.query(`SELECT u.*, p.photo_data
-                           FROM users u LEFT JOIN photos p ON u.id = p.user_id
-                            WHERE u.id NOT IN (
-                            SELECT userShown FROM interactions
-                            WHERE userWhoInteracted = $1)
-                            AND u.id != $1 AND p.photo_data IS NOT NULL
-                            LIMIT 1`, [id])
+                       FROM users u
+                       LEFT JOIN photos p ON u.id = p.user_id
+                       WHERE u.id NOT IN (
+                           SELECT userShown FROM interactions
+                           WHERE userWhoInteracted = $1
+                       )
+                       AND u.id != $1
+                       AND p.photo_data IS NOT NULL
+                       AND DATE_PART('year', AGE(u.birthdate)) >= $2
+                       AND DATE_PART('year', AGE(u.birthdate)) <= $3
+                       ${interestedInClause}
+                       LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax])
                 .then(res => resolve(res.rows[0]))
-                .catch(e => reject(e)))
+                .catch(e => reject(e))
+        );
     }
 
     async getLikedMe(id) {
