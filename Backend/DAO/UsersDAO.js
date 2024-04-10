@@ -67,17 +67,28 @@ module.exports = class UsersDAO extends dao {
             [nickname, email, hashedPassword])
     }
 
-    async getNext(id) {
+    async getNext(user) {
+        let interestedInClause = '';
+        if (user.interestedin === 'male' || user.interestedin === 'female') {
+            interestedInClause = `AND u.gender = '${user.interestedin}'`;
+        }
         return new Promise((resolve, reject) =>
             this.db.query(`SELECT u.*, p.photo_data
-                           FROM users u LEFT JOIN photos p ON u.id = p.user_id
-                            WHERE u.id NOT IN (
-                            SELECT userShown FROM interactions
-                            WHERE userWhoInteracted = $1)
-                            AND u.id != $1 AND p.photo_data IS NOT NULL
-                            LIMIT 1`, [id])
+                       FROM users u
+                       LEFT JOIN photos p ON u.id = p.user_id
+                       WHERE u.id NOT IN (
+                           SELECT userShown FROM interactions
+                           WHERE userWhoInteracted = $1
+                       )
+                       AND u.id != $1
+                       AND p.photo_data IS NOT NULL
+                       AND DATE_PART('year', AGE(u.birthdate)) >= $2
+                       AND DATE_PART('year', AGE(u.birthdate)) <= $3
+                       ${interestedInClause}
+                       LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax])
                 .then(res => resolve(res.rows[0]))
-                .catch(e => reject(e)))
+                .catch(e => reject(e))
+        );
     }
 
     async getLikedMe(id) {
@@ -155,8 +166,8 @@ module.exports = class UsersDAO extends dao {
 
 
     update(id, userData) {
-        return this.db.query("UPDATE users SET nickname=$2, email=$3, phoneNumber=$4, password=$5, bio=$6, birthdate=$7, gender=$8, links=$9, tags=$10, interestedIn=$11 WHERE id=$1",
-            [id, userData.nickname, userData.email, userData.phoneNumber, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn])
+        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, links=$8, tags=$9, interestedIn=$10, filter_agemin=$11, filter_agemax=$12, filter_dismax=$13 WHERE id=$1",
+            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn, userData.ageMin, userData.ageMax, userData.distance])
     }
 
     addPhoto(id, photo) {
