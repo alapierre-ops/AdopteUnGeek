@@ -5,6 +5,7 @@ class IndexController {
         this.interactionsRoutes = new InteractionsRoutes(apiUrl);
         this.initialize();
         this.addEventListeners();
+        this.setupSliders();
     }
 
     async initialize() {
@@ -99,36 +100,39 @@ class IndexController {
         this.bindFooter()
         this.bindHeader()
 
-        const textContainer = document.getElementById('textContainer');
-        textContainer.addEventListener('click', () => {
-            document.getElementById('tagContainer').classList.toggle("hidden")
-            this.showTags();
-            textContainer.classList.toggle("largeTextContainer");
-        });
-        const imageContainer = document.getElementById('imageContainer');
-        imageContainer.addEventListener('click', function (){
-            textContainer.classList.toggle("hidden");
+        document.getElementById('textContainer')
+            .addEventListener('click', () => {
+                document.getElementById('tagContainer')
+                    .classList.toggle("hidden")
+                this.showTags();
+                document.getElementById('textContainer')
+                    .classList.toggle("largeTextContainer");
         });
 
-        const likeButton = document.getElementById('likeIcon');
-        likeButton.addEventListener('click', () => this.addInteraction(true));
-        const skipButton = document.getElementById('skipIcon');
-        skipButton.addEventListener('click', () => this.addInteraction(false));
+        document.getElementById('imageContainer').addEventListener('click', function (){
+            document.getElementById('textContainer')
+                .classList.toggle("hidden");
+        });
+
+        document.getElementById('likeIcon')
+            .addEventListener('click', () => this.addInteraction(true));
+        document.getElementById('skipIcon')
+            .addEventListener('click', () => this.addInteraction(false));
     }
 
 
     bindFooter(){
-        const indexIcon = document.getElementById('indexIcon');
-        indexIcon.addEventListener('click', this.goToIndex.bind(this));
+        document.getElementById('indexIcon')
+            .addEventListener('click', this.goToIndex.bind(this));
 
-        const heartIcon = document.getElementById('heartIcon');
-        heartIcon.addEventListener('click', this.goToLikes.bind(this));
+        document.getElementById('heartIcon')
+            .addEventListener('click', this.goToLikes.bind(this));
 
-        const messagesIcon = document.getElementById('messagesIcon');
-        messagesIcon.addEventListener('click', this.goToMessages.bind(this));
+        document.getElementById('messagesIcon')
+            .addEventListener('click', this.goToMessages.bind(this));
 
-        const settingsIcon = document.getElementById('settingsIcon');
-        settingsIcon.addEventListener('click', this.goToSettings.bind(this));
+        document.getElementById('settingsIcon')
+            .addEventListener('click', this.goToSettings.bind(this));
 
         console.log("bindFooter(): binding footer icons")
     }
@@ -136,11 +140,46 @@ class IndexController {
     bindHeader(){
         console.log("bindHeader(): binding header icons")
 
-        const profileIcon = document.getElementById('profileIcon');
-        profileIcon.addEventListener('click', this.goToProfile.bind(this));
+        document.getElementById('profileIcon')
+            .addEventListener('click', this.goToProfile.bind(this));
 
-        const filterIcon = document.getElementById('filterIcon');
-        filterIcon.addEventListener('click', this.goToFilters.bind(this));
+        document.getElementById('filterIcon')
+            .addEventListener('click', function() {
+            document.getElementById('filterModal').style.display = "block";
+        });
+
+        document.getElementById('closeBtn').onclick = function() {
+            document.getElementById('filterModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('filterModal')) {
+                document.getElementById('filterModal').style.display = 'none';
+            }
+        }
+
+        document.getElementById('distanceSlider').oninput = function() {
+            if(this.value > 149){
+                document.getElementById('distanceValue').textContent = "Pas de limite"
+            }
+            else{
+                document.getElementById('distanceValue').textContent = this.value + " km";
+            }
+        };
+
+        document.getElementById('submitFilters')
+            .addEventListener('click', this.changeFilters.bind(this))
+    }
+
+    changeFilters(){
+        this.filters = {
+            distance: document.getElementById('distanceSlider').value,
+            ageMax: document.getElementById('toInput').value,
+            ageMin: document.getElementById('fromInput').value,
+        }
+        console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance)
+        this.usersRoutes.updateUser(this.userID, this.filters)
+            .then(r => this.getUserInfo())
     }
 
     async isUserLoggedIn() {
@@ -199,6 +238,106 @@ class IndexController {
             .then(() => this.getUserInfo(this.userID))
     }
 
+    setupSliders() {
+        const fromSlider = document.querySelector('#fromSlider');
+        const toSlider = document.querySelector('#toSlider');
+        const fromInput = document.querySelector('#fromInput');
+        const toInput = document.querySelector('#toInput');
+
+        // Function to control slider from input
+        const controlFromInput = (fromSlider, fromInput, toInput, controlSlider) => {
+            const [from, to] = getParsed(fromInput, toInput);
+            fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', controlSlider);
+            if (from > to) {
+                fromSlider.value = to;
+                fromInput.value = to;
+            } else {
+                fromSlider.value = from;
+            }
+        };
+
+        // Function to control slider to input
+        const controlToInput = (toSlider, fromInput, toInput, controlSlider) => {
+            const [from, to] = getParsed(fromInput, toInput);
+            fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', controlSlider);
+            setToggleAccessible(toInput);
+            if (from <= to) {
+                toSlider.value = to;
+                toInput.value = to;
+            } else {
+                toInput.value = from;
+            }
+        };
+
+        // Function to control slider from slider
+        const controlFromSlider = (fromSlider, toSlider, fromInput) => {
+            const [from, to] = getParsed(fromSlider, toSlider);
+            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+            if (from > to) {
+                fromSlider.value = to;
+                fromInput.value = to;
+            } else {
+                fromInput.value = from;
+            }
+        };
+
+        // Function to control slider to slider
+        const controlToSlider = (fromSlider, toSlider, toInput) => {
+            const [from, to] = getParsed(fromSlider, toSlider);
+            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+            setToggleAccessible(toSlider);
+            if (from <= to) {
+                toSlider.value = to;
+                toInput.value = to;
+            } else {
+                toInput.value = from;
+                toSlider.value = from;
+            }
+        };
+
+        // Function to get parsed values
+        const getParsed = (currentFrom, currentTo) => {
+            const from = parseInt(currentFrom.value, 10);
+            const to = parseInt(currentTo.value, 10);
+            return [from, to];
+        };
+
+        // Function to fill the slider
+        const fillSlider = (from, to, sliderColor, rangeColor, controlSlider) => {
+            const rangeDistance = to.max - to.min;
+            const fromPosition = from.value - to.min;
+            const toPosition = to.value - to.min;
+            controlSlider.style.background = `linear-gradient(
+              to right,
+              ${sliderColor} 0%,
+              ${sliderColor} ${(fromPosition / rangeDistance) * 100}%,
+              ${rangeColor} ${((fromPosition / rangeDistance)) * 100}%,
+              ${rangeColor} ${(toPosition / rangeDistance) * 100}%, 
+              ${sliderColor} ${(toPosition / rangeDistance) * 100}%, 
+              ${sliderColor} 100%)`;
+        };
+
+        // Function to set toggle accessible
+        const setToggleAccessible = (currentTarget) => {
+            const toSlider = document.querySelector('#toSlider');
+            if (Number(currentTarget.value) <= 0) {
+                toSlider.style.zIndex = 2;
+            } else {
+                toSlider.style.zIndex = 0;
+            }
+        };
+
+        // Bind event listeners
+        fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
+        toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
+        fromInput.oninput = () => controlFromInput(fromSlider, fromInput, toInput, toSlider);
+        toInput.oninput = () => controlToInput(toSlider, fromInput, toInput, toSlider);
+
+        // Initial setup
+        fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+        setToggleAccessible(toSlider);
+    }
+
     goToIndex(){
         console.log("goToIndex(): going to index")
         window.location.href = 'index.html';
@@ -231,11 +370,6 @@ class IndexController {
                     console.log("Error fetching user photos:", e)
                     window.location.href = 'profile.html';
                 })
-    }
-
-    goToFilters(){
-        console.log("goToFilters(): going to filters")
-        //window.location.href = 'settings.html';
     }
 
     async handleLogout() {

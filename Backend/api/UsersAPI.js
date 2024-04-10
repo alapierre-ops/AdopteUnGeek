@@ -175,7 +175,6 @@ module.exports = (app, svc) => {
                 console.log(e);
                 res.status(500).end();
             });
-
     });
 
     app.patch("/users/:id/photo", async (req, res) => {
