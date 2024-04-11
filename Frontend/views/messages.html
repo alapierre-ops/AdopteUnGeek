@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Adopte un Geek</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/messages.css"/>
+</head>
+
+<body>
+
+    <div class="header">
+        <i class="fas fa-user" id="profileIcon"></i>
+        <h5>Adopte un Geek</h5>
+        <i class="fas fa-filter" id="filterIcon"></i>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <ul id="matchesList" class="matches-list">
+
+            </ul>
+        </div>
+        <div class="message-container">
+            <div class="user-info">
+                <img src="" alt="User Avatar" class="avatar" id="userPhoto">
+                <h2 class="username" id="nickname">Username</h2>
+            </div>
+            <div class="messages" id="messageContainer">
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-compass" id="indexIcon"></i>
+        <i class="fas fa-heart" id="heartIcon"></i>
+        <i class="fas fa-comments" id="messagesIcon"></i>
+        <i class="fas fa-cog" id="settingsIcon"></i>
+    </div>
+
+    <script src="base64js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="application/ecmascript" src="../app/tools.js"></script>
+    <script type="application/ecmascript" src="../app/services/usersRoutes.js"></script>
+    <script type="application/ecmascript" src="../app/services/interactionsRoutes.js"></script>
+    <script type="application/ecmascript" src="../app/controllers/messages.js"></script>
+</body>
+</html>

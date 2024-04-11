@@ -1,0 +1,188 @@
+class MessagesController {
+    constructor() {
+        const apiUrl = 'http://localhost:3333';
+        this.usersRoutes = new UsersRoutes(apiUrl);
+        this.initialize();
+        this.addEventListeners();
+    }
+
+    async initialize() {
+        this.userID = await this.isUserLoggedIn()
+        this.currentUser = await this.usersRoutes.getUser(this.userID)
+        await this.fetchMatches()
+
+        const url = window.location.href;
+        const regex = /\?(\d+)/;
+        const match = regex.exec(url);
+        const userID = match ? match[1] : null;
+        if(userID){
+            this.loadMessages(userID)
+        }
+    }
+
+    async fetchMatches() {
+        try {
+            const matches = await this.usersRoutes.getMatches(this.userID);
+
+            const matchesList = document.getElementById('matchesList');
+
+            matchesList.innerHTML = '';
+
+            matches.forEach(match => {
+                const listItem = document.createElement('li');
+                listItem.textContent = match.nickname;
+                listItem.dataset.userId = match.id;
+                listItem.dataset.nickname = match.nickname;
+                listItem.classList.add('match-item');
+                matchesList.appendChild(listItem);
+            });
+
+            const matchItems = document.querySelectorAll('.match-item');
+            matchItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    this.loadMessages(item.dataset.userId, item.dataset.nickname);
+                });
+            });
+        } catch (error) {
+            console.error('Error fetching matches: ', error);
+        }
+    }
+
+    async loadMessages(userId, nickname) {
+        console.log('Loading messages for user: ', userId);
+        if(!nickname){
+            const user = await this.usersRoutes.getUser(userId)
+            nickname = user.nickname
+        }
+        document.getElementById("nickname").textContent = nickname;
+        document.getElementById('userPhoto').src = await this.usersRoutes.getUserPhotos(userId)
+
+        const messages = await this.usersRoutes.getMessages(this.userID, userId);
+
+        const messageContainer = document.getElementById('messageContainer');
+
+        messageContainer.innerHTML = '';
+
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+
+            const senderElement = document.createElement('div');
+            if(message.sender_id === this.userID){
+                senderElement.textContent = nickname + ': ';
+            }
+            if(message.sender_id === userId){
+                senderElement.textContent = this.currentUser.nickname + ': ';
+            }
+
+            senderElement.classList.add('message-sender');
+            messageElement.appendChild(senderElement);
+
+            const contentElement = document.createElement('div');
+            contentElement.textContent = message.content;
+            contentElement.classList.add('message-content');
+            messageElement.appendChild(contentElement);
+
+            messageContainer.appendChild(messageElement);
+        });
+    }
+
+    addEventListeners(){
+        this.bindFooter()
+        this.bindHeader()
+    }
+
+
+    bindFooter(){
+        document.getElementById('indexIcon')
+            .addEventListener('click', this.goToIndex.bind(this));
+
+        document.getElementById('heartIcon')
+            .addEventListener('click', this.goToLikes.bind(this));
+
+        document.getElementById('messagesIcon')
+            .addEventListener('click', this.goToMessages.bind(this));
+
+        document.getElementById('settingsIcon')
+            .addEventListener('click', this.goToSettings.bind(this));
+
+        console.log("bindFooter(): binding footer icons")
+    }
+
+    bindHeader(){
+        console.log("bindHeader(): binding header icons")
+
+        document.getElementById('profileIcon')
+            .addEventListener('click', this.goToProfile.bind(this));
+    }
+
+    async isUserLoggedIn() {
+        const token = sessionStorage.getItem('token');
+        console.log("isUserLoggedIn(): Token:", token);
+        if (token) {
+            try {
+                const { userId } = await this.usersRoutes.verifyToken(token);
+                console.log("isUserLoggedIn(): token is valid, user ID:", userId);
+                return userId;
+            } catch (error) {
+                console.log("isUserLoggedIn():", error);
+                console.log('isUserLoggedIn(): Token expired or invalid. User is not logged in.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+                throw new Error('Token expired or invalid');
+            }
+        } else {
+            console.log("isUserLoggedIn(): token is empty");
+            window.location.href = 'login.html';
+            throw new Error('Token is missing');
+        }
+    }
+
+    goToIndex(){
+        console.log("goToIndex(): going to index")
+        window.location.href = 'index.html';
+    }
+
+    goToLikes(){
+        console.log("goToLikes(): going to likes")
+        window.location.href = 'likes.html';
+    }
+    goToMessages(){
+        console.log("goToMessages(): going to messages")
+        window.location.href = 'messages.html';
+    }
+    goToSettings(){
+        console.log("goToSettings(): going to settings")
+        this.handleLogout();
+    }
+
+    goToProfile() {
+        this.usersRoutes.getUserPhotos(this.userID)
+            .then(res => {
+                if (!res) {
+                    console.log("goToProfile(): Profile not complete, can't preview");
+                    window.location.href = 'profile.html';
+                } else {
+                    window.location.href = `index.html?me`;
+                }
+            })
+                .catch(e => {
+                    console.log("Error fetching user photos:", e)
+                    window.location.href = 'profile.html';
+                })
+    }
+
+    async handleLogout() {
+        console.log("handleLogOut")
+        try {
+            sessionStorage.removeItem("token")
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.log('Erreur lors de la déconnexion. ', error.message);
+            alert('Erreur lors de la déconnexion, veuillez réessayer plus tard.');
+        }
+    }
+}
+
+
+window.messagesController = new MessagesController()

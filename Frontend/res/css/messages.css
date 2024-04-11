@@ -1,0 +1,105 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 80vw;
+}
+
+.header i {
+    margin: 0 5px;
+    font-size: 24px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 80vw;
+}
+
+.footer i {
+    margin: 0 5px;
+    font-size: 24px;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    flex: 1;
+    background-color: #adadad;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message-container {
+    flex: 4;
+    padding: 20px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.username {
+    margin: 0;
+}
+
+.messages {
+    height: 70vh;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.message-sender {
+    font-weight: bold;
+}
+
+.message-content {
+    margin-top: 5px;
+}
+
+.message-sender {
+    font-weight: bold;
+}
+
+.message-content {
+    margin-top: 5px;
+}
+
+.message.sent-by-current-user {
+    background-color: #729ff6;
+}
+
+.message.sent-by-other-user {
+    background-color: #ff5e5e;
+}
