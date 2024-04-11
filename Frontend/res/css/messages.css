@@ -6,6 +6,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    justify-content: space-between;
 }
 
 .header {
@@ -39,7 +40,8 @@ body {
 
 .container {
     display: flex;
-    height: 100vh;
+    height: 80vh;
+    margin-bottom: 0;
 }
 
 .sidebar {
@@ -52,13 +54,13 @@ body {
 
 .message-container {
     flex: 4;
-    padding: 20px;
+    margin-left: 10px;
 }
 
 .user-info {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .avatar {
@@ -72,24 +74,17 @@ body {
     margin: 0;
 }
 
-.messages {
-    height: 70vh;
-    overflow-y: auto;
-    border: 1px solid #ccc;
+.message {
+    max-width: 70vw;
+    margin-bottom: 10px;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 10px;
+    word-wrap: break-word;
 }
 
 .message-sender {
     font-weight: bold;
-}
-
-.message-content {
-    margin-top: 5px;
-}
-
-.message-sender {
-    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .message-content {
@@ -97,9 +92,51 @@ body {
 }
 
 .message.sent-by-current-user {
-    background-color: #729ff6;
+    display: flex;
+    flex-direction: column;
+    background-color: #000000;
+    color: white;
+    width: fit-content;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: 24px;
 }
 
 .message.sent-by-other-user {
+    display: flex;
+    flex-direction: column;
     background-color: #ff5e5e;
+    color: white;
+    width: fit-content;
+    max-width: 80%;
+}
+
+.send-button {
+    margin-right: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.send-button i {
+    font-size: 24px;
+    color: #555;
+}
+
+.send-button:hover i {
+    color: #333;
+}
+
+.messages{
+    overflow-y: scroll;
+    height: 80%;
+}
+
+.message-input{
+    display: flex;
+    align-items: center;
+}
+
+.message-input-text{
+    margin-right: 10px;
 }

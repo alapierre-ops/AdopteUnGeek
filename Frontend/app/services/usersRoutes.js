@@ -239,13 +239,17 @@ class UsersRoutes {
     }
 
     async sendMessage(senderID, receiverID, content) {
+        console.log("content = " , content)
+        console.log("senderID = " , senderID)
+        console.log("receiverID = " , receiverID)
+
         try {
             const response = await fetch(`${this.apiUrl}/messages/${senderID}/${receiverID}`, {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'image/jpeg'
+                    'Content-Type': 'application/json'
                 },
-                body: {content: content}
+                body: JSON.stringify({ content: content })
             });
             if (!response.ok) {
                 return { error: response.statusText };

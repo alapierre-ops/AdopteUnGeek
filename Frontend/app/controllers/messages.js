@@ -14,9 +14,9 @@ class MessagesController {
         const url = window.location.href;
         const regex = /\?(\d+)/;
         const match = regex.exec(url);
-        const userID = match ? match[1] : null;
-        if(userID){
-            this.loadMessages(userID)
+        this.otherUserID = match ? match[1] : null;
+        if(this.otherUserID){
+            this.loadMessages(this.otherUserID)
         }
     }
 
@@ -49,15 +49,18 @@ class MessagesController {
     }
 
     async loadMessages(userId, nickname) {
-        console.log('Loading messages for user: ', userId);
+        if(userId){
+            this.otherUserID = userId
+        }
+        console.log('Loading messages for user: ', this.otherUserID);
         if(!nickname){
-            const user = await this.usersRoutes.getUser(userId)
+            const user = await this.usersRoutes.getUser(this.otherUserID)
             nickname = user.nickname
         }
         document.getElementById("nickname").textContent = nickname;
-        document.getElementById('userPhoto').src = await this.usersRoutes.getUserPhotos(userId)
+        document.getElementById('userPhoto').src = await this.usersRoutes.getUserPhotos(this.otherUserID)
 
-        const messages = await this.usersRoutes.getMessages(this.userID, userId);
+        const messages = await this.usersRoutes.getMessages(this.userID, this.otherUserID);
 
         const messageContainer = document.getElementById('messageContainer');
 
@@ -68,11 +71,12 @@ class MessagesController {
             messageElement.classList.add('message');
 
             const senderElement = document.createElement('div');
-            if(message.sender_id === this.userID){
+            if (message.sender_id === this.userID) {
+                senderElement.textContent = 'Vous: ';
+                messageElement.classList.add('sent-by-current-user');
+            } else {
                 senderElement.textContent = nickname + ': ';
-            }
-            if(message.sender_id === userId){
-                senderElement.textContent = this.currentUser.nickname + ': ';
+                messageElement.classList.add('sent-by-other-user');
             }
 
             senderElement.classList.add('message-sender');
@@ -85,11 +89,21 @@ class MessagesController {
 
             messageContainer.appendChild(messageElement);
         });
+        messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     addEventListeners(){
         this.bindFooter()
         this.bindHeader()
+
+        document.getElementById('sendButton').addEventListener('click', async () => {
+            const messageInput = document.getElementById('messageInput').value;
+            if (messageInput.trim() !== '') {
+                await this.usersRoutes.sendMessage(this.userID, this.otherUserID, messageInput);
+                await this.loadMessages(this.otherUserID);
+                document.getElementById('messageInput').value = '';
+            }
+        });
     }
 
 
