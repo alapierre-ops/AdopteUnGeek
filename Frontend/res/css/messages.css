@@ -46,7 +46,7 @@ body {
 
 .sidebar {
     flex: 1;
-    background-color: #adadad;
+    background-color: #f3f3f3 !important;
     border-right: 1px solid #ccc;
     padding: 20px;
     overflow-y: auto;
@@ -61,6 +61,7 @@ body {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .avatar {
@@ -139,4 +140,47 @@ body {
 
 .message-input-text{
     margin-right: 10px;
+}
+
+.matches-list {
+    list-style: none;
+    padding: 0;
+}
+
+.match-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.match-item:hover {
+    background-color: #ccc;
+}
+
+.match-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.match-item .match-info {
+    flex: 1;
+}
+
+.match-item .match-name {
+    font-weight: bold;
+}
+
+.match-item .match-status {
+    font-size: 0.8em;
+    color: #555;
+}
+
+.sidebar h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
 }

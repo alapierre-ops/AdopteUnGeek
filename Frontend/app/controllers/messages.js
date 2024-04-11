@@ -104,6 +104,11 @@ class MessagesController {
                 document.getElementById('messageInput').value = '';
             }
         });
+
+        document.getElementById('user-info')
+            .addEventListener('click', () => {
+                window.location.href = "index.html?" + this.otherUserID;
+            })
     }
 
 
