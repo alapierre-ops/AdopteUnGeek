@@ -83,7 +83,7 @@ class IndexController {
             console.log("getUserInfo(): nextUser == ", this.nextUser.nickname)
             document.getElementById('userName').textContent = this.nextUser.nickname;
             document.getElementById('userBio').textContent = this.nextUser.bio;
-            document.getElementById('imageContainer').src = "http://localhost:3333/users/" + this.nextUser.id + "/photos";
+            document.getElementById('imageContainer').src = await this.usersRoutes.getUserPhotos(this.nextUser.id)
 
             const currentDate = new Date();
             const birthdate = new Date(this.nextUser.birthdate);
