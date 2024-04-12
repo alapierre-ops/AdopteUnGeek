@@ -94,11 +94,22 @@ body {
     display: none;
 }
 
-.userFirstRow{
+.userFirstRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-right: 10px;
+    flex-wrap: wrap;
+}
+
+.userFirstRow h4 {
+    margin: 0;
+    line-height: 0;
+}
+
+#userDistance {
+    text-align: center;
+    font-size: 18px;
+    line-height: 0;
 }
 
 .tagContainer {

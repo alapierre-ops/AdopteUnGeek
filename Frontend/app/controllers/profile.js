@@ -34,6 +34,49 @@ class ProfileController {
         tags.forEach(tag => {
             tag.addEventListener('click', this.toggleTag.bind(this, tag));
         });
+
+        const cityInput = document.getElementById('cityInput');
+        const suggestionsList = document.getElementById('suggestionsList');
+
+        cityInput.addEventListener('input', async () => {
+            const searchString = cityInput.value.trim();
+            if (searchString.length < 2) {
+                suggestionsList.innerHTML = '';
+                return;
+            }
+            try {
+                const suggestions = await this.fetchCitySuggestions(searchString);
+                this.displaySuggestions(suggestions);
+            } catch (error) {
+                console.error('Error fetching city suggestions:', error);
+            }
+        });
+    }
+
+    async fetchCitySuggestions(searchString) {
+        const apiUrl = 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-500/records';
+        const response = await fetch(`${apiUrl}?where=startswith(name%2C%20%22${searchString.charAt(0).toUpperCase() + searchString.slice(1)}%22)&limit=7&refine=country%3A%22France%22`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch city suggestions');
+        }
+        const res = await response.json()
+        return res.results
+    }
+
+    displaySuggestions(suggestions) {
+        const cityInput = document.getElementById('cityInput');
+        const suggestionsList = document.getElementById('suggestionsList');
+        suggestionsList.innerHTML = '';
+        suggestions.forEach(suggestion => {
+            console.log(suggestion.name)
+            const li = document.createElement('li');
+            li.textContent = suggestion.name;
+            li.addEventListener('click', () => {
+                cityInput.value = suggestion.name;
+                suggestionsList.innerHTML = '';
+            });
+            suggestionsList.appendChild(li);
+        });
     }
 
     async handlePhotoInputChange() {
@@ -81,15 +124,7 @@ class ProfileController {
                 document.getElementById('gender').options.item(2).selected = true;
             }
 
-            console.log("interestedin == " + this.currentUser.interestedin)
-            if(this.currentUser.interestedin === "male"){
-                document.getElementById('interestedIn').options.item(0).selected = true;
-            } else if(this.currentUser.interestedin === "female" || !this.currentUser.interestedin){
-                document.getElementById('interestedIn').options.item(1).selected = true;
-            } else if(this.currentUser.interestedin === "both"){
-                document.getElementById('interestedIn').options.item(2).selected = true;
-            }
-
+            document.getElementById('cityInput').textContent = this.currentUser.city;
             document.getElementById('bio').textContent = this.currentUser.bio;
             document.getElementById('birthdate').value = this.currentUser.birthdate ? this.currentUser.birthdate.substring(0, 10) : "";
 
@@ -142,10 +177,10 @@ class ProfileController {
         this.updatedUserData = {
             gender: formData.get('gender'),
             bio: formData.get('bio'),
-            interestedIn: formData.get('interestedIn'),
+            city: document.getElementById('cityInput').value,
             birthdate: formData.get('birthdate'),
         };
-        console.log("handleNext(): userBirthdate == " + this.updatedUserData.birthdate);
+        console.log("handleNext(): userCity == " + this.updatedUserData.city);
         document.getElementById('firstForm').style.display = 'none';
         document.getElementById('photoForm').style.display = 'block';
 

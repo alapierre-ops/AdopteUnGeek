@@ -20,12 +20,14 @@
                 <option value="female">Femme</option>
                 <option value="other">Non binaire</option>
             </select><br>
-            <label for="interestedIn">Genre recherché :</label><br>
-            <select id="interestedIn" name="interestedIn" class="browser-default" required>
-                <option value="male">Homme</option>
-                <option value="female">Femme</option>
-                <option value="both">Tout</option>
-            </select><br><br>
+
+            <div class="search-container">
+                <label for="cityInput">Ville :</label><br>
+                <input type="text" id="cityInput" placeholder="Entrez votre ville..." required>
+                <ul id="suggestionsList"></ul>
+            </div>
+
+
             <label for="birthdate">Date de naissance :</label><br>
             <input type="date" id="birthdate" name="birthdate" required><br>
             <label for="bio">Bio :</label><br>

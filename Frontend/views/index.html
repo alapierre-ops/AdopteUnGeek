@@ -26,6 +26,7 @@
                     <h4 id="userName"></h4>
                     <h4 id="userAge"></h4>
                 </div>
+                <p id="userDistance">à 0km</p>
                 <p id="userBio"></p>
                 <div class="tagContainer hidden" id="tagContainer"></div>
             </div>
@@ -43,7 +44,9 @@
     <div id="filterModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeBtn">&times;</span>
+
             <h4>Filtres</h4>
+
             <div class="range_container">
                 Âge
                 <div class="sliders_control">
@@ -61,11 +64,20 @@
                     </div>
                 </div>
             </div>
+
             Distance maximale
             <div class="slider_container">
                 <input id="distanceSlider" type="range" value="50" min="1" max="150">
             </div>
             <div class="slider-value" id="distanceValue">50 km</div>
+
+            <label for="interestedIn">Genre recherché :</label><br>
+            <select id="interestedIn" name="interestedIn" class="browser-default" required>
+                <option value="male">Homme</option>
+                <option value="female">Femme</option>
+                <option value="both">Tout</option>
+            </select><br><br>
+
             <div class="button-container">
                 <button type="submit" id="submitFilters">Valider</button>
             </div>

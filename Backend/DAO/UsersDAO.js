@@ -166,16 +166,12 @@ module.exports = class UsersDAO extends dao {
 
 
     update(id, userData) {
-        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, links=$8, tags=$9, interestedIn=$10, filter_agemin=$11, filter_agemax=$12, filter_dismax=$13 WHERE id=$1",
-            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn, userData.ageMin, userData.ageMax, userData.distance])
+        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, links=$8, tags=$9, interestedIn=$10, filter_agemin=$11, filter_agemax=$12, filter_dismax=$13, city=$14 WHERE id=$1",
+            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn, userData.ageMin, userData.ageMax, userData.distance, userData.city])
     }
 
     addPhoto(id, photo) {
         return this.db.query("INSERT INTO photos (user_id, photo_data) VALUES ($1, $2)",
-            [id, photo])
-    }
-    updatePhoto(id, photo) {
-        return this.db.query("UPDATE photos SET photo_data = $2 WHERE user_id = $1",
             [id, photo])
     }
 

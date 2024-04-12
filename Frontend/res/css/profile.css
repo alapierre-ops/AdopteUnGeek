@@ -115,3 +115,43 @@ h3 {
     margin-top: 5px !important;
     margin-bottom: 5px !important;
 }
+
+#suggestionsList {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    list-style-type: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    margin: 0;
+}
+
+#suggestionsList li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#suggestionsList li:hover {
+    background-color: #f3f3f3;
+}
+
+#cityInput {
+    margin-top: 0;
+}
+
+.search-container{
+    padding: 0;
+    width: 50%;
+    position: relative;
+    margin: 0 auto 15px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    column-gap: 10px;
+}
