@@ -115,14 +115,20 @@ class UsersRoutes {
         });
     }
 
-    async getNextUser(userID) {
+    async getNextUser(userID, shownUserIds) {
+        console.log("getNextUser(): shownUserIds == " + shownUserIds)
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/nextUser/${userID}`)
+            fetch(`${this.apiUrl}/nextUser/${userID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(shownUserIds)
+            })
                 .then(res => {
                     if (res.ok) {
                         resolve(res.json());
-                    }
-                    else {
+                    } else {
                         reject(res.status);
                         throw new Error(`Failed to fetch user: ${res.status}`);
                     }
@@ -130,6 +136,7 @@ class UsersRoutes {
                 .catch(err => reject(err));
         });
     }
+
 
     async getUser(userID) {
         return new Promise((resolve, reject) => {

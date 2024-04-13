@@ -67,7 +67,7 @@ module.exports = class UsersDAO extends dao {
             [nickname, email, hashedPassword])
     }
 
-    async getNext(user) {
+    async getNext(user, shownUserIds) {
         let interestedInClause = '';
         if (user.interestedin === 'male' || user.interestedin === 'female') {
             interestedInClause = `AND u.gender = '${user.interestedin}'`;
@@ -81,11 +81,12 @@ module.exports = class UsersDAO extends dao {
                            WHERE userWhoInteracted = $1
                        )
                        AND u.id != $1
+                       AND u.id NOT IN (${(shownUserIds || []).map((_, i) => `$${i + 4}`).join(', ')})
                        AND p.photo_data IS NOT NULL
                        AND DATE_PART('year', AGE(u.birthdate)) >= $2
                        AND DATE_PART('year', AGE(u.birthdate)) <= $3
                        ${interestedInClause}
-                       LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax])
+                       LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax, ...shownUserIds])
                 .then(res => resolve(res.rows[0]))
                 .catch(e => reject(e))
         );

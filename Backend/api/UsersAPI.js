@@ -141,25 +141,29 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/nextUser/:id", async (req, res) => {
+    app.post("/users/nextUser/:id", async (req, res) => {
         try {
-            console.log("nextUser/:id : id == " +req.params.id)
-            const currentUser = await svc.dao.getById(req.params.id)
-            const user = await svc.dao.getNext(currentUser)
-            console.log("nextUser/:id == ", user)
+            console.log("nextUser/:id : id == " + req.params.id);
+            const currentUser = await svc.dao.getById(req.params.id);
+
+            console.log("shownUserIds == " + req.body)
+
+            const user = await svc.dao.getNext(currentUser, req.body);
+            console.log("nextUser/:id == ", user);
             if (!user) {
-                console.log("nextUser/:id : user is empty")
-                return res.status(301).end()
+                console.log("nextUser/:id : user is empty");
+                return res.status(301).end();
             }
             if (!user === undefined) {
-                console.log("nextUser/:id : user is undefined")
-                return res.status(407).end()
+                console.log("nextUser/:id : user is undefined");
+                return res.status(407).end();
             }
-            return res.json(user)
+            return res.json(user);
         } catch (e) {
-            console.log(e)
-            res.status(400).end() }
-    })
+            console.log(e);
+            res.status(400).end();
+        }
+    });
 
     app.patch("/users/:id", async (req, res) => {
         const userId = req.params.id;

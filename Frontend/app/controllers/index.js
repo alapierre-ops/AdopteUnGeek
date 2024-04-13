@@ -10,14 +10,7 @@ class IndexController {
 
     async initialize() {
         try {
-            this.userID = await this.isUserLoggedIn();
-            this.currentUser = await this.usersRoutes.getUser(this.userID)
-
-            console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
-            if(!this.currentUser.interestedin){
-                this.showModal()
-                return
-            }
+            if(!await this.hasFilters()) return
 
             const url = window.location.href;
             const regex = /\?(\d+|me)/; // Update regex to match user ID or "me"
@@ -73,36 +66,76 @@ class IndexController {
         }
     }
 
+    async hasFilters(){
+        this.userID = await this.isUserLoggedIn();
+        this.currentUser = await this.usersRoutes.getUser(this.userID)
+
+        console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
+        if(!this.currentUser.interestedin){
+            this.showModal()
+            return false
+        }
+        return true
+    }
+
 
     async getUserInfo(userID) {
         try {
+            console.log("getUserInfo(): alreadyFetchedUsers == " + this.alreadyFetchedUsers)
+            if(!this.alreadyFetchedUsers){
+                this.alreadyFetchedUsers = [0]
+            }
             if(!userID){
                 console.log("getUserInfo(): userID == ", this.userID);
-                this.nextUser = await this.usersRoutes.getNextUser(this.userID);
+                this.nextUser = await this.usersRoutes.getNextUser(this.userID, this.alreadyFetchedUsers);
                 if(!this.nextUser.nickname){
-                    alert("No more available users. You swiped on everyone.")
+                    alert("Plus aucun profil ne correspond à vos filtres actuels.")
+                    this.showModal()
                 }
             }
             else{
                 this.nextUser = await this.usersRoutes.getUser(userID)
             }
 
-            const coord1 = await this.getCityCoordinates(this.nextUser.city)
-            const coord2 = await this.getCityCoordinates(this.currentUser.city)
+            const isDistanceOk = await this.isDistanceOk()
 
-            const distance = this.getDistanceFromLatLonInKm(coord1.lat, coord1.lon, coord2.lat, coord2.lon);
-            document.getElementById('userDistance').textContent = "à " + distance + " km"
+            if( isDistanceOk ){
+                await this.displayUserInfo()
+            }
+            else{
+                this.alreadyFetchedUsers.push(this.nextUser.id)
+                await this.getUserInfo();
+            }
 
-            console.log("getUserInfo(): nextUser == ", this.nextUser.nickname)
-            document.getElementById('userName').textContent = this.nextUser.nickname;
-            document.getElementById('userBio').textContent = this.nextUser.bio;
-            document.getElementById('imageContainer').src = await this.usersRoutes.getUserPhotos(this.nextUser.id)
 
-            document.getElementById('userAge').textContent = this.getAge(this.nextUser.birthdate) + " ans";
         } catch (error) {
             console.error("getUserInfo():", error);
             alert("No more available users. You swiped on everyone.")
         }
+    }
+
+    async isDistanceOk(){
+        const coord1 = await this.getCityCoordinates(this.nextUser.city)
+        const coord2 = await this.getCityCoordinates(this.currentUser.city)
+
+        this.distance = this.getDistanceFromLatLonInKm(coord1.lat, coord1.lon, coord2.lat, coord2.lon);
+
+        console.log(`getUserInfo(): ${this.distance} > ${this.currentUser.filter_dismax} ?`)
+
+        if(this.currentUser.filter_dismax === 150){
+            return true
+        }
+
+        return this.distance <= this.currentUser.filter_dismax;
+
+    }
+
+    async displayUserInfo(){
+        document.getElementById('userDistance').textContent = "à " + this.distance + " km"
+        document.getElementById('userName').textContent = this.nextUser.nickname;
+        document.getElementById('userBio').textContent = this.nextUser.bio;
+        document.getElementById('imageContainer').src = await this.usersRoutes.getUserPhotos(this.nextUser.id)
+        document.getElementById('userAge').textContent = this.getAge(this.nextUser.birthdate) + " ans";
     }
 
     addEventListeners(){
@@ -131,7 +164,7 @@ class IndexController {
     }
 
     bindModal(){
-        if(!this.currentUser.interestedIn){
+        if(!this.currentUser.interestedin){
             this.changeFilters()
         }
         window.onclick = function(event) {
@@ -192,11 +225,11 @@ class IndexController {
     showModal(){
         document.getElementById('filterModal').style.display = "block";
 
-        if(this.currentUser.interestedIn === "male" || !this.currentUser.interestedIn){
+        if(this.currentUser.interestedin === "male" || !this.currentUser.interestedin){
             document.getElementById('interestedIn').options.item(0).selected = true;
-        } else if(this.currentUser.interestedIn === "female"){
+        } else if(this.currentUser.interestedin === "female"){
             document.getElementById('interestedIn').options.item(1).selected = true;
-        } else if(this.currentUser.interestedIn === "both"){
+        } else if(this.currentUser.interestedin === "both"){
             document.getElementById('interestedIn').options.item(2).selected = true;
         }
 
@@ -213,7 +246,7 @@ class IndexController {
             document.getElementById('distanceValue').textContent = "Pas de limite"
         }
         else{
-            document.getElementById('distanceValue').textContent = this.value + " km";
+            document.getElementById('distanceValue').textContent = document.getElementById('distanceSlider').value + " km";
         }
     }
 
@@ -226,7 +259,9 @@ class IndexController {
         }
         console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedIn)
         this.usersRoutes.updateUser(this.userID, this.filters)
-            .then(() => this.getUserInfo())
+            .then(() =>
+                this.hasFilters()
+                    .then(() => this.getUserInfo()))
     }
 
     getAge(birthdate){
@@ -246,7 +281,6 @@ class IndexController {
                 const longitude = data.results[0].longitude;
                 return { lat: latitude, lon: longitude };
             } else {
-                console.error("Error fetching city coordinates:", error);
                 return null;
             }
         } catch(error) {
