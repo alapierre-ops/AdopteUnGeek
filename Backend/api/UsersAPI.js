@@ -35,11 +35,11 @@ module.exports = (app, svc) => {
 
     app.get("/users/:id", async (req, res) => {
         try {
-            const users = await svc.dao.getById(req.params.id)
-            if (users === undefined) {
+            const user = await svc.dao.getById(req.params.id)
+            if (user === undefined) {
                 return res.status(404).end()
             }
-            return res.json(users)
+            return res.json(user)
         } catch (e) { res.status(400).end() }
     })
 

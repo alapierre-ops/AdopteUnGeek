@@ -195,6 +195,7 @@ class ProfileController {
         }
 
         this.updatedUserData.tags = this.selectedTags.join(',');
+        this.updatedUserData.interestedIn = "both"
 
         try {
             await this.usersRoutes.updateUser(this.userID, this.updatedUserData);

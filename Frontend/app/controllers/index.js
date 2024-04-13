@@ -3,64 +3,70 @@ class IndexController {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
         this.interactionsRoutes = new InteractionsRoutes(apiUrl);
-        this.initialize();
-        this.addEventListeners();
+        this.initialize()
+            .then(() => this.addEventListeners());
         this.setupSliders();
     }
 
     async initialize() {
         try {
             this.userID = await this.isUserLoggedIn();
-            if (this.userID) {
-                const url = window.location.href;
-                const regex = /\?(\d+|me)/; // Update regex to match user ID or "me"
-                const match = regex.exec(url);
-                const userID = match ? match[1] : null;
-                if(userID === 'me') {
-                    const skipIcon = document.getElementById('skipIcon');
-                    const likeIcon = document.getElementById('likeIcon');
+            this.currentUser = await this.usersRoutes.getUser(this.userID)
 
-                    const editButton = document.createElement('button');
-                    editButton.textContent = 'Modifier';
-                    editButton.classList.add('editButton');
+            console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
+            if(!this.currentUser.interestedin){
+                this.showModal()
+                return
+            }
 
-                    const continueButton = document.createElement('button');
-                    continueButton.textContent = 'Continuer';
-                    continueButton.classList.add('msgButton');
+            const url = window.location.href;
+            const regex = /\?(\d+|me)/; // Update regex to match user ID or "me"
+            const match = regex.exec(url);
+            const userID = match ? match[1] : null;
+            if(userID === 'me') {
+                const skipIcon = document.getElementById('skipIcon');
+                const likeIcon = document.getElementById('likeIcon');
 
-                    skipIcon.parentNode.replaceChild(editButton, skipIcon);
-                    likeIcon.parentNode.replaceChild(continueButton, likeIcon);
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Modifier';
+                editButton.classList.add('editButton');
 
-                    editButton.addEventListener('click', () => window.location.href = "profile.html");
-                    continueButton.addEventListener('click', () => window.location.href = "index.html");
+                const continueButton = document.createElement('button');
+                continueButton.textContent = 'Continuer';
+                continueButton.classList.add('msgButton');
 
-                    console.log('User is viewing their own profile');
-                    this.getUserInfo(this.userID);
+                skipIcon.parentNode.replaceChild(editButton, skipIcon);
+                likeIcon.parentNode.replaceChild(continueButton, likeIcon);
 
-                } else if(userID) {
-                    const skipIcon = document.getElementById('skipIcon');
-                    const likeIcon = document.getElementById('likeIcon');
+                editButton.addEventListener('click', () => window.location.href = "profile.html");
+                continueButton.addEventListener('click', () => window.location.href = "index.html");
 
-                    const backButton = document.createElement('button');
-                    backButton.textContent = 'Retour';
-                    backButton.classList.add('backButton');
+                console.log('User is viewing their own profile');
+                this.getUserInfo(this.userID);
 
-                    const msgButton = document.createElement('button');
-                    msgButton.textContent = 'Discuter';
-                    msgButton.classList.add('msgButton');
+            } else if(userID) {
+                const skipIcon = document.getElementById('skipIcon');
+                const likeIcon = document.getElementById('likeIcon');
 
-                    skipIcon.parentNode.replaceChild(backButton, skipIcon);
-                    likeIcon.parentNode.replaceChild(msgButton, likeIcon);
+                const backButton = document.createElement('button');
+                backButton.textContent = 'Retour';
+                backButton.classList.add('backButton');
 
-                    backButton.addEventListener('click', () => window.location.href = `likes.html`);
-                    msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
+                const msgButton = document.createElement('button');
+                msgButton.textContent = 'Discuter';
+                msgButton.classList.add('msgButton');
 
-                    this.getUserInfo(userID);
-                    console.log('User ID:', userID);
+                skipIcon.parentNode.replaceChild(backButton, skipIcon);
+                likeIcon.parentNode.replaceChild(msgButton, likeIcon);
 
-                } else {
-                    this.getUserInfo();
-                }
+                backButton.addEventListener('click', () => window.location.href = `likes.html`);
+                msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
+
+                this.getUserInfo(userID);
+                console.log('User ID:', userID);
+
+            } else {
+                this.getUserInfo();
             }
         } catch (error) {
             console.error("initialize(): ", error);
@@ -81,24 +87,18 @@ class IndexController {
                 this.nextUser = await this.usersRoutes.getUser(userID)
             }
 
-            this.currentUser = await this.usersRoutes.getUser(this.userID)
-
             const coord1 = await this.getCityCoordinates(this.nextUser.city)
             const coord2 = await this.getCityCoordinates(this.currentUser.city)
 
             const distance = this.getDistanceFromLatLonInKm(coord1.lat, coord1.lon, coord2.lat, coord2.lon);
-            console.log("Distance: ", distance)
+            document.getElementById('userDistance').textContent = "à " + distance + " km"
 
             console.log("getUserInfo(): nextUser == ", this.nextUser.nickname)
             document.getElementById('userName').textContent = this.nextUser.nickname;
             document.getElementById('userBio').textContent = this.nextUser.bio;
             document.getElementById('imageContainer').src = await this.usersRoutes.getUserPhotos(this.nextUser.id)
 
-            const currentDate = new Date();
-            const birthdate = new Date(this.nextUser.birthdate);
-            const differenceMs = currentDate - birthdate;
-            const nextUserAge = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
-            document.getElementById('userAge').textContent = nextUserAge + " ans";
+            document.getElementById('userAge').textContent = this.getAge(this.nextUser.birthdate) + " ans";
         } catch (error) {
             console.error("getUserInfo():", error);
             alert("No more available users. You swiped on everyone.")
@@ -108,6 +108,7 @@ class IndexController {
     addEventListeners(){
         this.bindFooter()
         this.bindHeader()
+        this.bindModal()
 
         document.getElementById('textContainer')
             .addEventListener('click', () => {
@@ -127,6 +128,34 @@ class IndexController {
             .addEventListener('click', () => this.addInteraction(true));
         document.getElementById('skipIcon')
             .addEventListener('click', () => this.addInteraction(false));
+    }
+
+    bindModal(){
+        if(!this.currentUser.interestedIn){
+            this.changeFilters()
+        }
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('filterModal')) {
+                document.getElementById('filterModal').style.display = 'none';
+            }
+        }
+
+        document.getElementById('distanceSlider').oninput = function() {
+            if(this.value > 149){
+                document.getElementById('distanceValue').textContent = "Pas de limite"
+            }
+            else{
+                document.getElementById('distanceValue').textContent = this.value + " km";
+            }
+        };
+
+        document.getElementById('submitFilters')
+            .addEventListener('click', this.changeFilters.bind(this))
+        document.getElementById('submitFilters')
+            .addEventListener('click', () => {
+                this.changeFilters();
+                document.getElementById('filterModal').style.display = 'none'
+            });
     }
 
 
@@ -153,31 +182,39 @@ class IndexController {
             .addEventListener('click', this.goToProfile.bind(this));
 
         document.getElementById('filterIcon')
-            .addEventListener('click', function() {
-            document.getElementById('filterModal').style.display = "block";
-        });
+            .addEventListener('click', this.showModal.bind(this));
 
         document.getElementById('closeBtn').onclick = function() {
             document.getElementById('filterModal').style.display = 'none';
         }
+    }
 
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('filterModal')) {
-                document.getElementById('filterModal').style.display = 'none';
-            }
+    showModal(){
+        document.getElementById('filterModal').style.display = "block";
+
+        if(this.currentUser.interestedIn === "male" || !this.currentUser.interestedIn){
+            document.getElementById('interestedIn').options.item(0).selected = true;
+        } else if(this.currentUser.interestedIn === "female"){
+            document.getElementById('interestedIn').options.item(1).selected = true;
+        } else if(this.currentUser.interestedIn === "both"){
+            document.getElementById('interestedIn').options.item(2).selected = true;
         }
 
-        document.getElementById('distanceSlider').oninput = function() {
-            if(this.value > 149){
-                document.getElementById('distanceValue').textContent = "Pas de limite"
-            }
-            else{
-                document.getElementById('distanceValue').textContent = this.value + " km";
-            }
-        };
+        const ageMin = this.currentUser.filter_agemin ? this.currentUser.filter_agemin : Math.max(18, this.getAge(this.currentUser.birthdate) - 5);
+        const ageMax = this.currentUser.filter_agemax ? this.currentUser.filter_agemax : this.getAge(this.currentUser.birthdate) + 5;
+        document.getElementById('toInput').value = ageMax
+        document.getElementById('fromInput').value = ageMin
+        document.getElementById('toSlider').value = ageMax
+        document.getElementById('fromSlider').value = ageMin
 
-        document.getElementById('submitFilters')
-            .addEventListener('click', this.changeFilters.bind(this))
+        document.getElementById('distanceSlider').value = this.currentUser.filter_dismax ? this.currentUser.filter_dismax : 150
+
+        if(document.getElementById('distanceSlider').value > 149){
+            document.getElementById('distanceValue').textContent = "Pas de limite"
+        }
+        else{
+            document.getElementById('distanceValue').textContent = this.value + " km";
+        }
     }
 
     changeFilters(){
@@ -185,10 +222,18 @@ class IndexController {
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,
             ageMin: document.getElementById('fromInput').value,
+            interestedIn: document.getElementById('interestedIn').value
         }
-        console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance)
+        console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedIn)
         this.usersRoutes.updateUser(this.userID, this.filters)
-            .then(r => this.getUserInfo())
+            .then(() => this.getUserInfo())
+    }
+
+    getAge(birthdate){
+        const currentDate = new Date();
+        const newBirthdate = new Date(birthdate)
+        const differenceMs = currentDate - newBirthdate;
+        return Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
     }
 
     async getCityCoordinates(cityName) {
@@ -223,7 +268,7 @@ class IndexController {
             Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
             Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        return Math.ceil(R * c);
     }
 
     async isUserLoggedIn() {
