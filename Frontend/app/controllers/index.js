@@ -80,6 +80,15 @@ class IndexController {
             else{
                 this.nextUser = await this.usersRoutes.getUser(userID)
             }
+
+            this.currentUser = await this.usersRoutes.getUser(this.userID)
+
+            const coord1 = await this.getCityCoordinates(this.nextUser.city)
+            const coord2 = await this.getCityCoordinates(this.currentUser.city)
+
+            const distance = this.getDistanceFromLatLonInKm(coord1.lat, coord1.lon, coord2.lat, coord2.lon);
+            console.log("Distance: ", distance)
+
             console.log("getUserInfo(): nextUser == ", this.nextUser.nickname)
             document.getElementById('userName').textContent = this.nextUser.nickname;
             document.getElementById('userBio').textContent = this.nextUser.bio;
@@ -180,6 +189,41 @@ class IndexController {
         console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance)
         this.usersRoutes.updateUser(this.userID, this.filters)
             .then(r => this.getUserInfo())
+    }
+
+    async getCityCoordinates(cityName) {
+        try {
+            const response = await fetch(`https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-500/records?where=name%3D%22${cityName}%22&limit=20&refine=country%3A%22France%22`);
+            const data = await response.json();
+
+            if(data.results.length > 0) {
+                const latitude = data.results[0].latitude;
+                const longitude = data.results[0].longitude;
+                return { lat: latitude, lon: longitude };
+            } else {
+                console.error("Error fetching city coordinates:", error);
+                return null;
+            }
+        } catch(error) {
+            console.error("Error fetching city coordinates:", error);
+            return null;
+        }
+    }
+
+    deg2rad(deg) {
+        return deg * (Math.PI/180);
+    }
+
+    getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+        const R = 6371; // Radius of the Earth in km
+        const dLat = this.deg2rad(lat2-lat1);
+        const dLon = this.deg2rad(lon2-lon1);
+        const a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
     }
 
     async isUserLoggedIn() {

@@ -55,7 +55,7 @@ class ProfileController {
 
     async fetchCitySuggestions(searchString) {
         const apiUrl = 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-500/records';
-        const response = await fetch(`${apiUrl}?where=startswith(name%2C%20%22${searchString.charAt(0).toUpperCase() + searchString.slice(1)}%22)&limit=7&refine=country%3A%22France%22`);
+        const response = await fetch(`${apiUrl}?where=search(name%2C%20%22${searchString.charAt(0).toUpperCase() + searchString.slice(1)}%22)&limit=7&refine=country%3A%22France%22`);
         if (!response.ok) {
             throw new Error('Failed to fetch city suggestions');
         }
@@ -92,8 +92,7 @@ class ProfileController {
     }
 
 
-    toggleTag(tag) {
-        this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+    toggleTag(tag){
         if (this.selectedTags.includes(tag.textContent)) {
             this.selectedTags = this.selectedTags.filter(t => t !== tag.textContent);
             tag.classList.remove('selected');
@@ -103,7 +102,7 @@ class ProfileController {
             if (this.selectedTags.length < 5) {
                 this.selectedTags.push(tag.textContent);
                 tag.classList.add('selected');
-                console.log("tag added")
+                console.log("tag added, this.selectedTags == " + this.selectedTags)
 
             } else {
                 alert('Vous ne pouvez sélectionner que 5 tags.');
@@ -124,11 +123,12 @@ class ProfileController {
                 document.getElementById('gender').options.item(2).selected = true;
             }
 
-            document.getElementById('cityInput').textContent = this.currentUser.city;
+            document.getElementById('cityInput').value = this.currentUser.city;
             document.getElementById('bio').textContent = this.currentUser.bio;
             document.getElementById('birthdate').value = this.currentUser.birthdate ? this.currentUser.birthdate.substring(0, 10) : "";
 
             await this.displayPhotoPreview()
+            this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
             this.colorSelectedTags();
         } catch (error) {
             console.error("getUserInfo():", error);
@@ -136,7 +136,6 @@ class ProfileController {
     }
 
     colorSelectedTags(){
-        this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
         console.log("Selected tags: " + this.selectedTags)
         const tags = document.querySelectorAll('.tag');
         tags.forEach(tag => {

@@ -132,7 +132,9 @@ module.exports = (app, svc) => {
                 return res.status(409).json({ message: "Un compte existe déjà avec cette adresse mail. Veuillez vous connecter." });
             }
             await svc.dao.signUp(nickname, email, password);
-            return res.status(201).json({ message: "Votre compte a été créé avec succès."});
+            const newUser = await svc.dao.getByEmail(email);
+            const token = svc.generateToken(newUser.id);
+            return res.status(201).json({ message: "Votre compte a été créé avec succès.",token: token});
         } catch (e) {
             console.error(e);
             return res.status(500).json({ message: "Erreur interne, veuillez réessayer plus tard." });
