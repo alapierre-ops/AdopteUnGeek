@@ -110,7 +110,8 @@ class IndexController {
 
         } catch (error) {
             console.error("getUserInfo():", error);
-            alert("No more available users. You swiped on everyone.")
+            alert("Plus aucun profil ne correspond à vos filtres actuels.")
+            this.showModal()
         }
     }
 
