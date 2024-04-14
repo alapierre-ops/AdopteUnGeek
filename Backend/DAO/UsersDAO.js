@@ -63,11 +63,11 @@ module.exports = class UsersDAO extends dao {
     async signUp(nickname, email, password) {
         console.log('backend' + password)
         const hashedPassword = await bcrypt.hash(password, 10)
-        return this.db.query("INSERT INTO users(nickname, email, password) VALUES ($1,$2,$3)",
+        await this.db.query("INSERT INTO users(nickname, email, password) VALUES ($1,$2,$3)",
             [nickname, email, hashedPassword])
     }
 
-    async getNext(user) {
+    async getNext(user, shownUserIds) {
         let interestedInClause = '';
         if (user.interestedin === 'male' || user.interestedin === 'female') {
             interestedInClause = `AND u.gender = '${user.interestedin}'`;
@@ -81,11 +81,12 @@ module.exports = class UsersDAO extends dao {
                            WHERE userWhoInteracted = $1
                        )
                        AND u.id != $1
+                       AND u.id NOT IN (${(shownUserIds || []).map((_, i) => `$${i + 4}`).join(', ')})
                        AND p.photo_data IS NOT NULL
                        AND DATE_PART('year', AGE(u.birthdate)) >= $2
                        AND DATE_PART('year', AGE(u.birthdate)) <= $3
                        ${interestedInClause}
-                       LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax])
+                       LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax, ...shownUserIds])
                 .then(res => resolve(res.rows[0]))
                 .catch(e => reject(e))
         );
@@ -166,16 +167,12 @@ module.exports = class UsersDAO extends dao {
 
 
     update(id, userData) {
-        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, links=$8, tags=$9, interestedIn=$10, filter_agemin=$11, filter_agemax=$12, filter_dismax=$13 WHERE id=$1",
-            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn, userData.ageMin, userData.ageMax, userData.distance])
+        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, links=$8, tags=$9, interestedIn=$10, filter_agemin=$11, filter_agemax=$12, filter_dismax=$13, city=$14 WHERE id=$1",
+            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.links, userData.tags, userData.interestedIn, userData.ageMin, userData.ageMax, userData.distance, userData.city])
     }
 
     addPhoto(id, photo) {
         return this.db.query("INSERT INTO photos (user_id, photo_data) VALUES ($1, $2)",
-            [id, photo])
-    }
-    updatePhoto(id, photo) {
-        return this.db.query("UPDATE photos SET photo_data = $2 WHERE user_id = $1",
             [id, photo])
     }
 
@@ -183,7 +180,6 @@ module.exports = class UsersDAO extends dao {
         return new Promise((resolve, reject) =>
             this.db.query(`SELECT photo_data FROM photos WHERE user_id=$1`, [id])
                 .then(res => {
-                    console.log(res)
                     resolve(res.rows[0].photo_data);
                 })
                 .catch(e => reject(e))

@@ -51,10 +51,13 @@ class LoginController{
 
         this.usersRoutes.signUp(nickname, email, password)
             .then(res => {
-                console.log("handleSignUp(): No error detected")
+                console.log("handleSignUp(): ", res)
                 console.log("Putting the token in place")
-                sessionStorage.setItem("token", res.token)
-                this.isUserLoggedIn()
+                sessionStorage.setItem("token", res.token);
+                console.log("Token set:", res.token);
+                return this.isUserLoggedIn("pass");
+            })
+            .then(() => {
                 window.location.href = 'profile.html';
             })
             .catch(err => {
@@ -105,7 +108,7 @@ class LoginController{
             })
     }
 
-    async isUserLoggedIn() {
+    async isUserLoggedIn(pass) {
         const token = sessionStorage.getItem('token');
         console.log("isUserLoggedIn() : Token: " + token);
         if (token) {
@@ -120,7 +123,11 @@ class LoginController{
                 localStorage.removeItem('token');
                 throw new Error('Token expired or invalid');
             }
-        } else {
+        }
+        else if (pass){
+            window.location.href = 'index.html'
+        }
+        else {
             console.log("token is empty");
             throw new Error('Token is missing');
         }

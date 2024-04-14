@@ -35,11 +35,11 @@ module.exports = (app, svc) => {
 
     app.get("/users/:id", async (req, res) => {
         try {
-            const users = await svc.dao.getById(req.params.id)
-            if (users === undefined) {
+            const user = await svc.dao.getById(req.params.id)
+            if (user === undefined) {
                 return res.status(404).end()
             }
-            return res.json(users)
+            return res.json(user)
         } catch (e) { res.status(400).end() }
     })
 
@@ -132,32 +132,38 @@ module.exports = (app, svc) => {
                 return res.status(409).json({ message: "Un compte existe déjà avec cette adresse mail. Veuillez vous connecter." });
             }
             await svc.dao.signUp(nickname, email, password);
-            return res.status(201).json({ message: "Votre compte a été créé avec succès."});
+            const newUser = await svc.dao.getByEmail(email);
+            const token = svc.generateToken(newUser.id);
+            return res.status(201).json({ message: "Votre compte a été créé avec succès.",token: token});
         } catch (e) {
             console.error(e);
             return res.status(500).json({ message: "Erreur interne, veuillez réessayer plus tard." });
         }
     });
 
-    app.get("/users/nextUser/:id", async (req, res) => {
+    app.post("/users/nextUser/:id", async (req, res) => {
         try {
-            console.log("nextUser/:id : id == " +req.params.id)
-            const currentUser = await svc.dao.getById(req.params.id)
-            const user = await svc.dao.getNext(currentUser)
-            console.log("nextUser/:id == ", user)
+            console.log("nextUser/:id : id == " + req.params.id);
+            const currentUser = await svc.dao.getById(req.params.id);
+
+            console.log("shownUserIds == " + req.body)
+
+            const user = await svc.dao.getNext(currentUser, req.body);
+            console.log("nextUser/:id == ", user);
             if (!user) {
-                console.log("nextUser/:id : user is empty")
-                return res.status(301).end()
+                console.log("nextUser/:id : user is empty");
+                return res.status(301).end();
             }
             if (!user === undefined) {
-                console.log("nextUser/:id : user is undefined")
-                return res.status(407).end()
+                console.log("nextUser/:id : user is undefined");
+                return res.status(407).end();
             }
-            return res.json(user)
+            return res.json(user);
         } catch (e) {
-            console.log(e)
-            res.status(400).end() }
-    })
+            console.log(e);
+            res.status(400).end();
+        }
+    });
 
     app.patch("/users/:id", async (req, res) => {
         const userId = req.params.id;
