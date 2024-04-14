@@ -69,9 +69,8 @@ module.exports = class UsersDAO extends dao {
 
     async getNext(user, shownUserIds) {
         let interestedInClause = '';
-        let genderPreferenceClause = '';
 
-        if (user.interestedin === 'male' || user.interestedin === 'female') {
+        if (user.interestedin !== 'both') {
             interestedInClause = `AND u.gender = '${user.interestedin}'`;
         }
 

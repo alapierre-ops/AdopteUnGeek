@@ -252,9 +252,14 @@ class IndexController {
     }
 
     changeFilters(){
-        if(this.filters.distance > document.getElementById('distanceSlider').value){
-            this.alreadyFetchedUsers = [0]
+        if (!this.filters) {
+            this.filters = {};
         }
+
+        if (this.filters.distance > document.getElementById('distanceSlider').value) {
+            this.alreadyFetchedUsers = [0];
+        }
+
         this.filters = {
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,

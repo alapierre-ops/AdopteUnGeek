@@ -4,6 +4,7 @@ body {
     align-items: center;
     height: 100vh;
     justify-content: space-between;
+    font-family: Arial, sans-serif;
 }
 
 .login-container{
@@ -32,6 +33,153 @@ body {
     cursor: pointer;
 }
 
+.container {
+    display: flex;
+    height: 80vh;
+    margin-bottom: 0;
+}
+
+.message-sidebar {
+    flex: 1;
+    background-color: #f3f3f3 !important;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message-container {
+    flex: 4;
+    margin-left: 10px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.username {
+    margin: 0;
+}
+
+.message {
+    max-width: 70vw;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+}
+
+.message-sender {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.message-content {
+    margin-top: 5px;
+}
+
+.message.sent-by-current-user {
+    display: flex;
+    flex-direction: column;
+    background-color: #000000;
+    color: white;
+    width: fit-content;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: 24px;
+}
+
+.message.sent-by-other-user {
+    display: flex;
+    flex-direction: column;
+    background-color: #ff5e5e;
+    color: white;
+    width: fit-content;
+    max-width: 80%;
+}
+
+.send-button {
+    margin-right: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.send-button i {
+    font-size: 24px;
+    color: #555;
+}
+
+.send-button:hover i {
+    color: #333;
+}
+
+.messages{
+    overflow-y: scroll;
+    height: 80%;
+}
+
+.message-input{
+    display: flex;
+    align-items: center;
+}
+
+.message-input-text{
+    margin-right: 10px;
+}
+
+.matches-list {
+    list-style: none;
+    padding: 0;
+}
+
+.match-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.match-item:hover {
+    background-color: #ccc;
+}
+
+.match-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.match-item .match-info {
+    flex: 1;
+}
+
+.match-item .match-name {
+    font-weight: bold;
+}
+
+.match-item .match-status {
+    font-size: 0.8em;
+    color: #555;
+}
+
+.message-sidebar h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -45,6 +193,7 @@ body {
 .header i {
     margin: 0 5px;
     font-size: 24px;
+    cursor: pointer;
 }
 
 .footer {
@@ -59,11 +208,13 @@ body {
 .footer i {
     margin: 0 5px;
     font-size: 24px;
+    cursor: pointer;
 }
 
 .h5 {
     display: inline-block;
     margin: 0;
+    cursor: pointer;
 }
 
 .person{
@@ -74,6 +225,7 @@ body {
 .person i{
     font-size: 100px;
     margin: 0 10px;
+    cursor: pointer;
 }
 
 .image-container {
@@ -130,6 +282,7 @@ body {
 .userFirstRow h4 {
     margin: 0;
     line-height: 0;
+    font-size: 180%;
 }
 
 #userDistance {
