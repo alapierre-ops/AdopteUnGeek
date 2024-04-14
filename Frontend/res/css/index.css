@@ -199,7 +199,6 @@ body {
     left: 0;
     top: 0;
     width: 100%;
-    height: 100%;
     max-height: none;
     overflow: auto;
     background-color: rgb(0,0,0);
@@ -208,12 +207,20 @@ body {
 
 .modal-content {
     align-items: center;
+    display: flex;
+    flex-direction: column;
     background-color: #fefefe;
     margin: 0 auto;
-    padding: 20px;
     border: 1px solid #888;
     width: 30%;
     justify-content: space-between;
+    height: 100vh;
+}
+
+.modal-top{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .close {
@@ -234,8 +241,16 @@ body {
     display: flex;
     flex-direction: column;
     width: 80%;
-    margin: 35% auto;
+    margin: 10% auto 10%;
 }
+
+.slider_container {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 10% auto 10%;
+}
+
 
 .sliders_control {
     position: relative;
@@ -246,8 +261,9 @@ body {
     position: relative;
     display: flex;
     justify-content: space-between;
-    font-size: 24px;
+    font-size: 16px;
     color: #635a5a;
+    margin-top: -20px;
 }
 
 input[type=range]::-webkit-slider-thumb {
@@ -313,13 +329,9 @@ input[type="range"] {
     width: 50px !important;
 }
 
-#distanceSlider{
-    max-width: 300px;
-}
-
 .slider-value {
     text-align: center;
-    margin-top: 30px;
+    margin-top: -20px;
 }
 
 button[type="submit"] {
