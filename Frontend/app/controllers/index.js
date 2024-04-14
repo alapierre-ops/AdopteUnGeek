@@ -110,7 +110,8 @@ class IndexController {
 
         } catch (error) {
             console.error("getUserInfo():", error);
-            alert("No more available users. You swiped on everyone.")
+            alert("Plus aucun profil ne correspond à vos filtres actuels.")
+            this.showModal()
         }
     }
 
@@ -251,6 +252,9 @@ class IndexController {
     }
 
     changeFilters(){
+        if(this.filters.distance > document.getElementById('distanceSlider').value){
+            this.alreadyFetchedUsers = [0]
+        }
         this.filters = {
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,
