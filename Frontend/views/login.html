@@ -6,24 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="../res/css/login.css"/>
+    <link rel="stylesheet" type="text/css" href="../res/css/index.css"/>
 </head>
 <body>
-    <div class="container">
+    <div class="login-container">
         <div id="loginForm">
             <h3>Connexion</h3>
-            <form>
+            <form class="login-form">
                 <label for="loginEmail">Adresse email :</label><br>
                 <input type="email" id="loginEmail" name="email" required><br>
                 <label for="loginPassword">Mot de passe :</label><br>
                 <input type="password" id="loginPassword" name="password" required><br><br>
-                <button type="submit">Connexion</button>
+                <button type="submit" class="login-button">Connexion</button>
             </form>
         </div>
 
         <div id="signupForm" class="hidden">
             <h3>Créer un compte</h3>
-            <form>
+            <form class="login-form">
                 <label for="signupNickname">Pseudonyme:</label><br>
                 <input type="text" id="signupNickname" name="nickname" required><br>
                 <label for="signupEmail">Email:</label><br>
@@ -31,7 +31,7 @@
                 <div id="emailError" class="error-message"></div>
                 <label for="signupPassword">Mot de passe:</label><br>
                 <input type="password" id="signupPassword" name="password" required><br><br>
-                <button type="submit">Créer un compte</button>
+                <button type="submit" class="login-button">Créer un compte</button>
             </form>
         </div>
 
