@@ -8,7 +8,6 @@ class MessagesController {
 
     async initialize() {
         this.userID = await this.isUserLoggedIn()
-        this.currentUser = await this.usersRoutes.getUser(this.userID)
         await this.fetchMatches()
 
         const url = window.location.href;
@@ -24,9 +23,15 @@ class MessagesController {
         try {
             const matches = await this.usersRoutes.getMatches(this.userID);
 
+            console.log("fetchMatches(): ", matches)
+
             const matchesList = document.getElementById('matchesList');
 
             matchesList.innerHTML = '';
+
+            if (matches.length > 0) {
+                await this.loadMessages(matches[0].id, matches[0].nickname);
+            }
 
             matches.forEach(match => {
                 const listItem = document.createElement('li');

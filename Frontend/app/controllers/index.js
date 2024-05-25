@@ -3,23 +3,36 @@ class IndexController {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
         this.interactionsRoutes = new InteractionsRoutes(apiUrl);
-        this.initialize()
-            .then(() => this.addEventListeners());
+        document.addEventListener("DOMContentLoaded", async () => {
+            this.initialize()
+                .then(() => {
+                    console.log(this.nextUser)
+                    this.addEventListeners();
+                    this.isMobile();
+                });
+        })
         this.setupSliders();
     }
 
     async initialize() {
         try {
             if(!await this.hasFilters()) return
-
             const url = window.location.href;
-            const regex = /\?(\d+|me)/; // Update regex to match user ID or "me"
+            const regex = /\?(\d+|me)/;
             const match = regex.exec(url);
             const userID = match ? match[1] : null;
-            if(userID === 'me') {
-                const skipIcon = document.getElementById('skipIcon');
-                const likeIcon = document.getElementById('likeIcon');
 
+            if(window.innerWidth < 600){
+                this.skipIcon = document.getElementById('skipIcon2');
+                this.likeIcon = document.getElementById('likeIcon2');
+            }
+            else{
+                this.skipIcon = document.getElementById('skipIcon');
+                this.likeIcon = document.getElementById('likeIcon');
+            }
+
+            if(userID === 'me') {
+                await this.getUserInfo(this.userID);
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Modifier';
                 editButton.classList.add('editButton');
@@ -28,18 +41,17 @@ class IndexController {
                 continueButton.textContent = 'Continuer';
                 continueButton.classList.add('msgButton');
 
-                skipIcon.parentNode.replaceChild(editButton, skipIcon);
-                likeIcon.parentNode.replaceChild(continueButton, likeIcon);
+                this.skipIcon.parentNode.replaceChild(editButton, this.skipIcon);
+                this.likeIcon.parentNode.replaceChild(continueButton, this.likeIcon);
 
                 editButton.addEventListener('click', () => window.location.href = "profile.html");
                 continueButton.addEventListener('click', () => window.location.href = "index.html");
 
                 console.log('User is viewing their own profile');
-                this.getUserInfo(this.userID);
 
             } else if(userID) {
-                const skipIcon = document.getElementById('skipIcon');
-                const likeIcon = document.getElementById('likeIcon');
+                await this.getUserInfo(userID);
+                console.log('User ID:', userID);
 
                 const backButton = document.createElement('button');
                 backButton.textContent = 'Retour';
@@ -49,20 +61,37 @@ class IndexController {
                 msgButton.textContent = 'Discuter';
                 msgButton.classList.add('msgButton');
 
-                skipIcon.parentNode.replaceChild(backButton, skipIcon);
-                likeIcon.parentNode.replaceChild(msgButton, likeIcon);
+                this.skipIcon.parentNode.replaceChild(backButton, this.skipIcon);
+                this.likeIcon.parentNode.replaceChild(msgButton, this.likeIcon);
 
                 backButton.addEventListener('click', () => window.location.href = `likes.html`);
                 msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
-
-                this.getUserInfo(userID);
-                console.log('User ID:', userID);
-
             } else {
-                this.getUserInfo();
+                await this.getUserInfo();
+                if(window.innerWidth < 600) {
+                    document.getElementById('likeIcon2')
+                        .addEventListener('click', () => this.addInteraction(true));
+                    document.getElementById('skipIcon2')
+                        .addEventListener('click', () => this.addInteraction(false));
+                }
+                else{
+                    document.getElementById('likeIcon')
+                        .addEventListener('click', () => this.addInteraction(true));
+                    document.getElementById('skipIcon')
+                        .addEventListener('click', () => this.addInteraction(false));
+                }
             }
         } catch (error) {
             console.error("initialize(): ", error);
+        }
+    }
+
+    async isMobile(){
+        if (window.innerWidth < 600) {
+            document.getElementById('tagContainer').classList.remove("hidden");
+            this.showTags();
+            document.getElementById('textContainer').classList.toggle("largeTextContainer");
+            console.log("done")
         }
     }
 
@@ -144,24 +173,20 @@ class IndexController {
         this.bindHeader()
         this.bindModal()
 
-        document.getElementById('textContainer')
-            .addEventListener('click', () => {
-                document.getElementById('tagContainer')
-                    .classList.toggle("hidden")
-                this.showTags();
-                document.getElementById('textContainer')
-                    .classList.toggle("largeTextContainer");
-        });
-
-        document.getElementById('imageContainer').addEventListener('click', function (){
+        if (window.innerWidth > 600) {
             document.getElementById('textContainer')
-                .classList.toggle("hidden");
-        });
-
-        document.getElementById('likeIcon')
-            .addEventListener('click', () => this.addInteraction(true));
-        document.getElementById('skipIcon')
-            .addEventListener('click', () => this.addInteraction(false));
+                .addEventListener('click', () => {
+                    document.getElementById('tagContainer')
+                        .classList.toggle("hidden")
+                    this.showTags();
+                    document.getElementById('textContainer')
+                        .classList.toggle("largeTextContainer");
+                });
+            document.getElementById('imageContainer').addEventListener('click', function () {
+                document.getElementById('textContainer')
+                    .classList.toggle("hidden");
+            });
+        }
     }
 
     bindModal(){
@@ -224,7 +249,7 @@ class IndexController {
     }
 
     showModal(){
-        document.getElementById('filterModal').style.display = "block";
+        document.getElementById('filterModal').style.display = "flex";
 
         if(this.currentUser.interestedin === "male" || !this.currentUser.interestedin){
             document.getElementById('interestedIn').options.item(0).selected = true;
@@ -260,10 +285,12 @@ class IndexController {
             this.alreadyFetchedUsers = [0];
         }
 
+        const controller = new IndexController();
+
         this.filters = {
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,
-            ageMin: document.getElementById('fromInput').value,
+            ageMin: controller.mapSliderToAge(document.getElementById('fromInput').value),
             interestedIn: document.getElementById('interestedIn').value
         }
         console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedIn)
@@ -367,7 +394,7 @@ class IndexController {
             window.location.href = "profile.html"
         }
         this.interactionsRoutes.addInteraction(this.userID, this.nextUser.id, liked)
-            .then(() => this.getUserInfo(this.userID))
+            .then(() => this.getUserInfo())
     }
 
     setupSliders() {
@@ -376,80 +403,86 @@ class IndexController {
         const fromInput = document.querySelector('#fromInput');
         const toInput = document.querySelector('#toInput');
 
-        // Function to control slider from input
+        // Function to map slider value to age
+        const mapSliderToAge = (value) => {
+            if (value <= 32) {
+                return value + 18; // 18 to 50 maps to 0 to 32
+            } else if (value <= 40) {
+                return 50 + (value - 32) * 5; // 50 to 80 maps to 32 to 40
+            } else {
+                return 80; // Values greater than 40 map to 80+
+            }
+        };
+
+        // Function to map age to slider value
+        const mapAgeToSlider = (age) => {
+            if (age <= 50) {
+                return age - 18; // 18 to 50 maps to 0 to 32
+            } else if (age <= 80) {
+                return 32 + (age - 50) / 5; // 50 to 80 maps to 32 to 40
+            } else {
+                return 41; // 80+ maps to 41
+            }
+        };
+
         const controlFromInput = (fromSlider, fromInput, toInput, controlSlider) => {
-            const [from, to] = getParsed(fromInput, toInput);
-            fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', controlSlider);
+            let from = parseInt(fromInput.value, 10);
+            let to = parseInt(toInput.value, 10);
             if (from > to) {
-                fromSlider.value = to;
-                fromInput.value = to;
-            } else {
-                fromSlider.value = from;
+                from = to;
             }
+            fromSlider.value = mapAgeToSlider(from);
+            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', controlSlider);
         };
 
-        // Function to control slider to input
         const controlToInput = (toSlider, fromInput, toInput, controlSlider) => {
-            const [from, to] = getParsed(fromInput, toInput);
-            fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', controlSlider);
-            setToggleAccessible(toInput);
-            if (from <= to) {
-                toSlider.value = to;
-                toInput.value = to;
-            } else {
-                toInput.value = from;
-            }
-        };
-
-        // Function to control slider from slider
-        const controlFromSlider = (fromSlider, toSlider, fromInput) => {
-            const [from, to] = getParsed(fromSlider, toSlider);
-            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+            let from = parseInt(fromInput.value, 10);
+            let to = parseInt(toInput.value, 10);
             if (from > to) {
-                fromSlider.value = to;
-                fromInput.value = to;
-            } else {
-                fromInput.value = from;
+                to = from;
             }
+            toSlider.value = mapAgeToSlider(to);
+            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', controlSlider);
+            setToggleAccessible(toInput);
         };
 
-        // Function to control slider to slider
+        const controlFromSlider = (fromSlider, toSlider, fromInput) => {
+            let from = mapSliderToAge(parseInt(fromSlider.value, 10));
+            let to = mapSliderToAge(parseInt(toSlider.value, 10));
+            if (from > to) {
+                fromSlider.value = mapAgeToSlider(to);
+                from = to;
+            }
+            fromInput.value = from;
+            fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+        };
+
         const controlToSlider = (fromSlider, toSlider, toInput) => {
-            const [from, to] = getParsed(fromSlider, toSlider);
+            let from = mapSliderToAge(parseInt(fromSlider.value, 10));
+            let to = mapSliderToAge(parseInt(toSlider.value, 10));
+            if (from > to) {
+                toSlider.value = mapAgeToSlider(from);
+                to = from;
+            }
+            toInput.value = to;
             fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
             setToggleAccessible(toSlider);
-            if (from <= to) {
-                toSlider.value = to;
-                toInput.value = to;
-            } else {
-                toInput.value = from;
-                toSlider.value = from;
-            }
         };
 
-        // Function to get parsed values
-        const getParsed = (currentFrom, currentTo) => {
-            const from = parseInt(currentFrom.value, 10);
-            const to = parseInt(currentTo.value, 10);
-            return [from, to];
-        };
-
-        // Function to fill the slider
         const fillSlider = (from, to, sliderColor, rangeColor, controlSlider) => {
-            const rangeDistance = to.max - to.min;
-            const fromPosition = from.value - to.min;
-            const toPosition = to.value - to.min;
+            const rangeDistance = 41;
+            const fromPosition = from.value - 0;
+            const toPosition = to.value - 0;
             controlSlider.style.background = `linear-gradient(
-              to right,
-              ${sliderColor} 0%,
-              ${sliderColor} ${(fromPosition / rangeDistance) * 100}%,
-              ${rangeColor} ${((fromPosition / rangeDistance)) * 100}%,
-              ${rangeColor} ${(toPosition / rangeDistance) * 100}%, 
-              ${sliderColor} ${(toPosition / rangeDistance) * 100}%, 
-              ${sliderColor} 100%)`;
+          to right,
+          ${sliderColor} 0%,
+          ${sliderColor} ${(fromPosition / rangeDistance) * 100}%,
+          ${rangeColor} ${(fromPosition / rangeDistance) * 100}%,
+          ${rangeColor} ${(toPosition / rangeDistance) * 100}%, 
+          ${sliderColor} ${(toPosition / rangeDistance) * 100}%, 
+          ${sliderColor} 100%)`;
         };
 
-        // Function to set toggle accessible
         const setToggleAccessible = (currentTarget) => {
             const toSlider = document.querySelector('#toSlider');
             if (Number(currentTarget.value) <= 0) {
@@ -459,13 +492,11 @@ class IndexController {
             }
         };
 
-        // Bind event listeners
         fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
         toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
         fromInput.oninput = () => controlFromInput(fromSlider, fromInput, toInput, toSlider);
         toInput.oninput = () => controlToInput(toSlider, fromInput, toInput, toSlider);
 
-        // Initial setup
         fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
         setToggleAccessible(toSlider);
     }

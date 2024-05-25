@@ -25,13 +25,16 @@ module.exports = (app, svc) => {
 
     app.get("/users/getMatches/:id", async (req, res) => {
         try {
-            const users = await svc.dao.getMatches(req.params.id)
-            if (users === undefined) {
-                return res.status(404).end()
+            const users = await svc.dao.getMatches(req.params.id);
+            if (!users) {
+                return res.status(404).end();
             }
-            return res.json(users)
-        } catch (e) { res.status(400).end() }
-    })
+            return res.json(users);
+        } catch (e) {
+            console.error(e);
+            res.status(400).end();
+        }
+    });
 
     app.get("/users/:id", async (req, res) => {
         try {
@@ -207,9 +210,17 @@ module.exports = (app, svc) => {
             }
 
             let imgJpeg = await jimp.read(photo)
-            const centerX = imgJpeg.bitmap.width / 2 - 512;
-            const centerY = imgJpeg.bitmap.height / 2 - 512;
-            imgJpeg.crop(centerX, centerY, 1024, 1024)
+
+            const width = imgJpeg.bitmap.width;
+            const height = imgJpeg.bitmap.height;
+
+            if (width >= 1024 && height >= 1024) {
+                const centerX = width / 2 - 512;
+                const centerY = height / 2 - 512;
+                imgJpeg = imgJpeg.crop(centerX, centerY, 1024, 1024);
+            } else {
+                imgJpeg = imgJpeg.contain(1024, 1024);
+            }
 
             const photoBinary = await imgJpeg.getBufferAsync("image/jpeg")
 

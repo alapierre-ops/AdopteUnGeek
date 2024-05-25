@@ -18,7 +18,7 @@ class ProfileController {
     }
 
     addEventListeners(){
-        const form = document.getElementById('form');
+        const form = document.getElementById('profile-form');
         form.addEventListener('submit', function(event) {
             if (event.target.id === 'photoForm') {
                 this.handleConfirm(event);
@@ -127,8 +127,8 @@ class ProfileController {
             document.getElementById('bio').textContent = this.currentUser.bio;
             document.getElementById('birthdate').value = this.currentUser.birthdate ? this.currentUser.birthdate.substring(0, 10) : "";
 
-            await this.displayPhotoPreview()
             this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+            await this.displayPhotoPreview()
             this.colorSelectedTags();
         } catch (error) {
             console.error("getUserInfo():", error);

@@ -238,7 +238,7 @@ class UsersRoutes {
                     }
                     else {
                         reject(res.status);
-                        throw new Error(`Failed to fetch user: ${res.status}`);
+                        throw new Error(`Failed to fetch messages: ${res.status}`);
                     }
                 })
                 .catch(err => reject(err));

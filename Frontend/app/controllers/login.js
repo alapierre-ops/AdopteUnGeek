@@ -5,7 +5,7 @@ class LoginController{
         this.bindSignUpForm();
         this.bindLogInForm();
         this.bindFormSwitch();
-        this.isUserLoggedIn();
+        this.isUserLoggedIn().catch(e => {console.log(e)});
     }
 
     bindSignUpForm() {

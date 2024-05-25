@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="../res/css/profile.css"/>
+    <link rel="stylesheet" type="text/css" href="../res/css/index.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
 <body>
-<div class="container">
-    <div id="form">
+<div class="profile-container">
+    <div id="profile-form">
         <h3>A propos de vous</h3>
         <form id="firstForm">
             <label for="gender">Genre :</label><br>
@@ -21,18 +21,19 @@
                 <option value="other">Non binaire</option>
             </select><br>
 
+            <label for="birthdate">Date de naissance :</label><br>
+            <input type="date" id="birthdate" name="birthdate" required><br>
+
             <div class="search-container">
                 <label for="cityInput">Ville :</label><br>
                 <input type="text" id="cityInput" placeholder="Entrez votre ville..." required>
                 <ul id="suggestionsList"></ul>
             </div>
 
-
-            <label for="birthdate">Date de naissance :</label><br>
-            <input type="date" id="birthdate" name="birthdate" required><br>
             <label for="bio">Bio :</label><br>
             <textarea id="bio" name="bio" rows="4" required></textarea><br>
-            <button type="submit">Valider</button>
+
+            <button type="submit" class="buttonProfileForm">Valider</button>
         </form>
         <form id="photoForm" class="photoForm">
             <label for="photoInput">Choisissez votre photo préférée :</label>
@@ -65,7 +66,7 @@
             </div>
             <input type="hidden" id="selectedTags">
 
-            <button type="submit">Valider</button>
+            <button type="submit" class="buttonProfileForm">Valider</button>
         </form>
     </div>
 

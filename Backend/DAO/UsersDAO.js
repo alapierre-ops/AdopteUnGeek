@@ -142,30 +142,37 @@ module.exports = class UsersDAO extends dao {
 
     async getMatches(id) {
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT u.*, p.photo_data
-                   FROM users u 
-                   LEFT JOIN photos p ON u.id = p.user_id
-                   WHERE u.id IN (
-                       SELECT userShown 
-                       FROM interactions
-                       WHERE userWhoInteracted = $1
-                       AND liked = true
-                   )
-                   AND u.id IN (
-                       SELECT userWhoInteracted 
-                       FROM interactions
-                       WHERE userShown = $1
-                       AND liked = true
-                   )`, [id])
+            this.db.query(`
+            SELECT u.*, p.photo_data, MAX(m.sent_at) as last_message_date
+            FROM users u
+            LEFT JOIN photos p ON u.id = p.user_id
+            LEFT JOIN messages m ON (m.sender_id = u.id OR m.receiver_id = u.id)
+            WHERE u.id IN (
+                SELECT userShown 
+                FROM interactions
+                WHERE userWhoInteracted = $1
+                AND liked = true
+            )
+            AND u.id IN (
+                SELECT userWhoInteracted 
+                FROM interactions
+                WHERE userShown = $1
+                AND liked = true
+            )
+            GROUP BY u.id, p.photo_data
+            ORDER BY last_message_date DESC NULLS LAST
+        `, [id])
                 .then(res => {
                     const matchedUsers = res.rows.map(row => ({
                         id: row.id,
                         nickname: row.nickname,
-                        birthdate: row.birthdate
+                        birthdate: row.birthdate,
+                        lastMessageDate: row.last_message_date
                     }));
                     resolve(matchedUsers);
                 })
-                .catch(e => reject(e)))
+                .catch(e => reject(e))
+        );
     }
 
 
