@@ -2,6 +2,7 @@ class ProfileController {
     constructor() {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
+        this.photosRoutes = new PhotosRoutes(apiUrl)
         this.initialize();
         this.addEventListeners();
     }
@@ -83,7 +84,7 @@ class ProfileController {
         console.log("handlePhotoInputChange()");
         const file = document.getElementById('photoInput').files[0];
         try {
-            await this.usersRoutes.updatePhotos(this.userID, file);
+            await this.photosRoutes.updatePhotos(this.userID, file);
             console.log("handlePhotoInputChange(): photo changed successfully");
             await this.displayPhotoPreview();
         } catch (error) {
@@ -148,7 +149,7 @@ class ProfileController {
 
     async displayPhotoPreview() {
         console.log("displayPhotoPreview()");
-        this.currentUser.photo = await this.usersRoutes.getUserPhotos(this.currentUser.id);
+        this.currentUser.photo = await this.photosRoutes.getUserPhotos(this.currentUser.id);
         if (this.currentUser.photo) {
             console.log("getUserInfo(): photo found");
             document.getElementById('preview').src = this.currentUser.photo;
