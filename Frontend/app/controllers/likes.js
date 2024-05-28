@@ -2,6 +2,8 @@ class LikesController {
     constructor() {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
+        this.photosRoutes = new PhotosRoutes(apiUrl);
+        this.interactionsRoutes = new InteractionsRoutes(apiUrl);
         this.initialize();
     }
 
@@ -70,15 +72,15 @@ class LikesController {
             userGrid.innerHTML = '';
 
             if(!category || category === "likedMe"){
-                this.users = await this.usersRoutes.getLikedMe(this.userID);
+                this.users = await this.interactionsRoutes.getLikedMe(this.userID);
             }
 
             if(category === "iLiked"){
-                this.users = await this.usersRoutes.getILiked(this.userID);
+                this.users = await this.interactionsRoutes.getILiked(this.userID);
             }
 
             if(category === "matches"){
-                this.users = await this.usersRoutes.getMatches(this.userID);
+                this.users = await this.interactionsRoutes.getMatches(this.userID);
             }
 
             console.log("getUsers(): ", this.users)
@@ -100,7 +102,7 @@ class LikesController {
 
                     const img = document.createElement('img');
                     img.alt = 'main picture';
-                    img.src = "http://localhost:3333/users/" + user.id + "/photos";
+                    img.src = "http://localhost:3333/photos/" + user.id;
 
                     const textContainer = document.createElement('div');
                     textContainer.classList.add('textContainer');
@@ -181,7 +183,7 @@ class LikesController {
     }
 
     goToProfile() {
-        this.usersRoutes.getUserPhotos(this.userID)
+        this.photosRoutes.getUserPhotos(this.userID)
             .then(res => {
                 if (!res) {
                     console.log("goToProfile(): Profile not complete, can't preview");

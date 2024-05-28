@@ -11,10 +11,14 @@
     "jimp": "^0.22.12",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "mocha": "^10.4.0",
+    "chai": "^4.4.1",
+    "chai-http": "^4.4.0"
   },
   "scripts": {
     "run": "node main.js",
-    "debug": "node --inspect --inspect-brk main.js"
+    "debug": "node --inspect --inspect-brk main.js",
+    "test": "mocha"
   }
 }

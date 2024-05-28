@@ -2,6 +2,7 @@ class IndexController {
     constructor() {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
+        this.photosRoutes = new PhotosRoutes(apiUrl);
         this.interactionsRoutes = new InteractionsRoutes(apiUrl);
         document.addEventListener("DOMContentLoaded", async () => {
             this.initialize()
@@ -164,7 +165,7 @@ class IndexController {
         document.getElementById('userDistance').textContent = "à " + this.distance + " km"
         document.getElementById('userName').textContent = this.nextUser.nickname;
         document.getElementById('userBio').textContent = this.nextUser.bio;
-        document.getElementById('imageContainer').src = await this.usersRoutes.getUserPhotos(this.nextUser.id)
+        document.getElementById('imageContainer').src = await this.photosRoutes.getUserPhotos(this.nextUser.id)
         document.getElementById('userAge').textContent = this.getAge(this.nextUser.birthdate) + " ans";
     }
 
@@ -387,7 +388,7 @@ class IndexController {
 
     async addInteraction(liked){
         try{
-            await this.usersRoutes.getUserPhotos(this.userID)
+            await this.photosRoutes.getUserPhotos(this.userID)
         }
         catch (e) {
             alert("Vous devez compléter votre profil avant de continuer");
@@ -520,7 +521,7 @@ class IndexController {
     }
 
     goToProfile() {
-        this.usersRoutes.getUserPhotos(this.userID)
+        this.photosRoutes.getUserPhotos(this.userID)
             .then(res => {
                 if (!res) {
                     console.log("goToProfile(): Profile not complete, can't preview");

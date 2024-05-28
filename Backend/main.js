@@ -19,8 +19,8 @@ app.use(cors())
 app.use(morgan('dev'));
 app.use(cookieParser())
 
-console.log(process.env.CONNECTION_STRING)
 const dsn = process.env.CONNECTION_STRING
+const port = process.env.PORT || 3333
 const db = new pg.Pool({ connectionString: dsn })
 const usersService = new usersServices(db)
 const interactionsService = new interactionsServices(db)
@@ -31,7 +31,13 @@ require('./api/InteractionsAPI')(app, interactionsService)
 require('./api/MessagesAPI')(app, messagesService)
 require('./api/PhotosAPI')(app, photosService)
 require('dotenv').config();
-require('./datamodel/seeder')(usersService, interactionsService, messagesService, photosService)
-    .then(app.listen(3333))
+const seedDatabase = async () => require('./datamodel/seeder')(usersService, interactionsService, messagesService, photosService)
+if (require.main === module) {
+    seedDatabase().then( () =>
+        app.listen(port, () =>
+            console.log(`Listening on the port ${port}`)
+        )
+    )
+}
 
-
+module.exports = { app, seedDatabase, usersService, messagesService }

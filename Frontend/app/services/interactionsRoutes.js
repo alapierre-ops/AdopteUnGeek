@@ -25,4 +25,74 @@ class InteractionsRoutes {
         }).catch(err => reject(err)))
     }
 
+    async getLikedMe(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/getLikedMe/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch users: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    async getILiked(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/getILiked/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch users: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    async getMatches(userID) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/getMatches/${userID}`)
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    }
+                    else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch users: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    async getNextUser(userID, shownUserIds) {
+        console.log("getNextUser(): shownUserIds == " + shownUserIds)
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/nextUser/${userID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(shownUserIds)
+            })
+                .then(res => {
+                    if (res.ok) {
+                        resolve(res.json());
+                    } else {
+                        reject(res.status);
+                        throw new Error(`Failed to fetch user: ${res.status}`);
+                    }
+                })
+                .catch(err => reject(err));
+        });
+    }
+
 }

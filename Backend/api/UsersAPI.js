@@ -3,38 +3,6 @@ const jimp = require('jimp')
 const {rows} = require("pg/lib/defaults");
 
 module.exports = (app, svc) => {
-    app.get("/users/getLikedMe/:id", async (req, res) => {
-        try {
-            const users = await svc.dao.getLikedMe(req.params.id)
-            if (users === undefined) {
-                return res.status(404).end()
-            }
-            return res.json(users)
-        } catch (e) { res.status(400).end() }
-    })
-
-    app.get("/users/getILiked/:id", async (req, res) => {
-        try {
-            const users = await svc.dao.getILiked(req.params.id)
-            if (users === undefined) {
-                return res.status(404).end()
-            }
-            return res.json(users)
-        } catch (e) { res.status(400).end() }
-    })
-
-    app.get("/users/getMatches/:id", async (req, res) => {
-        try {
-            const users = await svc.dao.getMatches(req.params.id);
-            if (!users) {
-                return res.status(404).end();
-            }
-            return res.json(users);
-        } catch (e) {
-            console.error(e);
-            res.status(400).end();
-        }
-    });
 
     app.get("/users/:id", async (req, res) => {
         try {
@@ -144,30 +112,6 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.post("/users/nextUser/:id", async (req, res) => {
-        try {
-            console.log("nextUser/:id : id == " + req.params.id);
-            const currentUser = await svc.dao.getById(req.params.id);
-
-            console.log("shownUserIds == " + req.body)
-
-            const user = await svc.dao.getNext(currentUser, req.body);
-            console.log("nextUser/:id == ", user);
-            if (!user) {
-                console.log("nextUser/:id : user is empty");
-                return res.status(301).end();
-            }
-            if (!user === undefined) {
-                console.log("nextUser/:id : user is undefined");
-                return res.status(407).end();
-            }
-            return res.json(user);
-        } catch (e) {
-            console.log(e);
-            res.status(400).end();
-        }
-    });
-
     app.patch("/users/:id", async (req, res) => {
         const userId = req.params.id;
         const userData = req.body;
@@ -186,58 +130,4 @@ module.exports = (app, svc) => {
                 res.status(500).end();
             });
     });
-
-    app.patch("/users/:id/photo", async (req, res) => {
-        const userId = req.params.id;
-        const photo = req.body;
-
-        if (!userId) {
-            return res.status(400).end();
-        }
-        svc.dao.addPhoto(userId, photo)
-            .then(_ => res.status(204).end())
-            .catch(e => {
-                console.log(e);
-                res.status(500).end();
-            })
-    });
-
-    app.get("/users/:id/photos", async (req, res) => {
-        try {
-            const photo = await svc.dao.getPhotos(req.params.id)
-            if (photo === undefined) {
-                return res.status(404).end()
-            }
-
-            let imgJpeg = await jimp.read(photo)
-
-            const width = imgJpeg.bitmap.width;
-            const height = imgJpeg.bitmap.height;
-
-            if (width >= 1024 && height >= 1024) {
-                const centerX = width / 2 - 512;
-                const centerY = height / 2 - 512;
-                imgJpeg = imgJpeg.crop(centerX, centerY, 1024, 1024);
-            } else {
-                imgJpeg = imgJpeg.contain(1024, 1024);
-            }
-
-            const photoBinary = await imgJpeg.getBufferAsync("image/jpeg")
-
-            res.setHeader('Content-Type', 'image/jpeg')
-            res.send(photoBinary)
-        } catch (e) {
-            console.log("Error sending cropped photo: " + e)
-            res.status(400).end()
-        }
-    })
-
-    app.delete("/users/:id/photos", async (req, res) => {
-        svc.dao.deletePhoto(req.params.id)
-            .then(_ => res.status(200).end())
-            .catch(e => {
-                console.log(e)
-                res.status(500).end()
-            })
-    })
 }

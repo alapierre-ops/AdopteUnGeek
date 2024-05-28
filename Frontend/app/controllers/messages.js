@@ -2,6 +2,9 @@ class MessagesController {
     constructor() {
         const apiUrl = 'http://localhost:3333';
         this.usersRoutes = new UsersRoutes(apiUrl);
+        this.photosRoutes = new PhotosRoutes(apiUrl)
+        this.messagesRoutes = new MessagesRoutes(apiUrl)
+        this.interactionsRoutes = new InteractionsRoutes(apiUrl)
         this.initialize();
         this.addEventListeners();
     }
@@ -21,7 +24,7 @@ class MessagesController {
 
     async fetchMatches() {
         try {
-            const matches = await this.usersRoutes.getMatches(this.userID);
+            const matches = await this.interactionsRoutes.getMatches(this.userID);
 
             console.log("fetchMatches(): ", matches)
 
@@ -63,9 +66,9 @@ class MessagesController {
             nickname = user.nickname
         }
         document.getElementById("nickname").textContent = nickname;
-        document.getElementById('userPhoto').src = await this.usersRoutes.getUserPhotos(this.otherUserID)
+        document.getElementById('userPhoto').src = await this.photosRoutes.getUserPhotos(this.otherUserID)
 
-        const messages = await this.usersRoutes.getMessages(this.userID, this.otherUserID);
+        const messages = await this.messagesRoutes.getMessages(this.userID, this.otherUserID);
 
         const messageContainer = document.getElementById('messageContainer');
 
@@ -104,7 +107,7 @@ class MessagesController {
         document.getElementById('sendButton').addEventListener('click', async () => {
             const messageInput = document.getElementById('messageInput').value;
             if (messageInput.trim() !== '') {
-                await this.usersRoutes.sendMessage(this.userID, this.otherUserID, messageInput);
+                await this.messagesRoutes.sendMessage(this.userID, this.otherUserID, messageInput);
                 await this.loadMessages(this.otherUserID);
                 document.getElementById('messageInput').value = '';
             }
@@ -181,7 +184,7 @@ class MessagesController {
     }
 
     goToProfile() {
-        this.usersRoutes.getUserPhotos(this.userID)
+        this.photosRoutes.getUserPhotos(this.userID)
             .then(res => {
                 if (!res) {
                     console.log("goToProfile(): Profile not complete, can't preview");
