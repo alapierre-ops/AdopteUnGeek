@@ -2,53 +2,31 @@ module.exports = (app, svc) => {
     app.get("/messages", async (req, res) => {
         res.json(await svc.dao.getAll())
     })
-    app.get("/messages/:id", async (req, res) => {
+
+    app.get("/messages/:sender_id/:receiver_id", async (req, res) => {
         try {
-            const messages = await svc.dao.getById(req.params.id)
-            if (messages === undefined) {
-                return res.status(404).end()
+            const messages = await svc.dao.getMessages(req.params.sender_id, req.params.receiver_id)
+            console.log("messages/:id1/:id2 == ", messages)
+            if (!messages) {
+                console.log("messages/:id1/:id2 : no messages found")
+                return res.status(301).end()
             }
             return res.json(messages)
-        } catch (e) { res.status(400).end() }
+        } catch (e) {
+            console.log(e)
+            res.status(400).end() }
     })
-    app.post("/messages/", (req, res) => {
-        const messages = req.body
-        if (!svc.isValid(messages))  {
-            return res.status(400).end()
-        }
-        svc.dao.insert(messages)
-            .then(_ => res.status(200).end())
+
+    app.post("/messages/:sender_id/:receiver_id", async (req, res) => {
+        const sender_id = req.params.sender_id;
+        const receiver_id = req.params.receiver_id;
+        const content = req.body.content
+
+        svc.dao.addMessage(sender_id, receiver_id, content)
+            .then(_ => res.status(204).end())
             .catch(e => {
-                console.log(e)
-                res.status(500).end()
+                console.log(e);
+                res.status(500).end();
             })
-    })
-    app.delete("/messages/:id", async (req, res) => {
-        const messages = await svc.dao.getById(req.params.id)
-        if (messages === undefined) {
-            return res.status(404).end()
-        }
-        svc.dao.delete(req.params.id)
-            .then(_ => res.status(200).end())
-            .catch(e => {
-                console.log(e)
-                res.status(500).end()
-            })
-    })
-    app.put("/messages", async (req, res) => {
-        const messages = req.body
-        console.log(messages)
-        if ((messages.id === undefined) || (messages.id == null) || (!svc.isValid(messages))) {
-            return res.status(400).end()
-        }
-        if (await svc.dao.getById(messages.id) === undefined) {
-            return res.status(404).end()
-        }
-        svc.dao.update(messages)
-            .then(_ => res.status(200).end())
-            .catch(e => {
-                console.log(e)
-                res.status(500).end()
-            })
-    })
+    });
 }

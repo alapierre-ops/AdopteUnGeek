@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const morgan = require('morgan')
+require('dotenv').config()
 
 const usersServices = require("./Services/UsersServices")
 const interactionsServices = require("./Services/InteractionsServices")
@@ -18,8 +19,9 @@ app.use(cors())
 app.use(morgan('dev'));
 app.use(cookieParser())
 
-const connectionString = "postgres://user:password@localhost/Projet"
-const db = new pg.Pool({ connectionString: connectionString })
+console.log(process.env.CONNECTION_STRING)
+const dsn = process.env.CONNECTION_STRING
+const db = new pg.Pool({ connectionString: dsn })
 const usersService = new usersServices(db)
 const interactionsService = new interactionsServices(db)
 const messagesService = new messagesServices(db)
@@ -28,6 +30,7 @@ require('./api/UsersAPI')(app, usersService)
 require('./api/InteractionsAPI')(app, interactionsService)
 require('./api/MessagesAPI')(app, messagesService)
 require('./api/PhotosAPI')(app, photosService)
+require('dotenv').config();
 require('./datamodel/seeder')(usersService, interactionsService, messagesService, photosService)
     .then(app.listen(3333))
 
