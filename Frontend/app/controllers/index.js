@@ -1,9 +1,10 @@
 class IndexController {
     constructor() {
+        this.token = sessionStorage.getItem('token');
         const apiUrl = 'http://localhost:3333';
-        this.usersRoutes = new UsersRoutes(apiUrl);
-        this.photosRoutes = new PhotosRoutes(apiUrl);
-        this.interactionsRoutes = new InteractionsRoutes(apiUrl);
+        this.usersRoutes = new UsersRoutes(apiUrl, this.token);
+        this.photosRoutes = new PhotosRoutes(apiUrl, this.token);
+        this.interactionsRoutes = new InteractionsRoutes(apiUrl, this.token);
         document.addEventListener("DOMContentLoaded", async () => {
             this.initialize()
                 .then(() => {
@@ -117,7 +118,7 @@ class IndexController {
             }
             if(!userID){
                 console.log("getUserInfo(): userID == ", this.userID);
-                this.nextUser = await this.usersRoutes.getNextUser(this.userID, this.alreadyFetchedUsers);
+                this.nextUser = await this.interactionsRoutes.getNextUser(this.userID, this.alreadyFetchedUsers);
                 if(!this.nextUser.nickname){
                     alert("Plus aucun profil ne correspond à vos filtres actuels.")
                     this.showModal()
@@ -343,11 +344,11 @@ class IndexController {
     }
 
     async isUserLoggedIn() {
-        const token = sessionStorage.getItem('token');
-        console.log("isUserLoggedIn(): Token:", token);
-        if (token) {
+        this.token = sessionStorage.getItem('token');
+        console.log("isUserLoggedIn(): Token:", this.token);
+        if (this.token) {
             try {
-                const { userId } = await this.usersRoutes.verifyToken(token);
+                const { userId } = await this.usersRoutes.verifyToken(this.token);
                 console.log("isUserLoggedIn(): token is valid, user ID:", userId);
                 return userId;
             } catch (error) {
@@ -530,10 +531,10 @@ class IndexController {
                     window.location.href = `index.html?me`;
                 }
             })
-                .catch(e => {
-                    console.log("Error fetching user photos:", e)
-                    window.location.href = 'profile.html';
-                })
+            .catch(e => {
+                console.log("Error fetching user photos:", e)
+                window.location.href = 'profile.html';
+            })
     }
 
     async handleLogout() {

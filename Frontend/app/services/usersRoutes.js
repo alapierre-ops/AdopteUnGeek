@@ -1,7 +1,8 @@
 class UsersRoutes {
-    constructor(apiUrl) {
+    constructor(apiUrl, token) {
         console.log("UsersRoute : apiUrl == " + apiUrl)
-        this.apiUrl = apiUrl+"/users";
+        this.apiUrl = apiUrl + "/users";
+        this.token = token;
     }
 
     async insert(userAccount) {
@@ -58,6 +59,7 @@ class UsersRoutes {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify({ token })
         });
@@ -67,20 +69,21 @@ class UsersRoutes {
         return await response.json()
     }
 
-
     async getUser(userID) {
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${userID}`)
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch user: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
+            fetch(`${this.apiUrl}/${userID}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + this.token
+                }
+            }).then(res => {
+                if (res.ok) {
+                    resolve(res.json());
+                } else {
+                    reject(res.status);
+                    throw new Error(`Failed to fetch user: ${res.status}`);
+                }
+            }).catch(err => reject(err));
         });
     }
 
@@ -90,22 +93,23 @@ class UsersRoutes {
             const response = await fetch(`${this.apiUrl}/${userId}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.token
                 },
                 body: JSON.stringify(userData)
             });
             if (!response.ok) {
-                return {error: response.statusText};
+                return { error: response.statusText };
             }
             if (response.status !== 204) {
                 return await response.json();
             } else {
-                return {success: true};
+                return { success: true };
             }
         } catch (error) {
             if (error.message !== "JSON.parse: unexpected end of data at line 1 column 1 of the JSON data") {
                 console.error('Error updating user:', error.message);
-                return {error: error.message};
+                return { error: error.message };
             }
         }
     }

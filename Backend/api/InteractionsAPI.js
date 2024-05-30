@@ -1,19 +1,40 @@
+const jwt = require("jsonwebtoken");
+
 module.exports = (app, svc) => {
-    app.get("/interactions", async (req, res) => {
-        res.json(await svc.dao.getAll())
-    })
 
-    app.get("/interactions/:id", async (req, res) => {
+    const validateTokenMiddleware = (req, res, next) => {
+        const token = req.headers.authorization.substring(7);
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized: Token is missing" });
+        }
+
         try {
-            const interactions = await svc.dao.getById(req.params.id)
-            if (interactions === undefined) {
-                return res.status(404).end()
-            }
-            return res.json(interactions)
-        } catch (e) { res.status(400).end() }
-    })
+            const decoded = jwt.verify(token, "secretKey");
+            req.userId = decoded.userId;
+            next();
+        } catch (error) {
+            console.error("Error verifying token:", error);
+            return res.status(401).json({ error: "Unauthorized: " + error.message });
+        }
+    };
 
-    app.post("/interactions/", (req, res) => {
+    app.get("/interactions", validateTokenMiddleware, async (req, res) => {
+        res.json(await svc.dao.getAll());
+    });
+
+    app.get("/interactions/:id", validateTokenMiddleware, async (req, res) => {
+        try {
+            const interactions = await svc.dao.getById(req.params.id);
+            if (interactions === undefined) {
+                return res.status(404).end();
+            }
+            return res.json(interactions);
+        } catch (e) {
+            res.status(400).end();
+        }
+    });
+
+    app.post("/interactions/", validateTokenMiddleware, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
         svc.dao.add(date, userWhoInteracted, userShown, liked)
             .then(_ => {
@@ -25,42 +46,42 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.delete("/interactions/:id", async (req, res) => {
-        const interactions = await svc.dao.getById(req.params.id)
+    app.delete("/interactions/:id", validateTokenMiddleware, async (req, res) => {
+        const interactions = await svc.dao.getById(req.params.id);
         if (interactions === undefined) {
-            return res.status(404).end()
+            return res.status(404).end();
         }
         svc.dao.delete(req.params.id)
             .then(_ => res.status(200).end())
             .catch(e => {
-                console.log(e)
-                res.status(500).end()
-            })
-    })
+                console.log(e);
+                res.status(500).end();
+            });
+    });
 
-    app.put("/interactions", async (req, res) => {
-        const interactions = req.body
-        console.log(interactions)
+    app.put("/interactions", validateTokenMiddleware, async (req, res) => {
+        const interactions = req.body;
+        console.log(interactions);
         if ((interactions.id === undefined) || (interactions.id == null)) {
-            return res.status(400).end()
+            return res.status(400).end();
         }
         if (await svc.dao.getById(interactions.id) === undefined) {
-            return res.status(404).end()
+            return res.status(404).end();
         }
         svc.dao.insert(interactions)
             .then(_ => res.status(200).end())
             .catch(e => {
-                console.log(e)
-                res.status(500).end()
-            })
-    })
+                console.log(e);
+                res.status(500).end();
+            });
+    });
 
-    app.post("/users/nextUser/:id", async (req, res) => {
+    app.post("/users/nextUser/:id", validateTokenMiddleware, async (req, res) => {
         try {
             console.log("nextUser/:id : id == " + req.params.id);
             const currentUser = await svc.dao.getById(req.params.id);
 
-            console.log("shownUserIds == " + req.body)
+            console.log("shownUserIds == " + req.body);
 
             const user = await svc.dao.getNext(currentUser, req.body);
             console.log("nextUser/:id == ", user);
@@ -79,27 +100,31 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getLikedMe/:id", async (req, res) => {
+    app.get("/users/getLikedMe/:id", validateTokenMiddleware, async (req, res) => {
         try {
-            const users = await svc.dao.getLikedMe(req.params.id)
+            const users = await svc.dao.getLikedMe(req.params.id);
             if (users === undefined) {
-                return res.status(404).end()
+                return res.status(404).end();
             }
-            return res.json(users)
-        } catch (e) { res.status(400).end() }
-    })
+            return res.json(users);
+        } catch (e) {
+            res.status(400).end();
+        }
+    });
 
-    app.get("/users/getILiked/:id", async (req, res) => {
+    app.get("/users/getILiked/:id", validateTokenMiddleware, async (req, res) => {
         try {
-            const users = await svc.dao.getILiked(req.params.id)
+            const users = await svc.dao.getILiked(req.params.id);
             if (users === undefined) {
-                return res.status(404).end()
+                return res.status(404).end();
             }
-            return res.json(users)
-        } catch (e) { res.status(400).end() }
-    })
+            return res.json(users);
+        } catch (e) {
+            res.status(400).end();
+        }
+    });
 
-    app.get("/users/getMatches/:id", async (req, res) => {
+    app.get("/users/getMatches/:id", validateTokenMiddleware, async (req, res) => {
         try {
             const users = await svc.dao.getMatches(req.params.id);
             if (!users) {
@@ -111,4 +136,4 @@ module.exports = (app, svc) => {
             res.status(400).end();
         }
     });
-}
+};

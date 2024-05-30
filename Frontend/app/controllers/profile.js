@@ -1,8 +1,9 @@
 class ProfileController {
     constructor() {
+        this.token = sessionStorage.getItem('token');
         const apiUrl = 'http://localhost:3333';
-        this.usersRoutes = new UsersRoutes(apiUrl);
-        this.photosRoutes = new PhotosRoutes(apiUrl)
+        this.usersRoutes = new UsersRoutes(apiUrl, this.token);
+        this.photosRoutes = new PhotosRoutes(apiUrl, this.token)
         this.initialize();
         this.addEventListeners();
     }
@@ -124,7 +125,7 @@ class ProfileController {
                 document.getElementById('gender').options.item(2).selected = true;
             }
 
-            document.getElementById('cityInput').value = this.currentUser.city;
+            document.getElementById('cityInput').value = this.currentUser.city ? this.currentUser.city : "";
             document.getElementById('bio').textContent = this.currentUser.bio;
             document.getElementById('birthdate').value = this.currentUser.birthdate ? this.currentUser.birthdate.substring(0, 10) : "";
 

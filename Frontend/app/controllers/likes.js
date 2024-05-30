@@ -1,9 +1,10 @@
 class LikesController {
     constructor() {
+        this.token = sessionStorage.getItem('token');
         const apiUrl = 'http://localhost:3333';
-        this.usersRoutes = new UsersRoutes(apiUrl);
-        this.photosRoutes = new PhotosRoutes(apiUrl);
-        this.interactionsRoutes = new InteractionsRoutes(apiUrl);
+        this.usersRoutes = new UsersRoutes(apiUrl, this.token);
+        this.photosRoutes = new PhotosRoutes(apiUrl, this.token);
+        this.interactionsRoutes = new InteractionsRoutes(apiUrl, this.token);
         this.initialize();
     }
 

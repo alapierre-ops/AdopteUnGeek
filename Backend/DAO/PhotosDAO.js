@@ -4,30 +4,23 @@ module.exports = class PhotosDAO extends dao{
     constructor(db) {
         super(db,"Photos")
     }
-    delete(id) {
-        return this.db.query(`DELETE FROM ${this.tablename} WHERE id=$1`, [id])
+    addPhoto(id, photo) {
+        console.log("This is the dao with id " + id + " and photo = " + photo)
+        return this.db.query("INSERT INTO photos (user_id, photo_data) VALUES ($1, $2)",
+            [id, photo])
     }
-    getById(id) {
+
+    getPhotos(id) {
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT * FROM Photos WHERE id=$1`, [ id ])
-                .then(res => resolve(res.rows[0]) )
-                .catch(e => reject(e)))
+            this.db.query(`SELECT photo_data FROM photos WHERE user_id=$1`, [id])
+                .then(res => {
+                    resolve(res.rows[0].photo_data);
+                })
+                .catch(e => reject(e))
+        );
     }
 
-    getAll(){
-        return new Promise((resolve, reject) =>
-            this.db.query(`SELECT * FROM Photos`)
-                .then(res => resolve(res.rows) )
-                .catch(e => reject(e)))
-    }
-
-    insert(photos) {
-        return this.db.query("INSERT INTO photos(IDuser, url) VALUES ($1,$2)",
-            [photos.IDuser, photos.url])
-    }
-
-    update(photos) {
-        return this.db.query("UPDATE photos SET IDuser=$2,url=$3 WHERE id=$1",
-            [photos.id, photos.IDuser, photos.url])
+    deletePhoto(id) {
+        return this.db.query(`DELETE FROM photos WHERE user_id=$1`, [id])
     }
 }
