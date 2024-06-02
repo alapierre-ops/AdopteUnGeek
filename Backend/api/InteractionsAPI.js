@@ -7,7 +7,6 @@ module.exports = (app, svc) => {
         if (!token) {
             return res.status(401).json({ error: "Unauthorized: Token is missing" });
         }
-
         try {
             const decoded = jwt.verify(token, "secretKey");
             req.userId = decoded.userId;
@@ -18,41 +17,12 @@ module.exports = (app, svc) => {
         }
     };
 
-    app.get("/interactions", validateTokenMiddleware, async (req, res) => {
-        res.json(await svc.dao.getAll());
-    });
-
-    app.get("/interactions/:id", validateTokenMiddleware, async (req, res) => {
-        try {
-            const interactions = await svc.dao.getById(req.params.id);
-            if (interactions === undefined) {
-                return res.status(404).end();
-            }
-            return res.json(interactions);
-        } catch (e) {
-            res.status(400).end();
-        }
-    });
-
     app.post("/interactions/", validateTokenMiddleware, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
-        svc.dao.add(date, userWhoInteracted, userShown, liked)
+        svc.dao.addInteraction(date, userWhoInteracted, userShown, liked)
             .then(_ => {
                 res.status(200).json({});
             })
-            .catch(e => {
-                console.log(e);
-                res.status(500).end();
-            });
-    });
-
-    app.delete("/interactions/:id", validateTokenMiddleware, async (req, res) => {
-        const interactions = await svc.dao.getById(req.params.id);
-        if (interactions === undefined) {
-            return res.status(404).end();
-        }
-        svc.dao.delete(req.params.id)
-            .then(_ => res.status(200).end())
             .catch(e => {
                 console.log(e);
                 res.status(500).end();
@@ -68,7 +38,7 @@ module.exports = (app, svc) => {
         if (await svc.dao.getById(interactions.id) === undefined) {
             return res.status(404).end();
         }
-        svc.dao.insert(interactions)
+        svc.dao.insertInteraction(interactions)
             .then(_ => res.status(200).end())
             .catch(e => {
                 console.log(e);

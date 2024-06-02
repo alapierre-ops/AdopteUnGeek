@@ -1,6 +1,6 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http');
-const { app, seedDatabase, usersServices} = require("../main");
+const { app, seedDatabase, usersService} = require("../main");
 const {expect} = require("chai");
 const should = chai.should();
 
@@ -13,13 +13,14 @@ describe('API Tests', function() {
     before( (done) => {
         seedDatabase().then( async () => {
             console.log("Creating test user");
-            usersServices.insert('User1', 'user1', 'default').then( () =>
+            usersService.dao.signUp('User1', 'user1', 'default').then( () =>
                 chai.request(app)
                     .post('/users/auth/login')
                     .send({email: 'user1', password: 'default'})
                     .end((err, res) => {
                         res.should.have.status(200);
                         token = res.body.token;
+                        this.userID1 = res.body.user.id;
                         done();
                     })
             )})
@@ -27,28 +28,27 @@ describe('API Tests', function() {
 
     after( (done) => {
         console.log("Deleting test user")
-        usersServices.get('user1').then(
+        usersService.dao.getByEmail('user1').then(
             (user) => {
-                usersServices.dao.delete(user.id).then(done())
+                usersService.dao.delete(user.id).then(done())
             }
         )
     })
 
     it('should allow access with valid token', (done) => {
         chai.request(app)
-            .get('/users/getMatches/1')
+            .get(`/users/${this.userID1}`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-                res.body.should.have.lengthOf(0);
+                res.body.should.be.a('Object');
                 done();
             });
     });
 
     it('should deny access with invalid token', (done) => {
         chai.request(app)
-            .get('/users/getMatches/1')
+            .get(`/users/${this.userID1}`)
             .set('Authorization', 'Bearer wrongtoken')
             .end((err, res) => {
                 res.should.have.status(401);
@@ -56,20 +56,20 @@ describe('API Tests', function() {
             });
     });
 
-    // Tests insertion de données
     it('should insert a new user', (done) => {
         chai.request(app)
-            .post('/users/add')
+            .post('/users/auth/signup')
             .send({ nickname: 'User2', email: 'user2@example.com', password: 'default' })
             .end((err, res) => {
-                res.should.have.status(200);
+                res.should.have.status(201);
+                this.userID2 = res.body.id;
                 done();
             });
     });
 
     it('should not insert a user with missing fields', (done) => {
         chai.request(app)
-            .post('/users/add')
+            .post('/users/auth/signup')
             .send({ email: 'user3@example.com', password: 'default' })
             .end((err, res) => {
                 res.should.have.status(400);
@@ -77,17 +77,16 @@ describe('API Tests', function() {
             });
     });
 
-    // Tests sélection de données
     let user;
     it('should return a specific user by id', (done) => {
-        usersServices.getByEmail('user1@example.com').then((retrievedUser) => {
+        usersService.dao.getByEmail('user1').then((retrievedUser) => {
             chai.request(app)
                 .get(`/users/${retrievedUser.id}`)
                 .set('Authorization', `Bearer ${token}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.an('object');
-                    res.body.should.include({ nickname: 'User1', email: 'user1@example.com' });
+                    res.body.should.include({ nickname: 'User1', email: 'user1' });
                     user = res.body;
                     done();
                 });
@@ -114,19 +113,6 @@ describe('API Tests', function() {
             });
     });
 
-    // Tests suppression de données
-    it('should delete a user', (done) => {
-        usersServices.getByEmail('user2@example.com').then((retrievedUser) => {
-            chai.request(app)
-                .delete(`/users/${retrievedUser.id}`)
-                .set('Authorization', `Bearer ${token}`)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    done();
-                });
-        });
-    });
-
     it('should not delete a user with an unknown id', (done) => {
         chai.request(app)
             .delete(`/users/12345`)
@@ -145,5 +131,71 @@ describe('API Tests', function() {
                 res.should.have.status(400);
                 done();
             });
+    });
+
+    it('should send a message between two users', (done) => {
+        chai.request(app)
+            .post(`/messages/${this.userID1}/${this.userID2}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ content: 'Hello, User2!' })
+            .end((err, res) => {
+                res.should.have.status(204);
+                done();
+            });
+    });
+
+    it('should fail to send a message with invalid user ids', (done) => {
+        chai.request(app)
+            .post(`/messages/invalidID/invalidID`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ content: 'This should fail' })
+            .end((err, res) => {
+                res.should.have.status(400);
+                done();
+            });
+    });
+
+    it('should fail to send a message with missing content', (done) => {
+        chai.request(app)
+            .post(`/messages/${this.userID1}/${this.userID2}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ content: '' })
+            .end((err, res) => {
+                res.should.have.status(400);
+                done();
+            });
+    });
+
+    it('should retrieve messages between two users', (done) => {
+        chai.request(app)
+            .get(`/messages/${this.userID1}/${this.userID2}`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.an('array');
+                done();
+            });
+    });
+
+    it('should return 404 for messages between two users with no messages', (done) => {
+        chai.request(app)
+            .get(`/messages/11223/28683`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                res.should.have.status(404);
+                done();
+            });
+    });
+
+    it('should delete a user', (done) => {
+        usersService.dao.getByEmail('user2@example.com').then((retrievedUser) => {
+            chai.request(app)
+                .delete(`/users/${retrievedUser.id}`)
+                .set('Authorization', `Bearer ${token}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
     });
 });

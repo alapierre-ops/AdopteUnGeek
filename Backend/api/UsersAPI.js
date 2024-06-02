@@ -32,20 +32,10 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.post("/users/add", validateTokenMiddleware, (req, res) => {
-        const users = req.body;
-        if (!svc.isValid(users)) {
+    app.delete("/users/:id", validateTokenMiddleware, async (req, res) => {
+        if(isNaN(req.params.id)){
             return res.status(400).end();
         }
-        svc.dao.insert(users)
-            .then(() => res.status(200).end())
-            .catch(e => {
-                console.error(e);
-                res.status(500).end();
-            });
-    });
-
-    app.delete("/users/:id", validateTokenMiddleware, async (req, res) => {
         const users = await svc.dao.getById(req.params.id);
         if (users === undefined) {
             return res.status(404).end();
@@ -115,6 +105,10 @@ module.exports = (app, svc) => {
 
     app.post("/users/auth/signup", async (req, res) => {
         const { nickname, email, password } = req.body;
+
+        if(!nickname || !email || !password) {
+            return res.status(400).end();
+        }
         try {
             const existingUser = await svc.dao.getByEmail(email);
             if (existingUser) {
@@ -123,7 +117,7 @@ module.exports = (app, svc) => {
             await svc.dao.signUp(nickname, email, password);
             const newUser = await svc.dao.getByEmail(email);
             const token = svc.generateToken(newUser.id);
-            return res.status(201).json({ message: "Votre compte a été créé avec succès.", token });
+            return res.status(201).json({ message: "Votre compte a été créé avec succès.", token, id: newUser.id });
         } catch (e) {
             console.error(e);
             return res.status(500).json({ message: "Erreur interne, veuillez réessayer plus tard." });

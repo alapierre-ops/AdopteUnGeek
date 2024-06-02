@@ -10,13 +10,12 @@ services:
     ports:
       - "3333:3333"
     volumes:
-      - .:/app
       - /app/node_modules
     environment:
-      - CONNECTION_STRING=postgres://user:password@localhost/Projet
+      - CONNECTION_STRING=postgres://user:password@postgresql/Projet
       - PORT=3333
       - NODE_ENV=development
-    command: node main.js
+    command: npm run run
     networks:
       - app-network
 

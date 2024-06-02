@@ -32,11 +32,6 @@ module.exports = class UsersDAO extends dao {
                 .catch(e => reject(e)))
     }
 
-    insert(users) {
-        return this.db.query("INSERT INTO users(nickname, email, phoneNumber, password, bio, birthdate, gender, links, tags) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
-            [users.nickname, users.email, users.phoneNumber, users.password, users.bio, users.birthdate, users.gender, users.links, users.tags])
-    }
-
 
     async authenticate(email, password) {
         console.log("Authenticate: " + email + " " + password)

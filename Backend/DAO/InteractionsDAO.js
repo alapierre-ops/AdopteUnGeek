@@ -5,12 +5,12 @@ module.exports = class InteractionsDAO extends dao{
         super(db,"interactions")
     }
 
-    insert(interactions) {
+    insertInteraction(interactions) {
         return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
             [interactions.date, interactions.userWhoInteracted, interactions.userShown, interactions.liked])
     }
 
-    add(date, userWhoInteracted, userShown, liked) {
+    addInteraction(date, userWhoInteracted, userShown, liked) {
         return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
             [date, userWhoInteracted, userShown, liked])
     }
