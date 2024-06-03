@@ -19,6 +19,7 @@ app.use(cors())
 app.use(morgan('dev'));
 app.use(cookieParser())
 
+
 let dsn = process.env.CONNECTION_STRING;
 if (dsn === undefined) {
     const {env} = process;
