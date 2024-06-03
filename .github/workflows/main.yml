@@ -2,9 +2,10 @@ name: Backend CI
 
 on:
   push:
-    branches: [ Cleanup ]
+
+    branches: [ main ]
   pull_request:
-    branches: [ Cleanup ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -46,4 +47,5 @@ jobs:
         env:
           CONNECTION_STRING: postgresql://ci_user:ci_password@localhost:5432/ci_db
           CI: true
+
         working-directory: ./Backend
