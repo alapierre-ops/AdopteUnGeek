@@ -1,14 +1,17 @@
 class MessagesController {
     constructor() {
+        this.token = sessionStorage.getItem('token');
         const apiUrl = 'http://localhost:3333';
-        this.usersRoutes = new UsersRoutes(apiUrl);
+        this.usersRoutes = new UsersRoutes(apiUrl, this.token);
+        this.photosRoutes = new PhotosRoutes(apiUrl, this.token)
+        this.messagesRoutes = new MessagesRoutes(apiUrl, this.token)
+        this.interactionsRoutes = new InteractionsRoutes(apiUrl, this.token)
         this.initialize();
         this.addEventListeners();
     }
 
     async initialize() {
         this.userID = await this.isUserLoggedIn()
-        this.currentUser = await this.usersRoutes.getUser(this.userID)
         await this.fetchMatches()
 
         const url = window.location.href;
@@ -22,11 +25,17 @@ class MessagesController {
 
     async fetchMatches() {
         try {
-            const matches = await this.usersRoutes.getMatches(this.userID);
+            const matches = await this.interactionsRoutes.getMatches(this.userID);
+
+            console.log("fetchMatches(): ", matches)
 
             const matchesList = document.getElementById('matchesList');
 
             matchesList.innerHTML = '';
+
+            if (matches.length > 0) {
+                await this.loadMessages(matches[0].id, matches[0].nickname);
+            }
 
             matches.forEach(match => {
                 const listItem = document.createElement('li');
@@ -58,9 +67,9 @@ class MessagesController {
             nickname = user.nickname
         }
         document.getElementById("nickname").textContent = nickname;
-        document.getElementById('userPhoto').src = await this.usersRoutes.getUserPhotos(this.otherUserID)
+        document.getElementById('userPhoto').src = await this.photosRoutes.getUserPhotos(this.otherUserID)
 
-        const messages = await this.usersRoutes.getMessages(this.userID, this.otherUserID);
+        const messages = await this.messagesRoutes.getMessages(this.userID, this.otherUserID);
 
         const messageContainer = document.getElementById('messageContainer');
 
@@ -99,7 +108,7 @@ class MessagesController {
         document.getElementById('sendButton').addEventListener('click', async () => {
             const messageInput = document.getElementById('messageInput').value;
             if (messageInput.trim() !== '') {
-                await this.usersRoutes.sendMessage(this.userID, this.otherUserID, messageInput);
+                await this.messagesRoutes.sendMessage(this.userID, this.otherUserID, messageInput);
                 await this.loadMessages(this.otherUserID);
                 document.getElementById('messageInput').value = '';
             }
@@ -176,7 +185,7 @@ class MessagesController {
     }
 
     goToProfile() {
-        this.usersRoutes.getUserPhotos(this.userID)
+        this.photosRoutes.getUserPhotos(this.userID)
             .then(res => {
                 if (!res) {
                     console.log("goToProfile(): Profile not complete, can't preview");
