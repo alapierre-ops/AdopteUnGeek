@@ -2,6 +2,7 @@ name: Backend CI
 
 on:
   push:
+
     branches: [ main ]
   pull_request:
     branches: [ main ]
@@ -46,4 +47,5 @@ jobs:
         env:
           CONNECTION_STRING: postgresql://ci_user:ci_password@localhost:5432/ci_db
           CI: true
+
         working-directory: ./Backend

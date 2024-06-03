@@ -1,7 +1,8 @@
 class UsersRoutes {
-    constructor(apiUrl) {
+    constructor(apiUrl, token) {
         console.log("UsersRoute : apiUrl == " + apiUrl)
-        this.apiUrl = apiUrl+"/users";
+        this.apiUrl = apiUrl + "/users";
+        this.token = token;
     }
 
     async insert(userAccount) {
@@ -58,6 +59,7 @@ class UsersRoutes {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify({ token })
         });
@@ -67,90 +69,21 @@ class UsersRoutes {
         return await response.json()
     }
 
-    async getLikedMe(userID) {
-        return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/getLikedMe/${userID}`)
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch users: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-    async getILiked(userID) {
-        return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/getILiked/${userID}`)
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch users: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-    async getMatches(userID) {
-        return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/getMatches/${userID}`)
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch users: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-    async getNextUser(userID, shownUserIds) {
-        console.log("getNextUser(): shownUserIds == " + shownUserIds)
-        return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/nextUser/${userID}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(shownUserIds)
-            })
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    } else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch user: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-
     async getUser(userID) {
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${userID}`)
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch user: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
+            fetch(`${this.apiUrl}/${userID}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + this.token
+                }
+            }).then(res => {
+                if (res.ok) {
+                    resolve(res.json());
+                } else {
+                    reject(res.status);
+                    throw new Error(`Failed to fetch user: ${res.status}`);
+                }
+            }).catch(err => reject(err));
         });
     }
 
@@ -160,7 +93,8 @@ class UsersRoutes {
             const response = await fetch(`${this.apiUrl}/${userId}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.token
                 },
                 body: JSON.stringify(userData)
             });
@@ -173,102 +107,10 @@ class UsersRoutes {
                 return { success: true };
             }
         } catch (error) {
-            if(error.message !== "JSON.parse: unexpected end of data at line 1 column 1 of the JSON data"){
+            if (error.message !== "JSON.parse: unexpected end of data at line 1 column 1 of the JSON data") {
                 console.error('Error updating user:', error.message);
                 return { error: error.message };
             }
-        }
-    }
-
-    async updatePhotos(userId, photo) {
-        console.log("updatePhotos(): userId == " + userId + " photo == " + photo)
-
-        await fetch(`${this.apiUrl}/${userId}/photos`, {
-            method: 'DELETE',
-        });
-
-        try {
-            const response = await fetch(`${this.apiUrl}/${userId}/photo`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'image/jpeg'
-                },
-                body: photo
-            });
-            if (!response.ok) {
-                return { error: response.statusText };
-            }
-            if (response.status !== 204) {
-                return await response.json();
-            } else {
-                return { success: true };
-            }
-        } catch (error) {
-            if(error.message !== "JSON.parse: unexpected end of data at line 1 column 1 of the JSON data"){
-                console.error('Error updating photo:', error.message);
-                return { error: error.message };
-            }
-        }
-    }
-
-    async getUserPhotos(userID) {
-        return new Promise((resolve, reject) => {
-            console.log("getUserPhotos(): userID == " + userID)
-            fetch(`${this.apiUrl}/${userID}/photos`)
-                .then(async res => {
-                    if (res.status === 200) {
-                        const blob = await res.blob();
-                        resolve(URL.createObjectURL(blob));
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch photos: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-    async getMessages(currentUser, otherUser) {
-        return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/messages/${currentUser}/${otherUser}`)
-                .then(res => {
-                    if (res.ok) {
-                        resolve(res.json());
-                    }
-                    else {
-                        reject(res.status);
-                        throw new Error(`Failed to fetch user: ${res.status}`);
-                    }
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-    async sendMessage(senderID, receiverID, content) {
-        console.log("content = " , content)
-        console.log("senderID = " , senderID)
-        console.log("receiverID = " , receiverID)
-
-        try {
-            const response = await fetch(`${this.apiUrl}/messages/${senderID}/${receiverID}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content: content })
-            });
-            if (!response.ok) {
-                return { error: response.statusText };
-            }
-            if (response.status !== 204) {
-                return await response.json();
-            } else {
-                return { success: true };
-            }
-        } catch (error) {
-            console.error('Error updating photo:', error.message);
-            return { error: error.message };
         }
     }
 }

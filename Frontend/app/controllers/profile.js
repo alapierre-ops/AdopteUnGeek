@@ -1,7 +1,9 @@
 class ProfileController {
     constructor() {
+        this.token = sessionStorage.getItem('token');
         const apiUrl = 'http://localhost:3333';
-        this.usersRoutes = new UsersRoutes(apiUrl);
+        this.usersRoutes = new UsersRoutes(apiUrl, this.token);
+        this.photosRoutes = new PhotosRoutes(apiUrl, this.token)
         this.initialize();
         this.addEventListeners();
     }
@@ -18,7 +20,7 @@ class ProfileController {
     }
 
     addEventListeners(){
-        const form = document.getElementById('form');
+        const form = document.getElementById('profile-form');
         form.addEventListener('submit', function(event) {
             if (event.target.id === 'photoForm') {
                 this.handleConfirm(event);
@@ -83,7 +85,7 @@ class ProfileController {
         console.log("handlePhotoInputChange()");
         const file = document.getElementById('photoInput').files[0];
         try {
-            await this.usersRoutes.updatePhotos(this.userID, file);
+            await this.photosRoutes.updatePhotos(this.userID, file);
             console.log("handlePhotoInputChange(): photo changed successfully");
             await this.displayPhotoPreview();
         } catch (error) {
@@ -123,12 +125,12 @@ class ProfileController {
                 document.getElementById('gender').options.item(2).selected = true;
             }
 
-            document.getElementById('cityInput').value = this.currentUser.city;
+            document.getElementById('cityInput').value = this.currentUser.city ? this.currentUser.city : "";
             document.getElementById('bio').textContent = this.currentUser.bio;
             document.getElementById('birthdate').value = this.currentUser.birthdate ? this.currentUser.birthdate.substring(0, 10) : "";
 
-            await this.displayPhotoPreview()
             this.selectedTags = this.currentUser.tags ? this.currentUser.tags.split(',') : [];
+            await this.displayPhotoPreview()
             this.colorSelectedTags();
         } catch (error) {
             console.error("getUserInfo():", error);
@@ -148,7 +150,7 @@ class ProfileController {
 
     async displayPhotoPreview() {
         console.log("displayPhotoPreview()");
-        this.currentUser.photo = await this.usersRoutes.getUserPhotos(this.currentUser.id);
+        this.currentUser.photo = await this.photosRoutes.getUserPhotos(this.currentUser.id);
         if (this.currentUser.photo) {
             console.log("getUserInfo(): photo found");
             document.getElementById('preview').src = this.currentUser.photo;

@@ -17,10 +17,11 @@
         <i class="fas fa-filter" id="filterIcon"></i>
     </div>
 
+
     <div class="person">
         <i class="far fa-thumbs-down" id="skipIcon"></i>
         <div class="image-container">
-            <img alt="main picture" id="imageContainer">
+            <img alt="main picture" id="imageContainer" src="#">
             <div class="textContainer" id="textContainer">
                 <div class="userFirstRow">
                     <h4 id="userName"></h4>
@@ -32,6 +33,10 @@
             </div>
         </div>
         <i class="far fa-thumbs-up" id="likeIcon"></i>
+        <div class="mobile-icons">
+            <i class="far fa-thumbs-down" id="likeIcon2"></i>
+            <i class="far fa-thumbs-up" id="skipIcon2"></i>
+        </div>
     </div>
 
     <div class="footer">
@@ -51,17 +56,17 @@
             <div class="range_container">
                 Âge
                 <div class="sliders_control">
-                    <input id="fromSlider" type="range" value="18" min="18" max="99" class="ageSlider"/>
-                    <input id="toSlider" type="range" value="40" min="18" max="99" class="ageSlider"/>
+                    <input id="fromSlider" type="range" value="0" min="0" max="38" class="ageSlider"/>
+                    <input id="toSlider" type="range" value="22" min="0" max="38" class="ageSlider"/>
                 </div>
                 <div class="form_control">
                     <div class="form_control_container">
                         <div class="form_control_container__time">Min</div>
-                        <input class="form_control_container__time__input" type="number" id="fromInput" value="18" min="18" max="99"/>
+                        <input class="form_control_container__time__input" type="number" id="fromInput" value="18" min="18" max="80"/>
                     </div>
                     <div class="form_control_container">
                         <div class="form_control_container__time">Max</div>
-                        <input class="form_control_container__time__input" type="number" id="toInput" value="40" min="18" max="99"/>
+                        <input class="form_control_container__time__input" type="number" id="toInput" value="40" min="18" max="80"/>
                     </div>
                 </div>
             </div>
@@ -80,7 +85,7 @@
                     <option value="male">Homme</option>
                     <option value="female">Femme</option>
                     <option value="both">Tout</option>
-                </select><br><br>
+                </select>
             </div>
 
             <div class="button-container">
@@ -91,9 +96,10 @@
 
     <script src="base64js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script type="application/ecmascript" src="../app/tools.js"></script>
     <script type="application/ecmascript" src="../app/services/usersRoutes.js"></script>
     <script type="application/ecmascript" src="../app/services/interactionsRoutes.js"></script>
+    <script type="application/ecmascript" src="../app/services/photosRoutes.js"></script>
+    <script type="application/ecmascript" src="../app/services/messagesRoutes.js"></script>
     <script type="application/ecmascript" src="../app/controllers/index.js"></script>
 </body>
 </html>
