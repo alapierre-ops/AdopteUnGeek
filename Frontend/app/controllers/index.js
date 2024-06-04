@@ -20,6 +20,7 @@ class IndexController {
 
         this.currentUserID = await this.isUserLoggedIn();
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
+        if (!this.currentUser.photo) {window.location.href = "profile.html"}
 
         try {
             if(!await this.hasFilters()) return

@@ -15,7 +15,7 @@ describe('API Tests', function() {
             console.log("Creating test user");
             usersService.dao.signUp('User1', 'user1', 'default').then( () =>
                 chai.request(app)
-                    .post('/users/auth/login')
+                    .post('/api/users/auth/login')
                     .send({email: 'user1', password: 'default'})
                     .end((err, res) => {
                         res.should.have.status(200);
@@ -37,7 +37,7 @@ describe('API Tests', function() {
 
     it('should allow access with valid token', (done) => {
         chai.request(app)
-            .get(`/users/${this.userID1}`)
+            .get(`/api/users/${this.userID1}`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200);
@@ -48,7 +48,7 @@ describe('API Tests', function() {
 
     it('should deny access with invalid token', (done) => {
         chai.request(app)
-            .get(`/users/${this.userID1}`)
+            .get(`/api/users/${this.userID1}`)
             .set('Authorization', 'Bearer wrongtoken')
             .end((err, res) => {
                 res.should.have.status(401);
@@ -58,7 +58,7 @@ describe('API Tests', function() {
 
     it('should insert a new user', (done) => {
         chai.request(app)
-            .post('/users/auth/signup')
+            .post('/api/users/auth/signup')
             .send({ nickname: 'User2', email: 'user2@example.com', password: 'default' })
             .end((err, res) => {
                 res.should.have.status(201);
@@ -69,7 +69,7 @@ describe('API Tests', function() {
 
     it('should not insert a user with missing fields', (done) => {
         chai.request(app)
-            .post('/users/auth/signup')
+            .post('/api/users/auth/signup')
             .send({ email: 'user3@example.com', password: 'default' })
             .end((err, res) => {
                 res.should.have.status(400);
@@ -81,7 +81,7 @@ describe('API Tests', function() {
     it('should return a specific user by id', (done) => {
         usersService.dao.getByEmail('user1').then((retrievedUser) => {
             chai.request(app)
-                .get(`/users/${retrievedUser.id}`)
+                .get(`/api/users/${retrievedUser.id}`)
                 .set('Authorization', `Bearer ${token}`)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -95,7 +95,7 @@ describe('API Tests', function() {
 
     it('should not return a user with an invalid id', (done) => {
         chai.request(app)
-            .get(`/users/invalidID`)
+            .get(`/api/users/invalidID`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(400);
@@ -105,7 +105,7 @@ describe('API Tests', function() {
 
     it('should not return a user with an unknown id', (done) => {
         chai.request(app)
-            .get(`/users/12345`)
+            .get(`/api/users/12345`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(404);
@@ -115,7 +115,7 @@ describe('API Tests', function() {
 
     it('should not delete a user with an unknown id', (done) => {
         chai.request(app)
-            .delete(`/users/12345`)
+            .delete(`/api/users/12345`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(404);
@@ -125,7 +125,7 @@ describe('API Tests', function() {
 
     it('should not delete a user with an invalid id', (done) => {
         chai.request(app)
-            .delete(`/users/invalidID`)
+            .delete(`/api/users/invalidID`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(400);
@@ -135,7 +135,7 @@ describe('API Tests', function() {
 
     it('should send a message between two users', (done) => {
         chai.request(app)
-            .post(`/messages/${this.userID1}/${this.userID2}`)
+            .post(`/api/messages/${this.userID1}/${this.userID2}`)
             .set('Authorization', `Bearer ${token}`)
             .send({ content: 'Hello, User2!' })
             .end((err, res) => {
@@ -146,7 +146,7 @@ describe('API Tests', function() {
 
     it('should fail to send a message with invalid user ids', (done) => {
         chai.request(app)
-            .post(`/messages/invalidID/invalidID`)
+            .post(`/api/messages/invalidID/invalidID`)
             .set('Authorization', `Bearer ${token}`)
             .send({ content: 'This should fail' })
             .end((err, res) => {
@@ -157,7 +157,7 @@ describe('API Tests', function() {
 
     it('should fail to send a message with missing content', (done) => {
         chai.request(app)
-            .post(`/messages/${this.userID1}/${this.userID2}`)
+            .post(`/api/messages/${this.userID1}/${this.userID2}`)
             .set('Authorization', `Bearer ${token}`)
             .send({ content: '' })
             .end((err, res) => {
@@ -168,7 +168,7 @@ describe('API Tests', function() {
 
     it('should retrieve messages between two users', (done) => {
         chai.request(app)
-            .get(`/messages/${this.userID1}/${this.userID2}`)
+            .get(`/api/messages/${this.userID1}/${this.userID2}`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200);
@@ -179,7 +179,7 @@ describe('API Tests', function() {
 
     it('should return 404 for messages between two users with no messages', (done) => {
         chai.request(app)
-            .get(`/messages/11223/28683`)
+            .get(`/api/messages/11223/28683`)
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(404);
@@ -190,7 +190,7 @@ describe('API Tests', function() {
     it('should delete a user', (done) => {
         usersService.dao.getByEmail('user2@example.com').then((retrievedUser) => {
             chai.request(app)
-                .delete(`/users/${retrievedUser.id}`)
+                .delete(`/api/users/${retrievedUser.id}`)
                 .set('Authorization', `Bearer ${token}`)
                 .end((err, res) => {
                     res.should.have.status(200);
