@@ -1,24 +1,7 @@
 const jwt = require('jsonwebtoken');
-const jwtFunc = require("../jwt");
+const jwtFunc = require("../jwt")();
 
 module.exports = (app, svc) => {
-
-    const validateTokenMiddleware = (req, res, next) => {
-        const token = req.headers.authorization.substring(7);
-        console.log("Token back: " + token);
-        if (!token) {
-            return res.status(401).json({ error: "Unauthorized: Token is missing" });
-        }
-
-        try {
-            const decoded = jwt.verify(token, "secretKey");
-            req.userId = decoded.userId;
-            next();
-        } catch (error) {
-            console.error("Error verifying token:", error);
-            return res.status(401).json({ error: "Unauthorized: " + error.message });
-        }
-    };
 
     app.get("/users/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
@@ -33,7 +16,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.delete("/users/:id", validateTokenMiddleware, async (req, res) => {
+    app.delete("/users/:id", jwtFunc.validateJWT, async (req, res) => {
         if(isNaN(req.params.id)){
             return res.status(400).end();
         }
@@ -49,7 +32,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.put("/users", validateTokenMiddleware, async (req, res) => {
+    app.put("/users", jwtFunc.validateJWT, async (req, res) => {
         const users = req.body;
         if ((users.id === undefined) || (users.id == null) || (!svc.isValid(users))) {
             return res.status(400).end();
@@ -125,7 +108,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.patch("/users/:id", validateTokenMiddleware, async (req, res) => {
+    app.patch("/users/:id", jwtFunc.validateJWT, async (req, res) => {
         const userId = req.params.id;
         const userData = req.body;
 

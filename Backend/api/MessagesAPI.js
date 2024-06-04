@@ -1,24 +1,9 @@
 const jwt = require("jsonwebtoken");
+const jwtFunc = require("../jwt")()
 
 module.exports = (app, svc) => {
 
-    const validateTokenMiddleware = (req, res, next) => {
-        const token = req.headers.authorization.substring(7);
-        if (!token) {
-            return res.status(401).json({ error: "Unauthorized: Token is missing" });
-        }
-
-        try {
-            const decoded = jwt.verify(token, "secretKey");
-            req.userId = decoded.userId;
-            next();
-        } catch (error) {
-            console.error("Error verifying token:", error);
-            return res.status(401).json({ error: "Unauthorized: " + error.message });
-        }
-    };
-
-    app.get("/messages", validateTokenMiddleware, async (req, res) => {
+    app.get("/messages", jwtFunc.validateJWT, async (req, res) => {
         try {
             const messages = await svc.dao.getAll();
             return res.json(messages);
@@ -28,7 +13,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/messages/:sender_id/:receiver_id", validateTokenMiddleware, async (req, res) => {
+    app.get("/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const messages = await svc.dao.getMessages(req.params.sender_id, req.params.receiver_id);
             console.log("messages/:id1/:id2 == ", messages);
@@ -43,7 +28,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.post("/messages/:sender_id/:receiver_id", validateTokenMiddleware, async (req, res) => {
+    app.post("/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
         const sender_id = req.params.sender_id;
         const receiver_id = req.params.receiver_id;
         const content = req.body.content;

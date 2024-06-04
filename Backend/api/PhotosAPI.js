@@ -1,24 +1,8 @@
 const jimp = require("jimp");
 const jwt = require("jsonwebtoken");
+const jwtFunc = require("../jwt")()
 module.exports = (app, svc) => {
-
-    const validateTokenMiddleware = (req, res, next) => {
-        const token = req.headers.authorization.substring(7);
-        if (!token) {
-            return res.status(401).json({ error: "Unauthorized: Token is missing" });
-        }
-
-        try {
-            const decoded = jwt.verify(token, "secretKey");
-            req.userId = decoded.userId;
-            next();
-        } catch (error) {
-            console.error("Error verifying token:", error);
-            return res.status(401).json({ error: "Unauthorized: " + error.message });
-        }
-    };
-
-    app.patch("/photos/:id", validateTokenMiddleware, async (req, res) => {
+    app.patch("/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         const userId = req.params.id;
         const photo = req.body;
 
@@ -36,7 +20,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.get("/photos/:id", validateTokenMiddleware, async (req, res) => {
+    app.get("/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const photo = await svc.dao.getPhotos(req.params.id)
             if (photo === undefined) {
@@ -66,7 +50,7 @@ module.exports = (app, svc) => {
         }
     })
 
-    app.delete("/photos/:id", validateTokenMiddleware, async (req, res) => {
+    app.delete("/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         svc.dao.deletePhoto(req.params.id)
             .then(_ => res.status(200).end())
             .catch(e => {

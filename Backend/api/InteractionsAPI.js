@@ -1,22 +1,7 @@
 const jwt = require("jsonwebtoken");
-const jwtFunc = require("../jwt")
+const jwtFunc = require("../jwt")()
 
 module.exports = (app, svc) => {
-
-    const validateTokenMiddleware = (req, res, next) => {
-        const token = req.headers.authorization.substring(7);
-        if (!token) {
-            return res.status(401).json({ error: "Unauthorized: Token is missing" });
-        }
-        try {
-            const decoded = jwt.verify(token, "secretKey");
-            req.userId = decoded.userId;
-            next();
-        } catch (error) {
-            console.error("Error verifying token:", error);
-            return res.status(401).json({ error: "Unauthorized: " + error.message });
-        }
-    };
 
     app.post("/interactions/", jwtFunc.validateJWT, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
@@ -30,7 +15,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.put("/interactions", validateTokenMiddleware, async (req, res) => {
+    app.put("/interactions", jwtFunc.validateJWT, async (req, res) => {
         const interactions = req.body;
         console.log(interactions);
         if ((interactions.id === undefined) || (interactions.id == null)) {
@@ -47,7 +32,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.post("/users/nextUser/:id", validateTokenMiddleware, async (req, res) => {
+    app.post("/users/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             console.log("nextUser/:id : id == " + req.params.id);
             const currentUser = await svc.dao.getById(req.params.id);
@@ -71,7 +56,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getLikedMe/:id", validateTokenMiddleware, async (req, res) => {
+    app.get("/users/getLikedMe/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getLikedMe(req.params.id);
             if (users === undefined) {
@@ -83,7 +68,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getILiked/:id", validateTokenMiddleware, async (req, res) => {
+    app.get("/users/getILiked/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getILiked(req.params.id);
             if (users === undefined) {
@@ -95,7 +80,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getMatches/:id", validateTokenMiddleware, async (req, res) => {
+    app.get("/users/getMatches/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getMatches(req.params.id);
             if (!users) {
