@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const jwtFunc = require("../jwt")();
+const usersServices = require("../Services/UsersServices")
+const jwtFunc = require("../jwt")(usersServices);
 
 module.exports = (app, svc) => {
 
