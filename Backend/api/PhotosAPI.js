@@ -2,7 +2,8 @@ const jimp = require("jimp");
 const jwt = require("jsonwebtoken");
 const jwtFunc = require("../jwt")()
 module.exports = (app, svc) => {
-    app.patch("/photos/:id", jwtFunc.validateJWT, async (req, res) => {
+
+    app.patch("/api/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         const userId = req.params.id;
         const photo = req.body;
 
@@ -20,7 +21,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.get("/photos/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const photo = await svc.dao.getPhotos(req.params.id)
             if (photo === undefined) {
@@ -50,7 +51,7 @@ module.exports = (app, svc) => {
         }
     })
 
-    app.delete("/photos/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.delete("/api/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         svc.dao.deletePhoto(req.params.id)
             .then(_ => res.status(200).end())
             .catch(e => {

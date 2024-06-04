@@ -3,7 +3,7 @@ const jwtFunc = require("../jwt")()
 
 module.exports = (app, svc) => {
 
-    app.post("/interactions/", jwtFunc.validateJWT, (req, res) => {
+    app.post("/api/interactions/", jwtFunc.validateJWT, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
         svc.dao.addInteraction(date, userWhoInteracted, userShown, liked)
             .then(_ => {
@@ -15,7 +15,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.put("/interactions", jwtFunc.validateJWT, async (req, res) => {
+    app.put("/api/interactions", jwtFunc.validateJWT, async (req, res) => {
         const interactions = req.body;
         console.log(interactions);
         if ((interactions.id === undefined) || (interactions.id == null)) {
@@ -32,7 +32,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.post("/users/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.post("/api/users/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             console.log("nextUser/:id : id == " + req.params.id);
             const currentUser = await svc.dao.getById(req.params.id);
@@ -56,7 +56,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getLikedMe/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/users/getLikedMe/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getLikedMe(req.params.id);
             if (users === undefined) {
@@ -68,7 +68,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getILiked/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/users/getILiked/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getILiked(req.params.id);
             if (users === undefined) {
@@ -80,7 +80,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/users/getMatches/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/users/getMatches/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getMatches(req.params.id);
             if (!users) {

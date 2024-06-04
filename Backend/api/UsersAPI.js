@@ -3,7 +3,7 @@ const jwtFunc = require("../jwt")();
 
 module.exports = (app, svc) => {
 
-    app.get("/users/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const user = await svc.dao.getById(req.params.id);
             if (user === undefined) {
@@ -16,7 +16,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.delete("/users/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.delete("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
         if(isNaN(req.params.id)){
             return res.status(400).end();
         }
@@ -32,7 +32,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.put("/users", jwtFunc.validateJWT, async (req, res) => {
+    app.put("/api/users", jwtFunc.validateJWT, async (req, res) => {
         const users = req.body;
         if ((users.id === undefined) || (users.id == null) || (!svc.isValid(users))) {
             return res.status(400).end();
@@ -48,7 +48,7 @@ module.exports = (app, svc) => {
             });
     });
 
-    app.post("/users/auth/verify", async (req, res) => {
+    app.post("/api/users/auth/verify", async (req, res) => {
         const token = req.body.token;
         console.log("token being verified: " + token);
         if (!token) {
@@ -66,7 +66,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.post("/users/auth/login", async (req, res) => {
+    app.post("/api/users/auth/login", async (req, res) => {
         const { email, password } = req.body;
         console.log('back logIn');
         try {
@@ -108,7 +108,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.patch("/users/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.patch("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
         const userId = req.params.id;
         const userData = req.body;
 

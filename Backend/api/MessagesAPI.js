@@ -3,7 +3,7 @@ const jwtFunc = require("../jwt")()
 
 module.exports = (app, svc) => {
 
-    app.get("/messages", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/messages", jwtFunc.validateJWT, async (req, res) => {
         try {
             const messages = await svc.dao.getAll();
             return res.json(messages);
@@ -13,7 +13,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.get("/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const messages = await svc.dao.getMessages(req.params.sender_id, req.params.receiver_id);
             console.log("messages/:id1/:id2 == ", messages);
@@ -28,7 +28,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.post("/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
+    app.post("/api/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
         const sender_id = req.params.sender_id;
         const receiver_id = req.params.receiver_id;
         const content = req.body.content;
