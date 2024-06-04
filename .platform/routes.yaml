@@ -1,7 +1,11 @@
 # Each route describes how an incoming URL is going to be processed by Platform.sh.
-"https://www.{default}/":
+"https://www.{default}/api":
   type: upstream
   upstream: "back:http"
+
+"https://www.{default}/":
+  type: upstream
+  upstream: "front:http"
 
 "https://{default}/":
   type: redirect
