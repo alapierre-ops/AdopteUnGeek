@@ -36,5 +36,5 @@ web:
     start: "node main.js"
   locations:
     '/':
-      root: '../Frontend/views'
+      root: 'Frontend/views'
       index: ['/index.html']
