@@ -4,5 +4,5 @@ type: 'nodejs:20'
 web:
   locations:
     '/':
-      root: 'views'
+      root: ''
       index: ['index.html']
