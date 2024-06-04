@@ -35,6 +35,6 @@ web:
   commands:
     start: "node main.js"
   locations:
-    '/': '../Frontend/views'
-    root: ''
-    index: ['index.html']
+    '/':
+      root: '../Frontend/views'
+      index: ['/index.html']
