@@ -1,4 +1,4 @@
-name: 'app'
+name: 'front'
 type: 'nodejs:20'
 
 web:
