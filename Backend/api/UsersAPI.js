@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const jwtFunc = require("../jwt");
 
 module.exports = (app, svc) => {
 
@@ -19,7 +20,7 @@ module.exports = (app, svc) => {
         }
     };
 
-    app.get("/users/:id", validateTokenMiddleware, async (req, res) => {
+    app.get("/users/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const user = await svc.dao.getById(req.params.id);
             if (user === undefined) {
@@ -103,7 +104,7 @@ module.exports = (app, svc) => {
         }
     });
 
-    app.post("/users/auth/signup", async (req, res) => {
+    app.post("/api/users/auth/signup", async (req, res) => {
         const { nickname, email, password } = req.body;
 
         if(!nickname || !email || !password) {

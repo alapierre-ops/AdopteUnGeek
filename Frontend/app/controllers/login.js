@@ -1,6 +1,6 @@
 class LoginController{
     constructor() {
-        const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/';
+        const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/api';
         this.usersRoutes = new UsersRoutes(apiUrl);
         this.bindSignUpForm();
         this.bindLogInForm();

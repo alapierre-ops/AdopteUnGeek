@@ -1,7 +1,7 @@
 class MessagesController {
     constructor() {
         this.token = sessionStorage.getItem('token');
-        const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/';
+        const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/api';
         this.usersRoutes = new UsersRoutes(apiUrl, this.token);
         this.photosRoutes = new PhotosRoutes(apiUrl, this.token)
         this.messagesRoutes = new MessagesRoutes(apiUrl, this.token)

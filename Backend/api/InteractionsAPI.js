@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const jwtFunc = require("../jwt")
 
 module.exports = (app, svc) => {
 
@@ -17,7 +18,7 @@ module.exports = (app, svc) => {
         }
     };
 
-    app.post("/interactions/", validateTokenMiddleware, (req, res) => {
+    app.post("/interactions/", jwtFunc.validateJWT, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
         svc.dao.addInteraction(date, userWhoInteracted, userShown, liked)
             .then(_ => {
