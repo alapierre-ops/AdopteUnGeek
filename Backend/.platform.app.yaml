@@ -34,7 +34,3 @@ relationships:
 web:
   commands:
     start: "node main.js"
-  locations:
-    '/':
-      root: 'Frontend/views'
-      index: ['/index.html']
