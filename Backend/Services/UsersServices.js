@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 module.exports = class UsersService {
     constructor(db) {
-        this.dao = new UsersDAO(db)
+        this.usersDAO = new UsersDAO(db)
     }
     isValid(user) {
         return true

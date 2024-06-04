@@ -5,7 +5,7 @@ module.exports = (app, svc) => {
 
     app.get("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
-            const user = await svc.dao.getById(req.params.id);
+            const user = await svc.usersDAO.getById(req.params.id);
             if (user === undefined) {
                 return res.status(404).end();
             }
@@ -20,11 +20,11 @@ module.exports = (app, svc) => {
         if(isNaN(req.params.id)){
             return res.status(400).end();
         }
-        const users = await svc.dao.getById(req.params.id);
+        const users = await svc.usersDAO.getById(req.params.id);
         if (users === undefined) {
             return res.status(404).end();
         }
-        svc.dao.delete(req.params.id)
+        svc.usersDAO.delete(req.params.id)
             .then(() => res.status(200).end())
             .catch(e => {
                 console.error(e);
@@ -37,10 +37,10 @@ module.exports = (app, svc) => {
         if ((users.id === undefined) || (users.id == null) || (!svc.isValid(users))) {
             return res.status(400).end();
         }
-        if (await svc.dao.getById(users.id) === undefined) {
+        if (await svc.usersDAO.getById(users.id) === undefined) {
             return res.status(404).end();
         }
-        svc.dao.update(users)
+        svc.usersDAO.update(users)
             .then(() => res.status(200).end())
             .catch(e => {
                 console.error(e);
@@ -70,7 +70,7 @@ module.exports = (app, svc) => {
         const { email, password } = req.body;
         console.log('back logIn');
         try {
-            const response = await svc.dao.authenticate(email, password);
+            const response = await svc.usersDAO.authenticate(email, password);
             if (response.err === "404") {
                 return res.status(404).json({ message: "Aucun utilisateur avec cette adresse email" });
             }
@@ -94,12 +94,12 @@ module.exports = (app, svc) => {
             return res.status(400).end();
         }
         try {
-            const existingUser = await svc.dao.getByEmail(email);
+            const existingUser = await svc.usersDAO.getByEmail(email);
             if (existingUser) {
                 return res.status(409).json({ message: "Un compte existe déjà avec cette adresse mail. Veuillez vous connecter." });
             }
-            await svc.dao.signUp(nickname, email, password);
-            const newUser = await svc.dao.getByEmail(email);
+            await svc.usersDAO.signUp(nickname, email, password);
+            const newUser = await svc.usersDAO.getByEmail(email);
             const token = svc.generateToken(newUser.id);
             return res.status(201).json({ message: "Votre compte a été créé avec succès.", token, id: newUser.id });
         } catch (e) {
@@ -116,13 +116,13 @@ module.exports = (app, svc) => {
             return res.status(400).end();
         }
 
-        const existingUser = await svc.dao.getById(userId);
+        const existingUser = await svc.usersDAO.getById(userId);
         if (!existingUser) {
             return res.status(404).end();
         }
 
         const updatedUser = { ...existingUser, ...userData };
-        svc.dao.update(userId, updatedUser)
+        svc.usersDAO.update(userId, updatedUser)
             .then(() => res.status(204).end())
             .catch(e => {
                 console.error(e);
