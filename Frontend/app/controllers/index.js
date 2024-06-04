@@ -17,6 +17,10 @@ class IndexController {
     }
 
     async initialize() {
+
+        this.currentUserID = await this.isUserLoggedIn();
+        this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
+
         try {
             if(!await this.hasFilters()) return
             const url = window.location.href;
@@ -98,7 +102,6 @@ class IndexController {
     }
 
     async hasFilters(){
-        this.userID = await this.isUserLoggedIn();
         this.currentUser = await this.usersRoutes.getUser(this.userID)
 
         console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
@@ -192,8 +195,8 @@ class IndexController {
     }
 
     bindModal(){
-        if(!this.currentUser.interestedin){
-            this.changeFilters()
+        if (!this.currentUser.interestedin) {
+            this.changeFilters();
         }
         window.onclick = function(event) {
             if (event.target === document.getElementById('filterModal')) {

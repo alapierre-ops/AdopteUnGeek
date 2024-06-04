@@ -5,19 +5,6 @@ class UsersRoutes {
         this.token = token;
     }
 
-    async insert(userAccount) {
-        const response = await fetch(`${this.apiUrl}/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userAccount)
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to insert user account: ${response.status}`);
-        }
-    }
-
     async signUp(nickname, email, password) {
         return new Promise((resolve, reject) => fetch(`${this.apiUrl}/auth/signup`, {
             method: "POST",
