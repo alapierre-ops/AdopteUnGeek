@@ -1,7 +1,7 @@
 class IndexController {
     constructor() {
         this.token = sessionStorage.getItem('token');
-        const apiUrl = 'http://localhost:3333';
+        const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site';
         this.usersRoutes = new UsersRoutes(apiUrl, this.token);
         this.photosRoutes = new PhotosRoutes(apiUrl, this.token);
         this.interactionsRoutes = new InteractionsRoutes(apiUrl, this.token);
