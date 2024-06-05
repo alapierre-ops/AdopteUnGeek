@@ -19,6 +19,10 @@ module.exports = (userAccountService) => {
                 }
                 console.log(user)
                 try {
+                    console.log("userAccountService: ")
+                    console.log(userAccountService)
+                    console.log("userAccountService.usersDAO: ")
+                    console.log(userAccountService.usersDAO)
                     req.user = await userAccountService.usersDAO.getByEmail(user.email)
                     return next()
                 } catch(e) {
