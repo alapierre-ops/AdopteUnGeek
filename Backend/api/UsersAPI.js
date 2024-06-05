@@ -1,8 +1,5 @@
-const jwt = require('jsonwebtoken');
-const usersService = require("../Services/UsersServices")
-const jwtFunc = require("../jwt")(usersService);
 
-module.exports = (app, svc) => {
+module.exports = (app, svc, jwtFunc) => {
 
     app.get("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
