@@ -42,9 +42,9 @@ const messagesService = new messagesServices(db)
 const photosService = new photosServices(db)
 const jwtFunc = require("./jwt")(usersService);
 require('./api/UsersAPI')(app, usersService, jwtFunc)
-require('./api/InteractionsAPI')(app, interactionsService)
-require('./api/MessagesAPI')(app, messagesService)
-require('./api/PhotosAPI')(app, photosService)
+require('./api/InteractionsAPI')(app, interactionsService, jwtFunc)
+require('./api/MessagesAPI')(app, messagesService, jwtFunc)
+require('./api/PhotosAPI')(app, photosService, jwtFunc)
 require('dotenv').config();
 const seedDatabase = async () => require('./datamodel/seeder')(usersService, interactionsService, messagesService, photosService)
 if (require.main === module) {

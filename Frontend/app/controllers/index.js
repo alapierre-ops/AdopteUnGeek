@@ -8,7 +8,7 @@ class IndexController {
         document.addEventListener("DOMContentLoaded", async () => {
             this.initialize()
                 .then(() => {
-                    console.log(this.nextUser)
+                    console.log("User shown = " + this.nextUser)
                     this.addEventListeners();
                     this.isMobile();
                 });
@@ -19,8 +19,10 @@ class IndexController {
     async initialize() {
 
         this.currentUserID = await this.isUserLoggedIn();
+        console.log("initialize(): currentUserID == ",this.currentUserID);
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
-        //if (!this.currentUser.photo) {window.location.href = "profile.html"}
+        console.log("initialize(): currentUser == ", this.currentUser);
+        if (!this.currentUser.photo) {window.location.href = "profile.html"}
 
         try {
             if(!await this.hasFilters()) return
@@ -348,12 +350,12 @@ class IndexController {
     }
 
     async isUserLoggedIn() {
-        this.token = sessionStorage.getItem('token');
         console.log("isUserLoggedIn(): Token:", this.token);
         if (this.token) {
             try {
                 const { userId } = await this.usersRoutes.verifyToken(this.token);
                 console.log("isUserLoggedIn(): token is valid, user ID:", userId);
+                this.currentUserID = userId;
                 return userId;
             } catch (error) {
                 console.log("isUserLoggedIn():", error);

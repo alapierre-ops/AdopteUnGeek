@@ -1,7 +1,6 @@
 const jimp = require("jimp");
-const jwt = require("jsonwebtoken");
-const jwtFunc = require("../jwt")()
-module.exports = (app, svc) => {
+
+module.exports = (app, svc, jwtFunc) => {
 
     app.patch("/api/photos/:id", jwtFunc.validateJWT, async (req, res) => {
         const userId = req.params.id;

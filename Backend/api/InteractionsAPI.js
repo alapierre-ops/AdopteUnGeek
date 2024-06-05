@@ -1,7 +1,5 @@
-const jwt = require("jsonwebtoken");
-const jwtFunc = require("../jwt")()
 
-module.exports = (app, svc) => {
+module.exports = (app, svc, jwtFunc) => {
 
     app.post("/api/interactions/", jwtFunc.validateJWT, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
