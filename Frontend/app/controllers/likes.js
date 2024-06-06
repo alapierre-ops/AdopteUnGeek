@@ -1,10 +1,10 @@
 class LikesController {
     constructor() {
         this.token = sessionStorage.getItem('token');
-        const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/api';
-        this.usersRoutes = new UsersRoutes(apiUrl, this.token);
-        this.photosRoutes = new PhotosRoutes(apiUrl, this.token);
-        this.interactionsRoutes = new InteractionsRoutes(apiUrl, this.token);
+        this.apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/api';
+        this.usersRoutes = new UsersRoutes(this.apiUrl, this.token);
+        this.photosRoutes = new PhotosRoutes(this.apiUrl, this.token);
+        this.interactionsRoutes = new InteractionsRoutes(this.apiUrl, this.token);
         this.initialize();
     }
 
@@ -72,6 +72,10 @@ class LikesController {
             const userGrid = document.getElementById('userGrid');
             userGrid.innerHTML = '';
 
+            if(category){
+                document.getElementById("likedByOthers").classList.remove("category-option-selected")
+            }
+
             if(!category || category === "likedMe"){
                 this.users = await this.interactionsRoutes.getLikedMe(this.userID);
             }
@@ -84,7 +88,7 @@ class LikesController {
                 this.users = await this.interactionsRoutes.getMatches(this.userID);
             }
 
-            console.log("getUsers(): ", this.users)
+            console.log("getUsers(): ", this.users);
 
             const usersPerRow = 3;
 
@@ -103,7 +107,13 @@ class LikesController {
 
                     const img = document.createElement('img');
                     img.alt = 'main picture';
-                    img.src = "http://localhost:3333/photos/" + user.id;
+                    img.src = 'https://cdn.pixabay.com/animation/2023/11/18/09/26/09-26-08-99_512.gif';
+
+                    const actualImg = new Image();
+                    actualImg.src = `${this.apiUrl}/photos/${user.id}`;
+                    actualImg.onload = () => {
+                        img.src = actualImg.src;
+                    };
 
                     const textContainer = document.createElement('div');
                     textContainer.classList.add('textContainer');
@@ -119,7 +129,7 @@ class LikesController {
                     const birthdate = new Date(user.birthdate);
                     const differenceMs = currentDate - birthdate;
                     const age = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
-                    userAge.textContent = age + " ans";
+                    userAge.textContent = `${age} ans`;
 
                     userFirstRow.appendChild(userName);
                     userFirstRow.appendChild(userAge);
