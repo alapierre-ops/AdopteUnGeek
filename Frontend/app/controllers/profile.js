@@ -1,5 +1,6 @@
-class ProfileController {
+class ProfileController extends MainController {
     constructor() {
+        super(true)
         this.token = sessionStorage.getItem('token');
         const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/api';
         this.usersRoutes = new UsersRoutes(apiUrl, this.token);
@@ -8,9 +9,9 @@ class ProfileController {
         this.addEventListeners();
     }
 
-    async initialize(){
+    async initialize() {
         try {
-            this.userID = await this.isUserLoggedIn();
+            this.userID = await this.isUserLoggedIn(this.token);
             if (this.userID) {
                 await this.getUserInfo();
             }
@@ -19,9 +20,9 @@ class ProfileController {
         }
     }
 
-    addEventListeners(){
+    addEventListeners() {
         const form = document.getElementById('profile-form');
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', function (event) {
             if (event.target.id === 'photoForm') {
                 this.handleConfirm(event);
             } else {
@@ -94,7 +95,7 @@ class ProfileController {
     }
 
 
-    toggleTag(tag){
+    toggleTag(tag) {
         if (this.selectedTags.includes(tag.textContent)) {
             this.selectedTags = this.selectedTags.filter(t => t !== tag.textContent);
             tag.classList.remove('selected');
@@ -117,11 +118,11 @@ class ProfileController {
             console.log("getUserInfo(): userID == ", this.userID);
             this.currentUser = await this.usersRoutes.getUser(this.userID);
             console.log("getUserInfo(): currentUser == ", this.currentUser)
-            if(this.currentUser.gender === "male" || !this.currentUser.gender){
+            if (this.currentUser.gender === "male" || !this.currentUser.gender) {
                 document.getElementById('gender').options.item(0).selected = true;
-            } else if(this.currentUser.gender === "female"){
+            } else if (this.currentUser.gender === "female") {
                 document.getElementById('gender').options.item(1).selected = true;
-            } else if(this.currentUser.gender === "other"){
+            } else if (this.currentUser.gender === "other") {
                 document.getElementById('gender').options.item(2).selected = true;
             }
 
@@ -137,7 +138,7 @@ class ProfileController {
         }
     }
 
-    colorSelectedTags(){
+    colorSelectedTags() {
         console.log("Selected tags: " + this.selectedTags)
         const tags = document.querySelectorAll('.tag');
         tags.forEach(tag => {
@@ -192,7 +193,7 @@ class ProfileController {
     async handleConfirm(event) {
         event.preventDefault();
 
-        if(!this.currentUser.photo){
+        if (!this.currentUser.photo) {
             alert("Veuillez ajouter au moins une photo")
             return
         }
@@ -206,30 +207,6 @@ class ProfileController {
             window.location.href = "index.html?me";
         } catch (error) {
             console.error('Failed to update user: ', error.message);
-        }
-    }
-
-
-
-    async isUserLoggedIn() {
-        const token = sessionStorage.getItem('token');
-        console.log("isUserLoggedIn(): Token:", token);
-        if (token) {
-            try {
-                const { userId } = await this.usersRoutes.verifyToken(token);
-                console.log("isUserLoggedIn(): token is valid, user ID:", userId);
-                return userId;
-            } catch (error) {
-                console.log("isUserLoggedIn():", error);
-                console.log('isUserLoggedIn(): Token expired or invalid. User is not logged in.');
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-                throw new Error('Token expired or invalid');
-            }
-        } else {
-            console.log("isUserLoggedIn(): token is empty");
-            window.location.href = 'login.html';
-            throw new Error('Token is missing');
         }
     }
 }

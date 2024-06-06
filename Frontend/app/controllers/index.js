@@ -1,5 +1,6 @@
-class IndexController {
+class IndexController extends MainController{
     constructor() {
+        super(true);
         this.token = sessionStorage.getItem('token');
         const apiUrl = 'https://www.main-bvxea6i-egndfhevug7ok.fr-3.platformsh.site/api';
         this.usersRoutes = new UsersRoutes(apiUrl, this.token);
@@ -18,7 +19,7 @@ class IndexController {
 
     async initialize() {
 
-        this.currentUserID = await this.isUserLoggedIn();
+        this.currentUserID = await this.isUserLoggedIn(this.token);
         console.log("initialize(): currentUserID == ",this.currentUserID);
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
         console.log("initialize(): currentUser == ", this.currentUser);
@@ -42,6 +43,11 @@ class IndexController {
 
             if(userID === 'me') {
                 await this.getUserInfo(this.currentUserID);
+
+                if(!this.nextUser.city){
+                    window.location.href = "profile.html";
+                }
+
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Modifier';
                 editButton.classList.add('editButton');
@@ -199,6 +205,9 @@ class IndexController {
     }
 
     bindModal(){
+        const filterIcon = document.getElementById('filterIcon');
+        filterIcon.addEventListener('click', this.showModal.bind(this));
+
         if (!this.currentUser.interestedin) {
             this.changeFilters();
         }
@@ -224,37 +233,6 @@ class IndexController {
                 this.changeFilters();
                 document.getElementById('filterModal').style.display = 'none'
             });
-    }
-
-
-    bindFooter(){
-        document.getElementById('indexIcon')
-            .addEventListener('click', this.goToIndex.bind(this));
-
-        document.getElementById('heartIcon')
-            .addEventListener('click', this.goToLikes.bind(this));
-
-        document.getElementById('messagesIcon')
-            .addEventListener('click', this.goToMessages.bind(this));
-
-        document.getElementById('settingsIcon')
-            .addEventListener('click', this.goToSettings.bind(this));
-
-        console.log("bindFooter(): binding footer icons")
-    }
-
-    bindHeader(){
-        console.log("bindHeader(): binding header icons")
-
-        document.getElementById('profileIcon')
-            .addEventListener('click', this.goToProfile.bind(this));
-
-        document.getElementById('filterIcon')
-            .addEventListener('click', this.showModal.bind(this));
-
-        document.getElementById('closeBtn').onclick = function() {
-            document.getElementById('filterModal').style.display = 'none';
-        }
     }
 
     showModal(){
@@ -319,13 +297,6 @@ class IndexController {
                     .then(() => this.getUserInfo()))
     }
 
-    getAge(birthdate){
-        const currentDate = new Date();
-        const newBirthdate = new Date(birthdate)
-        const differenceMs = currentDate - newBirthdate;
-        return Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
-    }
-
     async getCityCoordinates(cityName) {
         try {
             const response = await fetch(`https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-500/records?where=name%3D%22${cityName}%22&limit=20&refine=country%3A%22France%22`);
@@ -358,28 +329,6 @@ class IndexController {
             Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return Math.ceil(R * c);
-    }
-
-    async isUserLoggedIn() {
-        console.log("isUserLoggedIn(): Token:", this.token);
-        if (this.token) {
-            try {
-                const { userId } = await this.usersRoutes.verifyToken(this.token);
-                console.log("isUserLoggedIn(): token is valid, user ID:", userId);
-                this.currentUserID = userId;
-                return userId;
-            } catch (error) {
-                console.log("isUserLoggedIn():", error);
-                console.log('isUserLoggedIn(): Token expired or invalid. User is not logged in.');
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-                throw new Error('Token expired or invalid');
-            }
-        } else {
-            console.log("isUserLoggedIn(): token is empty");
-            window.location.href = 'login.html';
-            throw new Error('Token is missing');
-        }
     }
 
     showTags(){
@@ -520,51 +469,6 @@ class IndexController {
 
         fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
         setToggleAccessible(toSlider);
-    }
-
-    goToIndex(){
-        console.log("goToIndex(): going to index")
-        window.location.href = 'index.html';
-    }
-
-    goToLikes(){
-        console.log("goToLikes(): going to likes")
-        window.location.href = 'likes.html';
-    }
-    goToMessages(){
-        console.log("goToMessages(): going to messages")
-        window.location.href = 'messages.html';
-    }
-    goToSettings(){
-        console.log("goToSettings(): going to settings")
-        this.handleLogout();
-    }
-
-    goToProfile() {
-        this.photosRoutes.getUserPhotos(this.currentUserID)
-            .then(res => {
-                if (!res) {
-                    console.log("goToProfile(): Profile not complete, can't preview");
-                    window.location.href = 'profile.html';
-                } else {
-                    window.location.href = `index.html?me`;
-                }
-            })
-            .catch(e => {
-                console.log("Error fetching user photos:", e)
-                window.location.href = 'profile.html';
-            })
-    }
-
-    async handleLogout() {
-        console.log("handleLogOut")
-        try {
-            sessionStorage.removeItem("token")
-            window.location.href = 'login.html';
-        } catch (error) {
-            console.log('Erreur lors de la déconnexion. ', error.message);
-            alert('Erreur lors de la déconnexion, veuillez réessayer plus tard.');
-        }
     }
 }
 
