@@ -22,7 +22,7 @@ class IndexController {
         console.log("initialize(): currentUserID == ",this.currentUserID);
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
         console.log("initialize(): currentUser == ", this.currentUser);
-        if (!this.currentUser.photo) {window.location.href = "profile.html"}
+        if (!this.currentUser.city) {window.location.href = "profile.html"}
 
         try {
             if(!await this.hasFilters()) return
@@ -41,7 +41,7 @@ class IndexController {
             }
 
             if(userID === 'me') {
-                await this.getUserInfo(this.userID);
+                await this.getUserInfo(this.currentUserID);
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Modifier';
                 editButton.classList.add('editButton');
@@ -91,6 +91,10 @@ class IndexController {
                 }
             }
         } catch (error) {
+            if(!this.nextUser){
+                alert("Plus aucun profil ne correspond à vos filtres actuels.")
+                this.showModal()
+            }
             console.error("initialize(): ", error);
         }
     }
@@ -105,7 +109,7 @@ class IndexController {
     }
 
     async hasFilters(){
-        this.currentUser = await this.usersRoutes.getUser(this.userID)
+        this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
 
         console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
         if(!this.currentUser.interestedin){
@@ -123,28 +127,25 @@ class IndexController {
                 this.alreadyFetchedUsers = [0]
             }
             if(!userID){
-                console.log("getUserInfo(): userID == ", this.userID);
-                this.nextUser = await this.interactionsRoutes.getNextUser(this.userID, this.alreadyFetchedUsers);
+                console.log("getUserInfo(): userID == ", this.currentUserID);
+                this.nextUser = await this.interactionsRoutes.getNextUser(this.currentUserID, this.alreadyFetchedUsers);
                 if(!this.nextUser.nickname){
                     alert("Plus aucun profil ne correspond à vos filtres actuels.")
                     this.showModal()
                 }
+                const isDistanceOk = await this.isDistanceOk()
+                if( isDistanceOk ){
+                    await this.displayUserInfo()
+                }
+                else{
+                    this.alreadyFetchedUsers.push(this.nextUser.id)
+                    await this.getUserInfo();
+                }
             }
             else{
                 this.nextUser = await this.usersRoutes.getUser(userID)
+                this.displayUserInfo()
             }
-
-            const isDistanceOk = await this.isDistanceOk()
-
-            if( isDistanceOk ){
-                await this.displayUserInfo()
-            }
-            else{
-                this.alreadyFetchedUsers.push(this.nextUser.id)
-                await this.getUserInfo();
-            }
-
-
         } catch (error) {
             console.error("getUserInfo():", error);
             alert("Plus aucun profil ne correspond à vos filtres actuels.")
@@ -169,7 +170,7 @@ class IndexController {
     }
 
     async displayUserInfo(){
-        document.getElementById('userDistance').textContent = "à " + this.distance + " km"
+        document.getElementById('userDistance').textContent = this.distance ? "à " + this.distance + " km" : "à 0 km"
         document.getElementById('userName').textContent = this.nextUser.nickname;
         document.getElementById('userBio').textContent = this.nextUser.bio;
         document.getElementById('imageContainer').src = await this.photosRoutes.getUserPhotos(this.nextUser.id)
@@ -267,12 +268,24 @@ class IndexController {
             document.getElementById('interestedIn').options.item(2).selected = true;
         }
 
-        const ageMin = this.currentUser.filter_agemin ? this.currentUser.filter_agemin : Math.max(18, this.getAge(this.currentUser.birthdate) - 5);
+        const toInput = document.getElementById('toInput');
+        const fromInput = document.getElementById('fromInput');
+        const toSlider = document.getElementById('toSlider');
+        const fromSlider = document.getElementById('fromSlider');
+
         const ageMax = this.currentUser.filter_agemax ? this.currentUser.filter_agemax : this.getAge(this.currentUser.birthdate) + 5;
-        document.getElementById('toInput').value = ageMax
-        document.getElementById('fromInput').value = ageMin
-        document.getElementById('toSlider').value = ageMax
-        document.getElementById('fromSlider').value = ageMin
+        const ageMin = this.currentUser.filter_agemin ? this.currentUser.filter_agemin : Math.max(18, this.getAge(this.currentUser.birthdate) - 5);
+
+        toInput.value = ageMax;
+        fromInput.value = ageMin;
+
+        toSlider.value = this.mapAgeToSlider(ageMax);
+        fromSlider.value = this.mapAgeToSlider(ageMin);
+
+        console.log("toInput.value = " + toInput.value)
+        console.log("fromSlider.value = " + fromSlider.value);
+        console.log("toSlider.value = " + toSlider.value);
+        console.log("fromInput.value = " + fromInput.value);
 
         document.getElementById('distanceSlider').value = this.currentUser.filter_dismax ? this.currentUser.filter_dismax : 150
 
@@ -293,16 +306,14 @@ class IndexController {
             this.alreadyFetchedUsers = [0];
         }
 
-        const controller = new IndexController();
-
         this.filters = {
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,
-            ageMin: controller.mapSliderToAge(document.getElementById('fromInput').value),
+            ageMin: document.getElementById('fromInput').value,
             interestedIn: document.getElementById('interestedIn').value
         }
         console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedIn)
-        this.usersRoutes.updateUser(this.userID, this.filters)
+        this.usersRoutes.updateUser(this.currentUserID, this.filters)
             .then(() =>
                 this.hasFilters()
                     .then(() => this.getUserInfo()))
@@ -395,15 +406,37 @@ class IndexController {
 
     async addInteraction(liked){
         try{
-            await this.photosRoutes.getUserPhotos(this.userID)
+            await this.photosRoutes.getUserPhotos(this.currentUserID)
         }
         catch (e) {
             alert("Vous devez compléter votre profil avant de continuer");
             window.location.href = "profile.html"
         }
-        this.interactionsRoutes.addInteraction(this.userID, this.nextUser.id, liked)
+        this.interactionsRoutes.addInteraction(this.currentUserID, this.nextUser.id, liked)
             .then(() => this.getUserInfo())
     }
+
+    // Function to map slider value to age
+    mapSliderToAge = (value) => {
+        if (value <= 32) {
+            return value + 18; // 18 to 50 maps to 0 to 32
+        } else if (value <= 40) {
+            return 50 + (value - 32) * 5; // 50 to 80 maps to 32 to 40
+        } else {
+            return 80; // Values greater than 40 map to 80+
+        }
+    };
+
+    // Function to map age to slider value
+    mapAgeToSlider = (age) => {
+        if (age <= 50) {
+            return age - 18; // 18 to 50 maps to 0 to 32
+        } else if (age <= 80) {
+            return 32 + (age - 50) / 5; // 50 to 80 maps to 32 to 40
+        } else {
+            return 41; // 80+ maps to 41
+        }
+    };
 
     setupSliders() {
         const fromSlider = document.querySelector('#fromSlider');
@@ -411,35 +444,14 @@ class IndexController {
         const fromInput = document.querySelector('#fromInput');
         const toInput = document.querySelector('#toInput');
 
-        // Function to map slider value to age
-        const mapSliderToAge = (value) => {
-            if (value <= 32) {
-                return value + 18; // 18 to 50 maps to 0 to 32
-            } else if (value <= 40) {
-                return 50 + (value - 32) * 5; // 50 to 80 maps to 32 to 40
-            } else {
-                return 80; // Values greater than 40 map to 80+
-            }
-        };
-
-        // Function to map age to slider value
-        const mapAgeToSlider = (age) => {
-            if (age <= 50) {
-                return age - 18; // 18 to 50 maps to 0 to 32
-            } else if (age <= 80) {
-                return 32 + (age - 50) / 5; // 50 to 80 maps to 32 to 40
-            } else {
-                return 41; // 80+ maps to 41
-            }
-        };
-
         const controlFromInput = (fromSlider, fromInput, toInput, controlSlider) => {
             let from = parseInt(fromInput.value, 10);
             let to = parseInt(toInput.value, 10);
             if (from > to) {
                 from = to;
+                fromInput.value = toInput.value
             }
-            fromSlider.value = mapAgeToSlider(from);
+            fromSlider.value = this.mapAgeToSlider(from);
             fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', controlSlider);
         };
 
@@ -448,17 +460,18 @@ class IndexController {
             let to = parseInt(toInput.value, 10);
             if (from > to) {
                 to = from;
+                toInput.value = fromInput.value
             }
-            toSlider.value = mapAgeToSlider(to);
+            toSlider.value = this.mapAgeToSlider(to);
             fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', controlSlider);
             setToggleAccessible(toInput);
         };
 
         const controlFromSlider = (fromSlider, toSlider, fromInput) => {
-            let from = mapSliderToAge(parseInt(fromSlider.value, 10));
-            let to = mapSliderToAge(parseInt(toSlider.value, 10));
+            let from = this.mapSliderToAge(parseInt(fromSlider.value, 10));
+            let to = this.mapSliderToAge(parseInt(toSlider.value, 10));
             if (from > to) {
-                fromSlider.value = mapAgeToSlider(to);
+                fromSlider.value = this.mapAgeToSlider(to);
                 from = to;
             }
             fromInput.value = from;
@@ -466,10 +479,10 @@ class IndexController {
         };
 
         const controlToSlider = (fromSlider, toSlider, toInput) => {
-            let from = mapSliderToAge(parseInt(fromSlider.value, 10));
-            let to = mapSliderToAge(parseInt(toSlider.value, 10));
+            let from = this.mapSliderToAge(parseInt(fromSlider.value, 10));
+            let to = this.mapSliderToAge(parseInt(toSlider.value, 10));
             if (from > to) {
-                toSlider.value = mapAgeToSlider(from);
+                toSlider.value = this.mapAgeToSlider(from);
                 to = from;
             }
             toInput.value = to;
@@ -528,7 +541,7 @@ class IndexController {
     }
 
     goToProfile() {
-        this.photosRoutes.getUserPhotos(this.userID)
+        this.photosRoutes.getUserPhotos(this.currentUserID)
             .then(res => {
                 if (!res) {
                     console.log("goToProfile(): Profile not complete, can't preview");

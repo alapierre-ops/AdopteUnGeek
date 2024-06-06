@@ -156,6 +156,7 @@ class ProfileController {
             document.getElementById('preview').src = this.currentUser.photo;
             document.getElementById('preview').style.display = 'block';
         }
+        document.body.style.overflow = 'auto'
     }
 
 
