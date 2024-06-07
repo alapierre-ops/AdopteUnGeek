@@ -29,7 +29,7 @@ class LoginController{
         event.preventDefault();
         const formData = new FormData(event.target);
         const nickname = formData.get('nickname');
-        const email = formData.get('email');
+        const email = formData.get('email').toLowerCase();
         const password = formData.get('password');
 
         if(!nickname){
@@ -77,7 +77,7 @@ class LoginController{
     async handleLogIn(event){
         event.preventDefault();
         const formData = new FormData(event.target);
-        const email = formData.get('email');
+        const email = formData.get('email').toLowerCase();
         const password = formData.get('password');
 
 
