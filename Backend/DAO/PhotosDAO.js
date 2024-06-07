@@ -5,7 +5,6 @@ module.exports = class PhotosDAO extends dao{
         super(db,"Photos")
     }
     addPhoto(id, photo) {
-        console.log("This is the dao with id " + id + " and photo = " + photo)
         return this.db.query("INSERT INTO photos (user_id, photo_data) VALUES ($1, $2)",
             [id, photo])
     }

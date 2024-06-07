@@ -17,7 +17,6 @@ class MainController{
             try {
                 const { userId } = await this.usersRoutes.verifyToken(token);
                 console.log("isUserLoggedIn(): token is valid, user ID:", userId);
-                this.currentUserId = userId;
                 return userId;
             } catch (error) {
                 console.log("isUserLoggedIn():", error);
@@ -33,7 +32,7 @@ class MainController{
         }
     }
 
-    async handleLogout() {
+    handleLogout() {
         console.log("handleLogOut")
         try {
             sessionStorage.removeItem("token")

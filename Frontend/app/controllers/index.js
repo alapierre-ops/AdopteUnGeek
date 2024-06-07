@@ -150,7 +150,7 @@ class IndexController extends MainController{
             }
             else{
                 this.nextUser = await this.usersRoutes.getUser(userID)
-                this.displayUserInfo()
+                await this.displayUserInfo()
             }
         } catch (error) {
             console.error("getUserInfo():", error);
@@ -217,6 +217,10 @@ class IndexController extends MainController{
             }
         }
 
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            document.getElementById('filterModal').style.display = 'none'
+        });
+
         document.getElementById('distanceSlider').oninput = function() {
             if(this.value > 149){
                 document.getElementById('distanceValue').textContent = "Pas de limite"
@@ -282,6 +286,19 @@ class IndexController extends MainController{
 
         if (this.filters.distance > document.getElementById('distanceSlider').value) {
             this.alreadyFetchedUsers = [0];
+        }
+
+        if(document.getElementById('fromInput').value < 18){
+            document.getElementById('fromInput').value = 18
+        }
+        if(document.getElementById('toInput').value < 18){
+            document.getElementById('toInput').value = 18
+        }
+        if(document.getElementById('fromInput').value > 80){
+            document.getElementById('fromInput').value = 80
+        }
+        if(document.getElementById('toInput').value > 80){
+            document.getElementById('toInput').value = 80
         }
 
         this.filters = {
@@ -411,6 +428,12 @@ class IndexController extends MainController{
                 to = from;
                 toInput.value = fromInput.value
             }
+            if (from < 18) {
+                fromInput.value = 18
+            }
+            if(to > 80) {
+                toInput.value = 80;
+            }
             toSlider.value = this.mapAgeToSlider(to);
             fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', controlSlider);
             setToggleAccessible(toInput);
@@ -422,6 +445,12 @@ class IndexController extends MainController{
             if (from > to) {
                 fromSlider.value = this.mapAgeToSlider(to);
                 from = to;
+            }
+            if (from < 18) {
+                fromInput.value = 18
+            }
+            if(to > 80) {
+                toInput.value = 80;
             }
             fromInput.value = from;
             fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
