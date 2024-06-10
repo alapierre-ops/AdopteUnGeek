@@ -117,8 +117,8 @@ class IndexController extends MainController{
     async hasFilters(){
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
 
-        console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
-        if(!this.currentUser.interestedin){
+        console.log("initialize(): interestedIn == " + this.currentUser.interestedIn)
+        if(!this.currentUser.interestedIn){
             this.showModal()
             return false
         }
@@ -208,7 +208,7 @@ class IndexController extends MainController{
         const filterIcon = document.getElementById('filterIcon');
         filterIcon.addEventListener('click', this.showModal.bind(this));
 
-        if (!this.currentUser.interestedin) {
+        if (!this.currentUser.interestedIn) {
             this.changeFilters();
         }
         window.onclick = function(event) {
@@ -242,11 +242,11 @@ class IndexController extends MainController{
     showModal(){
         document.getElementById('filterModal').style.display = "flex";
 
-        if(this.currentUser.interestedin === "male" || !this.currentUser.interestedin){
+        if(this.currentUser.interestedIn === "male" || !this.currentUser.interestedIn){
             document.getElementById('interestedIn').options.item(0).selected = true;
-        } else if(this.currentUser.interestedin === "female"){
+        } else if(this.currentUser.interestedIn === "female"){
             document.getElementById('interestedIn').options.item(1).selected = true;
-        } else if(this.currentUser.interestedin === "both"){
+        } else if(this.currentUser.interestedIn === "both"){
             document.getElementById('interestedIn').options.item(2).selected = true;
         }
 
