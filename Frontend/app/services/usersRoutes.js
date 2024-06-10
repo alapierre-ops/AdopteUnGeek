@@ -85,6 +85,7 @@ class UsersRoutes {
                 },
                 body: JSON.stringify(userData)
             });
+            console.log("updateFilters(): " + response.status)
             if (!response.ok) {
                 return { error: response.statusText };
             }

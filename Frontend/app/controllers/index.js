@@ -21,7 +21,7 @@ class IndexController extends MainController{
 
         this.currentUserID = await this.isUserLoggedIn(this.token);
         console.log("initialize(): currentUserID == ",this.currentUserID);
-        this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
+        this.currentUser = this.nextUser = await this.usersRoutes.getUser(this.currentUserID)
         console.log("initialize(): currentUser == ", this.currentUser);
         if (!this.currentUser.city) {window.location.href = "profile.html"}
 
