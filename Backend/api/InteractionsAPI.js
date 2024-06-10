@@ -30,7 +30,7 @@ module.exports = (app, svc, jwtFunc) => {
             });
     });
 
-    app.post("/api/users/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.post("/api/interactions/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             console.log("nextUser/:id : id == " + req.params.id);
             const currentUser = await svc.dao.getById(req.params.id);
@@ -54,7 +54,7 @@ module.exports = (app, svc, jwtFunc) => {
         }
     });
 
-    app.get("/api/users/getLikedMe/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/interactions/getLikedMe/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getLikedMe(req.params.id);
             if (users === undefined) {
@@ -66,7 +66,7 @@ module.exports = (app, svc, jwtFunc) => {
         }
     });
 
-    app.get("/api/users/getILiked/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/interactions/getILiked/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getILiked(req.params.id);
             if (users === undefined) {
@@ -78,7 +78,7 @@ module.exports = (app, svc, jwtFunc) => {
         }
     });
 
-    app.get("/api/users/getMatches/:id", jwtFunc.validateJWT, async (req, res) => {
+    app.get("/api/interactions/getMatches/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const users = await svc.dao.getMatches(req.params.id);
             if (!users) {
