@@ -14,7 +14,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
             await messagesService.dao.db.query("DROP TABLE IF EXISTS messages CASCADE");
 
             await interactionsService.dao.db.query("CREATE TABLE IF NOT EXISTS interactions(id SERIAL PRIMARY KEY, date DATE, userWhoInteracted INTEGER, userShown INTEGER, liked BOOLEAN )")
-            await usersService.usersDAO.db.query("CREATE TABLE IF NOT EXISTS users(id SERIAL PRIMARY KEY, nickname TEXT, email TEXT, password TEXT, bio TEXT, birthdate DATE, gender TEXT, tags TEXT, interestedIn TEXT, filter_agemin TEXT, filter_agemax TEXT, filter_dismax TEXT, city TEXT)")
+            await usersService.usersDAO.db.query("CREATE TABLE IF NOT EXISTS users(id SERIAL PRIMARY KEY, nickname TEXT, email TEXT, password TEXT, bio TEXT, birthdate DATE, gender TEXT, tags TEXT, interestedin TEXT, filter_agemin TEXT, filter_agemax TEXT, filter_dismax TEXT, city TEXT)")
             await photosService.dao.db.query("CREATE TABLE IF NOT EXISTS photos(id SERIAL PRIMARY KEY, user_id TEXT, photo_data bytea )")
             await messagesService.dao.db.query("CREATE TABLE IF NOT EXISTS messages(id SERIAL PRIMARY KEY, sender_id TEXT, receiver_id TEXT, sent_at DATE, content TEXT )")
 
@@ -28,7 +28,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1992-05-15",
                         gender: "male",
                         tags: "Jeux vidéos,Science-fiction,Manga",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -42,7 +42,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1994-09-22",
                         gender: "female",
                         tags: "Manga,Anime,Fantasy",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -56,7 +56,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1988-11-05",
                         gender: "male",
                         tags: "Cinéma,Science-fiction,Comics",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -70,7 +70,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1990-02-12",
                         gender: "female",
                         tags: "Technologie,Programmation,Intelligence artificielle",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -84,7 +84,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1986-04-28",
                         gender: "male",
                         tags: "Jeu de rôle (RP),Jeux vidéos,Manga",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -98,7 +98,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1995-07-19",
                         gender: "female",
                         tags: "Science-fiction,Technologie,Histoire",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -112,7 +112,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1983-06-14",
                         gender: "male",
                         tags: "Jeux vidéos,Cinéma,Art",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -126,7 +126,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1991-08-03",
                         gender: "female",
                         tags: "Fantasy,Livres,Jeu de rôle (RP)",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -140,7 +140,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1989-10-25",
                         gender: "male",
                         tags: "Science-fiction,Intelligence artificielle,Comics",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -154,7 +154,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         birthdate: "1993-12-30",
                         gender: "female",
                         tags: "Comics,Art,Photographie",
-                        interestedIn: "both",
+                        interestedin: "both",
                         filter_agemin: "18",
                         filter_agemax: "80",
                         filter_dismax: "150",
@@ -164,10 +164,10 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
 
                 for (const user of users) {
                     const result = await usersService.usersDAO.db.query(
-                        `INSERT INTO users (nickname, email, password, bio, birthdate, gender, tags, interestedIn, filter_agemin, filter_agemax, filter_dismax, city) 
+                        `INSERT INTO users (nickname, email, password, bio, birthdate, gender, tags, interestedin, filter_agemin, filter_agemax, filter_dismax, city) 
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
                         RETURNING id`,
-                        [user.nickname, user.email, user.password, user.bio, user.birthdate, user.gender, user.tags, user.interestedIn, user.filter_agemin, user.filter_agemax, user.filter_dismax, user.city]
+                        [user.nickname, user.email, user.password, user.bio, user.birthdate, user.gender, user.tags, user.interestedin, user.filter_agemin, user.filter_agemax, user.filter_dismax, user.city]
                     );
 
                     const userId = result.rows[0].id;

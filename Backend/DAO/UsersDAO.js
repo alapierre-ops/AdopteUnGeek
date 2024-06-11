@@ -63,7 +63,7 @@ module.exports = class UsersDAO extends dao {
     }
 
     update(id, userData) {
-        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, tags=$8, interestedIn=$9, filter_agemin=$10, filter_agemax=$11, filter_dismax=$12, city=$13 WHERE id=$1",
-            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.tags, userData.interestedIn, userData.ageMin, userData.ageMax, userData.distance, userData.city])
+        return this.db.query("UPDATE users SET nickname=$2, email=$3, password=$4, bio=$5, birthdate=$6, gender=$7, tags=$8, interestedin=$9, filter_agemin=$10, filter_agemax=$11, filter_dismax=$12, city=$13 WHERE id=$1",
+            [id, userData.nickname, userData.email, userData.password, userData.bio, userData.birthdate, userData.gender, userData.tags, userData.interestedin, userData.ageMin, userData.ageMax, userData.distance, userData.city])
     }
 }

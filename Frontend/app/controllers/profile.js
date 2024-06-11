@@ -199,7 +199,7 @@ class ProfileController extends MainController {
         }
 
         this.updatedUserData.tags = this.selectedTags.join(',');
-        this.updatedUserData.interestedIn = "both"
+        this.updatedUserData.interestedin = "both"
 
         try {
             await this.usersRoutes.updateUser(this.userID, this.updatedUserData);

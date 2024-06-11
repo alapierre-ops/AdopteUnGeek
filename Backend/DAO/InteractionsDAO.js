@@ -18,8 +18,8 @@ module.exports = class InteractionsDAO extends dao{
     async getNext(user, shownUserIds) {
         let interestedInClause = '';
 
-        if (user.interestedIn !== 'both') {
-            interestedInClause = `AND u.gender = '${user.interestedIn}'`;
+        if (user.interestedin !== 'both') {
+            interestedInClause = `AND u.gender = '${user.interestedin}'`;
         }
 
         return new Promise((resolve, reject) =>
@@ -36,7 +36,7 @@ module.exports = class InteractionsDAO extends dao{
                    AND DATE_PART('year', AGE(u.birthdate)) >= $2
                    AND DATE_PART('year', AGE(u.birthdate)) <= $3
                    ${interestedInClause}
-                   AND (u.interestedIn = 'both' OR u.interestedIn = $4)
+                   AND (u.interestedin = 'both' OR u.interestedin = $4)
                    LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax, user.gender, ...shownUserIds])
                 .then(res => resolve(res.rows[0]))
                 .catch(e => reject(e))

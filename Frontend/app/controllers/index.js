@@ -117,8 +117,8 @@ class IndexController extends MainController{
     async hasFilters(){
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
 
-        console.log("initialize(): interestedIn == " + this.currentUser.interestedIn)
-        if(!this.currentUser.interestedIn){
+        console.log("initialize(): interestedin == " + this.currentUser.interestedin)
+        if(!this.currentUser.interestedin){
             this.showModal()
             return false
         }
@@ -208,7 +208,7 @@ class IndexController extends MainController{
         const filterIcon = document.getElementById('filterIcon');
         filterIcon.addEventListener('click', this.showModal.bind(this));
 
-        if (!this.currentUser.interestedIn) {
+        if (!this.currentUser.interestedin) {
             this.changeFilters();
         }
         window.onclick = function(event) {
@@ -242,12 +242,12 @@ class IndexController extends MainController{
     showModal(){
         document.getElementById('filterModal').style.display = "flex";
 
-        if(this.currentUser.interestedIn === "male" || !this.currentUser.interestedIn){
-            document.getElementById('interestedIn').options.item(0).selected = true;
-        } else if(this.currentUser.interestedIn === "female"){
-            document.getElementById('interestedIn').options.item(1).selected = true;
-        } else if(this.currentUser.interestedIn === "both"){
-            document.getElementById('interestedIn').options.item(2).selected = true;
+        if(this.currentUser.interestedin === "male" || !this.currentUser.interestedin){
+            document.getElementById('interestedin').options.item(0).selected = true;
+        } else if(this.currentUser.interestedin === "female"){
+            document.getElementById('interestedin').options.item(1).selected = true;
+        } else if(this.currentUser.interestedin === "both"){
+            document.getElementById('interestedin').options.item(2).selected = true;
         }
 
         const toInput = document.getElementById('toInput');
@@ -305,9 +305,9 @@ class IndexController extends MainController{
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,
             ageMin: document.getElementById('fromInput').value,
-            interestedIn: document.getElementById('interestedIn').value
+            interestedin: document.getElementById('interestedin').value
         }
-        console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedIn)
+        console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedin)
         this.usersRoutes.updateUser(this.currentUserID, this.filters)
             .then(() =>
                 this.hasFilters()
