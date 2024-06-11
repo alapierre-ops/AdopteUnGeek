@@ -23,25 +23,25 @@ module.exports = class InteractionsDAO extends dao{
         }
 
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT u.*, p.photo_data
-                   FROM users u
-                   LEFT JOIN photos p ON u.id = p.user_id
-                   WHERE u.id NOT IN (
-                       SELECT userShown FROM interactions
-                       WHERE userWhoInteracted = $1
-                   )
-                   AND u.id != $1
-                   AND u.id NOT IN (${(shownUserIds || []).map((_, i) => `$${i + 5}`).join(', ')})
-                   AND p.photo_data IS NOT NULL
-                   AND DATE_PART('year', AGE(u.birthdate)) >= $2
-                   AND DATE_PART('year', AGE(u.birthdate)) <= $3
-                   ${interestedInClause}
-                   AND (u.interestedin = 'both' OR u.interestedin = $4)
-                   LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax, user.gender, ...shownUserIds])
+            this.db.query(`SELECT u.*
+               FROM users u
+               WHERE u.id NOT IN (
+                   SELECT userShown FROM interactions
+                   WHERE userWhoInteracted = $1
+               )
+               AND u.id != $1
+               AND u.id NOT IN (${(shownUserIds || []).map((_, i) => `$${i + 5}`).join(', ')})
+               AND u.city IS NOT NULL AND u.city <> ''
+               AND DATE_PART('year', AGE(u.birthdate)) >= $2
+               AND DATE_PART('year', AGE(u.birthdate)) <= $3
+               ${interestedInClause}
+               AND (u.interestedin = 'both' OR u.interestedin = $4)
+               LIMIT 1`, [user.id, user.filter_agemin, user.filter_agemax, user.gender, ...shownUserIds])
                 .then(res => resolve(res.rows[0]))
                 .catch(e => reject(e))
         );
     }
+
 
 
     async getLikedMe(id) {

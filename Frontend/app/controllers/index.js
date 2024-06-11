@@ -117,7 +117,7 @@ class IndexController extends MainController{
     async hasFilters(){
         this.currentUser = await this.usersRoutes.getUser(this.currentUserID)
 
-        console.log("initialize(): interestedin == " + this.currentUser.interestedin)
+        console.log("initialize(): interestedIn == " + this.currentUser.interestedin)
         if(!this.currentUser.interestedin){
             this.showModal()
             return false
@@ -305,7 +305,7 @@ class IndexController extends MainController{
             distance: document.getElementById('distanceSlider').value,
             ageMax: document.getElementById('toInput').value,
             ageMin: document.getElementById('fromInput').value,
-            interestedin: document.getElementById('interestedin').value
+            interestedin: document.getElementById('interestedIn').value
         }
         console.log("changeFilters(): " + this.filters.ageMin, this.filters.ageMax, this.filters.distance, this.filters.interestedin)
         this.usersRoutes.updateUser(this.currentUserID, this.filters)
