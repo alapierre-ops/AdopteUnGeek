@@ -243,11 +243,11 @@ class IndexController extends MainController{
         document.getElementById('filterModal').style.display = "flex";
 
         if(this.currentUser.interestedin === "male" || !this.currentUser.interestedin){
-            document.getElementById('interestedin').options.item(0).selected = true;
+            document.getElementById('interestedIn').options.item(0).selected = true;
         } else if(this.currentUser.interestedin === "female"){
-            document.getElementById('interestedin').options.item(1).selected = true;
+            document.getElementById('interestedIn').options.item(1).selected = true;
         } else if(this.currentUser.interestedin === "both"){
-            document.getElementById('interestedin').options.item(2).selected = true;
+            document.getElementById('interestedIn').options.item(2).selected = true;
         }
 
         const toInput = document.getElementById('toInput');
