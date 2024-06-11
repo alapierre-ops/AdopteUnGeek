@@ -89,6 +89,7 @@ class InteractionsRoutes {
 
     async getNextUser(userID, shownUserIds) {
         console.log("getNextUser(): shownUserIds == " + shownUserIds);
+        
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/nextUser/${userID}`, {
                 method: 'POST',

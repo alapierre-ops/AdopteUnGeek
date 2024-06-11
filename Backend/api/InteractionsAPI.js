@@ -33,7 +33,7 @@ module.exports = (app, svc, jwtFunc) => {
     app.post("/api/interactions/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             console.log("nextUser/:id : id == " + req.params.id);
-            const currentUser = await svc.dao.getById(req.params.id);
+            const currentUser = await svc.usersDAO.getById(req.params.id);
 
             console.log("shownUserIds == " + req.body);
 
