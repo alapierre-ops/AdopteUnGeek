@@ -42,7 +42,7 @@ const messagesService = new messagesServices(db)
 const photosService = new photosServices(db)
 const jwtFunc = require("./jwt")(usersService);
 require('./api/UsersAPI')(app, usersService, jwtFunc)
-require('./api/InteractionsAPI')(app, interactionsService, jwtFunc)
+require('./api/InteractionsAPI')(app, interactionsService, usersService, jwtFunc)
 require('./api/MessagesAPI')(app, messagesService, jwtFunc)
 require('./api/PhotosAPI')(app, photosService, jwtFunc)
 require('dotenv').config();

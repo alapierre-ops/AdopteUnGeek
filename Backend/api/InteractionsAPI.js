@@ -1,5 +1,5 @@
 
-module.exports = (app, svc, jwtFunc) => {
+module.exports = (app, svc, userSVC, jwtFunc) => {
 
     app.post("/api/interactions/", jwtFunc.validateJWT, (req, res) => {
         const { date, userWhoInteracted, userShown, liked } = req.body;
@@ -33,7 +33,7 @@ module.exports = (app, svc, jwtFunc) => {
     app.post("/api/interactions/nextUser/:id", jwtFunc.validateJWT, async (req, res) => {
         try {
             console.log("nextUser/:id : id == " + req.params.id);
-            const currentUser = await svc.usersDAO.getById(req.params.id);
+            const currentUser = await userSVC.usersDAO.getById(req.params.id);
 
             console.log("shownUserIds == " + req.body);
 
