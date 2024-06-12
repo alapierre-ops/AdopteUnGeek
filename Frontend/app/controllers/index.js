@@ -65,22 +65,44 @@ class IndexController extends MainController{
                 console.log('User is viewing their own profile');
 
             } else if(userID) {
+
                 await this.getUserInfo(userID);
                 console.log('User ID:', userID);
 
-                const backButton = document.createElement('button');
-                backButton.textContent = 'Retour';
-                backButton.classList.add('backButton');
+                const matchedUsers = await this.interactionsRoutes.getMatches(this.currentUserID);
+                const isMatched = matchedUsers.some(user => user.id === userID);
 
-                const msgButton = document.createElement('button');
-                msgButton.textContent = 'Discuter';
-                msgButton.classList.add('msgButton');
+                if(isMatched){
+                    const backButton = document.createElement('button');
+                    backButton.textContent = 'Retour';
+                    backButton.classList.add('backButton');
 
-                this.skipIcon.parentNode.replaceChild(backButton, this.skipIcon);
-                this.likeIcon.parentNode.replaceChild(msgButton, this.likeIcon);
+                    const msgButton = document.createElement('button');
+                    msgButton.textContent = 'Discuter';
+                    msgButton.classList.add('msgButton');
 
-                backButton.addEventListener('click', () => window.location.href = `likes.html`);
-                msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
+                    this.skipIcon.parentNode.replaceChild(backButton, this.skipIcon);
+                    this.likeIcon.parentNode.replaceChild(msgButton, this.likeIcon);
+
+                    backButton.addEventListener('click', () => window.location.href = `likes.html`);
+                    msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
+                }
+
+                else{
+                    if(window.innerWidth < 600) {
+                        document.getElementById('likeIcon2')
+                            .addEventListener('click', () => this.addInteraction(true));
+                        document.getElementById('skipIcon2')
+                            .addEventListener('click', () => this.addInteraction(false));
+                    }
+                    else{
+                        document.getElementById('likeIcon')
+                            .addEventListener('click', () => this.addInteraction(true));
+                        document.getElementById('skipIcon')
+                            .addEventListener('click', () => this.addInteraction(false));
+                    }
+                }
+
             } else {
                 await this.getUserInfo();
                 if(window.innerWidth < 600) {
