@@ -8,10 +8,10 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
     return new Promise(async (resolve, reject) => {
         try {
 
-            /*await interactionsService.dao.db.query("DROP TABLE IF EXISTS interactions CASCADE");
+            await interactionsService.dao.db.query("DROP TABLE IF EXISTS interactions CASCADE");
             await usersService.usersDAO.db.query("DROP TABLE IF EXISTS users CASCADE");
             await photosService.dao.db.query("DROP TABLE IF EXISTS photos CASCADE");
-            await messagesService.dao.db.query("DROP TABLE IF EXISTS messages CASCADE");*/
+            await messagesService.dao.db.query("DROP TABLE IF EXISTS messages CASCADE");
 
             await interactionsService.dao.db.query("CREATE TABLE IF NOT EXISTS interactions(id SERIAL PRIMARY KEY, date DATE, userWhoInteracted INTEGER, userShown INTEGER, liked BOOLEAN )")
             await usersService.usersDAO.db.query("CREATE TABLE IF NOT EXISTS users(id SERIAL PRIMARY KEY, nickname TEXT, email TEXT, password TEXT, bio TEXT, birthdate DATE, gender TEXT, tags TEXT, interestedin TEXT, filter_agemin TEXT, filter_agemax TEXT, filter_dismax TEXT, city TEXT)")
