@@ -7,7 +7,7 @@ module.exports = class MessagesDAO extends dao{
     getMessages(userId1, userId2) {
         return new Promise((resolve, reject) => {
             this.db.query(
-                "SELECT * FROM messages WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)",
+                "SELECT * FROM messages WHERE (sender_id = $1::text AND receiver_id = $2::text) OR (sender_id = $2::text AND receiver_id = $1::text)",
                 [userId1, userId2]
             )
                 .then(res => resolve(res.rows))
@@ -15,12 +15,13 @@ module.exports = class MessagesDAO extends dao{
         });
     }
 
-
     addMessage(senderID, receiverID, content) {
         const currentDate = new Date().toISOString();
         return new Promise((resolve, reject) => {
-            this.db.query("INSERT INTO messages (sender_id, receiver_id, content, sent_at) VALUES ($1, $2, $3, $4)",
-                [senderID, receiverID, content, currentDate])
+            this.db.query(
+                "INSERT INTO messages (sender_id, receiver_id, content, sent_at) VALUES ($1::text, $2::text, $3, $4)",
+                [senderID, receiverID, content, currentDate]
+            )
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });

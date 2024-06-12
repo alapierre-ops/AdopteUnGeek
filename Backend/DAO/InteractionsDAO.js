@@ -91,7 +91,7 @@ module.exports = class InteractionsDAO extends dao{
             this.db.query(`
         SELECT u.*, MAX(m.sent_at) as last_message_date
         FROM users u
-        LEFT JOIN messages m ON (m.sender_id = u.id OR m.receiver_id = u.id)
+        LEFT JOIN messages m ON (m.sender_id = u.id::text OR m.receiver_id = u.id::text)
         WHERE u.id IN (
             SELECT userShown 
             FROM interactions
@@ -106,7 +106,7 @@ module.exports = class InteractionsDAO extends dao{
         )
         GROUP BY u.id
         ORDER BY last_message_date DESC NULLS LAST
-    `, [parseInt(id)])
+    `, [id])
                 .then(res => {
                     const matchedUsers = res.rows.map(row => ({
                         id: row.id,
