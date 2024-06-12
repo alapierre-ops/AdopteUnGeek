@@ -200,6 +200,9 @@ class ProfileController extends MainController {
 
         this.updatedUserData.tags = this.selectedTags.join(',');
         this.updatedUserData.interestedin = "both"
+        this.updatedUserData.filter_dismax = 150
+        this.updatedUserData.filter_agemin = 18
+        this.updatedUserData.filter_agemax = 80
 
         try {
             await this.usersRoutes.updateUser(this.userID, this.updatedUserData);
