@@ -46,9 +46,8 @@ module.exports = class InteractionsDAO extends dao{
 
     async getLikedMe(id) {
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT u.*, p.photo_data
+            this.db.query(`SELECT u.*
                        FROM users u 
-                       LEFT JOIN photos p ON u.id = p.user_id
                        WHERE u.id IN (
                            SELECT userWhoInteracted 
                            FROM interactions
@@ -68,9 +67,8 @@ module.exports = class InteractionsDAO extends dao{
 
     async getILiked(id) {
         return new Promise((resolve, reject) =>
-            this.db.query(`SELECT u.*, p.photo_data
+            this.db.query(`SELECT u.*
                        FROM users u 
-                       LEFT JOIN photos p ON u.id = p.user_id
                        WHERE u.id IN (
                            SELECT userShown 
                            FROM interactions

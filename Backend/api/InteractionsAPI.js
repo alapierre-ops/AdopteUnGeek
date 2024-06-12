@@ -62,6 +62,7 @@ module.exports = (app, svc, userSVC, jwtFunc) => {
             }
             return res.json(users);
         } catch (e) {
+            console.log(e)
             res.status(400).end();
         }
     });
@@ -74,6 +75,7 @@ module.exports = (app, svc, userSVC, jwtFunc) => {
             }
             return res.json(users);
         } catch (e) {
+            console.log(e)
             res.status(400).end();
         }
     });

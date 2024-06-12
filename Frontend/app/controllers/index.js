@@ -165,11 +165,11 @@ class IndexController extends MainController{
 
         this.distance = this.getDistanceFromLatLonInKm(coord1.lat, coord1.lon, coord2.lat, coord2.lon);
 
-        console.log(`getUserInfo(): ${this.distance} > ${this.currentUser.filter_dismax} ?`)
-
         if(this.currentUser.filter_dismax === 150){
             return true
         }
+
+        console.log(`getUserInfo(): ${this.distance} > ${this.currentUser.filter_dismax} ?`)
 
         return this.distance <= this.currentUser.filter_dismax;
 
