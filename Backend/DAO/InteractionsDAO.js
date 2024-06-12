@@ -89,25 +89,24 @@ module.exports = class InteractionsDAO extends dao{
     async getMatches(id) {
         return new Promise((resolve, reject) =>
             this.db.query(`
-            SELECT u.*, p.photo_data, MAX(m.sent_at) as last_message_date
-            FROM users u
-            LEFT JOIN photos p ON u.id = p.user_id
-            LEFT JOIN messages m ON (m.sender_id = u.id OR m.receiver_id = u.id)
-            WHERE u.id IN (
-                SELECT userShown 
-                FROM interactions
-                WHERE userWhoInteracted = $1
-                AND liked = true
-            )
-            AND u.id IN (
-                SELECT userWhoInteracted 
-                FROM interactions
-                WHERE userShown = $1
-                AND liked = true
-            )
-            GROUP BY u.id, p.photo_data
-            ORDER BY last_message_date DESC NULLS LAST
-        `, [parseInt(id)])
+        SELECT u.*, MAX(m.sent_at) as last_message_date
+        FROM users u
+        LEFT JOIN messages m ON (m.sender_id = u.id OR m.receiver_id = u.id)
+        WHERE u.id IN (
+            SELECT userShown 
+            FROM interactions
+            WHERE userWhoInteracted = $1
+            AND liked = true
+        )
+        AND u.id IN (
+            SELECT userWhoInteracted 
+            FROM interactions
+            WHERE userShown = $1
+            AND liked = true
+        )
+        GROUP BY u.id
+        ORDER BY last_message_date DESC NULLS LAST
+    `, [parseInt(id)])
                 .then(res => {
                     const matchedUsers = res.rows.map(row => ({
                         id: row.id,
