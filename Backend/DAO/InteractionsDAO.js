@@ -107,7 +107,7 @@ module.exports = class InteractionsDAO extends dao{
             )
             GROUP BY u.id, p.photo_data
             ORDER BY last_message_date DESC NULLS LAST
-        `, [id])
+        `, [parseInt(id)])
                 .then(res => {
                     const matchedUsers = res.rows.map(row => ({
                         id: row.id,

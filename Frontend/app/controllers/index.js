@@ -69,6 +69,8 @@ class IndexController extends MainController{
                 await this.getUserInfo(userID);
                 console.log('User ID:', userID);
 
+                console.log("Initialize(): Testing if user is matched")
+
                 const matchedUsers = await this.interactionsRoutes.getMatches(this.currentUserID);
                 const isMatched = matchedUsers.some(user => user.id === userID);
 
@@ -89,7 +91,6 @@ class IndexController extends MainController{
                     msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
                     return
                 }
-
                 else{
                     const likedUsers = await this.interactionsRoutes.getILiked(this.currentUserID);
                     const isLiked = likedUsers.some(user => user.id === userID);
