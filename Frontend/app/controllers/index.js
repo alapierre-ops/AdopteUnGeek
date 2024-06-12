@@ -73,6 +73,7 @@ class IndexController extends MainController{
                 const isMatched = matchedUsers.some(user => user.id === userID);
 
                 if(isMatched){
+                    console.log("Initialize(): User is already matched")
                     const backButton = document.createElement('button');
                     backButton.textContent = 'Retour';
                     backButton.classList.add('backButton');
@@ -86,20 +87,30 @@ class IndexController extends MainController{
 
                     backButton.addEventListener('click', () => window.location.href = `likes.html`);
                     msgButton.addEventListener('click', () => window.location.href = `messages.html?${userID}`);
+                    return
                 }
 
                 else{
-                    if(window.innerWidth < 600) {
-                        document.getElementById('likeIcon2')
-                            .addEventListener('click', () => this.addInteraction(true));
-                        document.getElementById('skipIcon2')
-                            .addEventListener('click', () => this.addInteraction(false));
-                    }
-                    else{
-                        document.getElementById('likeIcon')
-                            .addEventListener('click', () => this.addInteraction(true));
-                        document.getElementById('skipIcon')
-                            .addEventListener('click', () => this.addInteraction(false));
+                    const likedUsers = await this.interactionsRoutes.getILiked(this.currentUserID);
+                    const isLiked = likedUsers.some(user => user.id === userID);
+
+                    if(isLiked){console.log("Initialize(): User is already liked");return}
+
+                    if(!isLiked){
+                        console.log("Initialize(): User isnt already liked")
+                        if(window.innerWidth < 600) {
+                            document.getElementById('likeIcon2')
+                                .addEventListener('click', () => this.addInteraction(true));
+                            document.getElementById('skipIcon2')
+                                .addEventListener('click', () => this.addInteraction(false));
+                        }
+                        else{
+                            document.getElementById('likeIcon')
+                                .addEventListener('click', () => this.addInteraction(true));
+                            document.getElementById('skipIcon')
+                                .addEventListener('click', () => this.addInteraction(false));
+                        }
+                        return
                     }
                 }
 
