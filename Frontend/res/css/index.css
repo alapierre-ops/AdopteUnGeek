@@ -335,6 +335,18 @@ button{
     font-size: 180%;
 }
 
+.userFirstRowLikes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.userFirstRowLikes h4 {
+    margin: 0;
+    font-size: 180%;
+}
+
 #userDistance {
     text-align: center;
     font-size: 18px;

@@ -93,7 +93,7 @@ class LikesController extends MainController {
                     textContainer.classList.add('textContainer');
 
                     const userFirstRow = document.createElement('div');
-                    userFirstRow.classList.add('userFirstRow');
+                    userFirstRow.classList.add('userFirstRowLikes');
 
                     const userName = document.createElement('h4');
                     userName.textContent = user.nickname;
