@@ -84,7 +84,7 @@ class LikesController extends MainController {
                     img.src = 'https://cdn.pixabay.com/animation/2023/11/18/09/26/09-26-08-99_512.gif';
 
                     const actualImg = new Image();
-                    actualImg.src = `${this.apiUrl}/photos/${user.id}`;
+                    actualImg.src = await this.photosRoutes.getUserPhotos(user.id);
                     actualImg.onload = () => {
                         img.src = actualImg.src;
                     };
