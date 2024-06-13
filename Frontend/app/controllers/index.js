@@ -72,6 +72,7 @@ class IndexController extends MainController{
                 console.log("Initialize(): Testing if user is matched")
 
                 const matchedUsers = await this.interactionsRoutes.getMatches(this.currentUserID);
+                console.log("matchedUsers: " + matchedUsers);
                 const isMatched = matchedUsers.some(user => user.id === userID);
 
                 if(isMatched){
@@ -93,6 +94,8 @@ class IndexController extends MainController{
                 }
                 else{
                     const likedUsers = await this.interactionsRoutes.getILiked(this.currentUserID);
+                    const likedUserIds = likedUsers.map(user => user.id);
+                    console.log("Liked users: " + likedUserIds.join(", "));
                     const isLiked = likedUsers.some(user => user.id === userID);
 
                     if(isLiked){console.log("Initialize(): User is already liked");return}

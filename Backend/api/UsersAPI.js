@@ -15,7 +15,7 @@ module.exports = (app, svc, jwtFunc) => {
         }
     });
 
-    app.delete("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
+    /*app.delete("/api/users/:id", jwtFunc.validateJWT, async (req, res) => {
         if(isNaN(req.params.id)){
             return res.status(400).end();
         }
@@ -29,7 +29,7 @@ module.exports = (app, svc, jwtFunc) => {
                 console.error(e);
                 res.status(500).end();
             });
-    });
+    });*/
 
     app.put("/api/users", jwtFunc.validateJWT, async (req, res) => {
         const users = req.body;
