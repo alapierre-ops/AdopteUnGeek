@@ -73,7 +73,7 @@ class IndexController extends MainController{
 
                 const matchedUsers = await this.interactionsRoutes.getMatches(this.currentUserID);
                 console.log("matchedUsers: " + matchedUsers);
-                const isMatched = matchedUsers.some(user => user.id === userID);
+                const isMatched = matchedUsers.some(user => user.id === Number(userID));
 
                 if(isMatched){
                     console.log("Initialize(): User is already matched")
@@ -94,11 +94,14 @@ class IndexController extends MainController{
                 }
                 else{
                     const likedUsers = await this.interactionsRoutes.getILiked(this.currentUserID);
-                    const likedUserIds = likedUsers.map(user => user.id);
-                    console.log("Liked users: " + likedUserIds.join(", "));
-                    const isLiked = likedUsers.some(user => user.id === userID);
+                    const isLiked = likedUsers.some(user => user.id === Number(userID));
 
-                    if(isLiked){console.log("Initialize(): User is already liked");return}
+                    if(isLiked){
+                        console.log("Initialize(): User is already liked");
+                        document.getElementById('likeIcon').classList.add("hidden")
+                        document.getElementById('skipIcon').classList.add("hidden")
+                        return
+                    }
 
                     if(!isLiked){
                         console.log("Initialize(): User isnt already liked")
@@ -218,8 +221,8 @@ class IndexController extends MainController{
         document.getElementById('userDistance').textContent = this.distance ? "à " + this.distance + " km" : "à 0 km"
         document.getElementById('userName').textContent = this.nextUser.nickname;
         document.getElementById('userBio').textContent = this.nextUser.bio;
-        document.getElementById('imageContainer').src = await this.photosRoutes.getUserPhotos(this.nextUser.id)
         document.getElementById('userAge').textContent = this.getAge(this.nextUser.birthdate) + " ans";
+        document.getElementById('imageContainer').src = await this.photosRoutes.getUserPhotos(this.nextUser.id)
     }
 
     addEventListeners(){
@@ -410,10 +413,7 @@ class IndexController extends MainController{
     }
 
     async addInteraction(liked){
-        try{
-            await this.photosRoutes.getUserPhotos(this.currentUserID)
-        }
-        catch (e) {
+        if(!this.currentUser.city){
             alert("Vous devez compléter votre profil avant de continuer");
             window.location.href = "profile.html"
         }
