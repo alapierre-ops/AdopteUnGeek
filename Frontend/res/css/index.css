@@ -737,7 +737,8 @@ h3{
     }
 
     .mobile-icons{
-        margin-top: -1px;
+        margin-top: 50%;
+        margin-bottom: 50%;
     }
 
     #likeIcon, #skipIcon{

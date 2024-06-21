@@ -58,7 +58,7 @@ class PhotosRoutes {
                         throw new Error(`Failed to fetch photos: ${res.status}`);
                     }
                 })
-                .catch(err => reject(err));
+                .catch(err => console.error(err));
         });
     }
 }

@@ -85,6 +85,7 @@ class ProfileController extends MainController {
     async handlePhotoInputChange() {
         console.log("handlePhotoInputChange()");
         const file = document.getElementById('photoInput').files[0];
+        document.getElementById('preview').src = "../res/loader.gif";
         try {
             await this.photosRoutes.updatePhotos(this.userID, file);
             console.log("handlePhotoInputChange(): photo changed successfully");

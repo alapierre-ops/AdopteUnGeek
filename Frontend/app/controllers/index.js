@@ -18,7 +18,6 @@ class IndexController extends MainController{
     }
 
     async initialize() {
-
         this.currentUserID = await this.isUserLoggedIn(this.token);
         console.log("initialize(): currentUserID == ",this.currentUserID);
         this.currentUser = this.nextUser = await this.usersRoutes.getUser(this.currentUserID)
@@ -167,6 +166,8 @@ class IndexController extends MainController{
 
 
     async getUserInfo(userID) {
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('person').style.display = 'none';
         try {
             console.log("getUserInfo(): alreadyFetchedUsers == " + this.alreadyFetchedUsers)
             if(!this.alreadyFetchedUsers){
@@ -223,6 +224,9 @@ class IndexController extends MainController{
         document.getElementById('userBio').textContent = this.nextUser.bio;
         document.getElementById('userAge').textContent = this.getAge(this.nextUser.birthdate) + " ans";
         document.getElementById('imageContainer').src = await this.photosRoutes.getUserPhotos(this.nextUser.id)
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('person').style.display = 'flex';
     }
 
     addEventListeners(){

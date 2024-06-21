@@ -1,9 +1,14 @@
+# Utiliser l'image officielle de Node.js comme image de base
 FROM node:16
+
+# Définir le répertoire de travail dans le conteneur
 WORKDIR /app
-# Installer les dépendances
+
+# Copier le fichier package.json et installer les dépendances
 COPY package*.json ./
 RUN npm install
-# Copier l'application dans le conteneur
+
+# Copier le reste du code source dans le conteneur
 COPY . .
-#
+# Exposer le port sur lequel l'application s'exécute
 EXPOSE 3333

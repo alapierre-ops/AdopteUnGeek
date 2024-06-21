@@ -17,11 +17,14 @@
         <i class="fas fa-filter" id="filterIcon"></i>
     </div>
 
+    <div id="loader" class="loader" style="margin: auto">
+        <img src="../res/loader.gif" alt="Loading...">
+    </div>
 
-    <div class="person">
+    <div class="person" id="person" style="display: none">
         <i class="far fa-thumbs-down" id="skipIcon"></i>
         <div class="image-container">
-            <img alt="main picture" id="imageContainer" src="https://cdn.pixabay.com/animation/2023/11/18/09/26/09-26-08-99_512.gif">
+            <img alt="main picture" id="imageContainer" src="../res/loader.gif">
             <div class="textContainer" id="textContainer">
                 <div class="userFirstRow">
                     <h4 id="userName"></h4>
@@ -43,7 +46,7 @@
         <i class="fas fa-compass" id="indexIcon"></i>
         <i class="fas fa-heart" id="heartIcon"></i>
         <i class="fas fa-comments" id="messagesIcon"></i>
-        <i class="fas fa-cog" id="settingsIcon"></i>
+        <i class="fas fa-sign-out-alt" id="settingsIcon"></i>
     </div>
 
     <div id="filterModal" class="modal">

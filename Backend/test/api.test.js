@@ -13,7 +13,7 @@ describe('API Tests', function() {
     before( (done) => {
         seedDatabase().then( async () => {
             console.log("Creating test user");
-            usersService.dao.signUp('User1', 'user1', 'default').then( () =>
+            usersService.usersDAO.signUp('User1', 'user1', 'default').then( () =>
                 chai.request(app)
                     .post('/api/users/auth/login')
                     .send({email: 'user1', password: 'default'})
@@ -28,9 +28,9 @@ describe('API Tests', function() {
 
     after( (done) => {
         console.log("Deleting test user")
-        usersService.dao.getByEmail('user1').then(
+        usersService.usersDAO.getByEmail('user1').then(
             (user) => {
-                usersService.dao.delete(user.id).then(done())
+                usersService.usersDAO.delete(user.id).then(done())
             }
         )
     })
@@ -79,7 +79,7 @@ describe('API Tests', function() {
 
     let user;
     it('should return a specific user by id', (done) => {
-        usersService.dao.getByEmail('user1').then((retrievedUser) => {
+        usersService.usersDAO.getByEmail('user1').then((retrievedUser) => {
             chai.request(app)
                 .get(`/api/users/${retrievedUser.id}`)
                 .set('Authorization', `Bearer ${token}`)
@@ -188,7 +188,7 @@ describe('API Tests', function() {
     });
 
     it('should delete a user', (done) => {
-        usersService.dao.getByEmail('user2@example.com').then((retrievedUser) => {
+        usersService.usersDAO.getByEmail('user2@example.com').then((retrievedUser) => {
             chai.request(app)
                 .delete(`/api/users/${retrievedUser.id}`)
                 .set('Authorization', `Bearer ${token}`)
