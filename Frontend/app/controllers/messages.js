@@ -34,10 +34,6 @@ class MessagesController extends MainController {
 
             matchesList.innerHTML = '';
 
-            if (matches.length > 0) {
-                await this.loadMessages(matches[0].id, matches[0].nickname);
-            }
-
             matches.forEach(match => {
                 const listItem = document.createElement('li');
                 listItem.textContent = match.nickname;
@@ -53,8 +49,14 @@ class MessagesController extends MainController {
                     this.loadMessages(item.dataset.userId, item.dataset.nickname);
                 });
             });
+
+            if (matches.length > 0) {
+                await this.loadMessages(matches[0].id, matches[0].nickname);
+            }
         } catch (error) {
-            console.error('Error fetching matches: ', error);
+            if(error !== 404){
+                console.error('Error fetching matches: ', error);
+            }
         }
     }
 
@@ -75,6 +77,8 @@ class MessagesController extends MainController {
         const messageContainer = document.getElementById('messageContainer');
 
         messageContainer.innerHTML = '';
+
+        if (messages.length == 0) {return}
 
         messages.forEach(message => {
             const messageElement = document.createElement('div');
