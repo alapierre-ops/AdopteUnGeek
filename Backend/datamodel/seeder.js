@@ -188,7 +188,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
 
                 for (const user of users) {
                     if(user.gender == "female") {
-                        return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
+                        return usersService.usersDAO.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
                             [date, user.id, this.futureUserID, true])
                     }
                 }
