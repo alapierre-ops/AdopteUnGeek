@@ -54,31 +54,24 @@ class MessagesController extends MainController {
                 await this.loadMessages(matches[0].id, matches[0].nickname);
             }
         } catch (error) {
-            if(error !== 404){
-                console.error('Error fetching matches: ', error);
-            }
+            console.error('Error fetching matches: ', error);
         }
     }
 
     async loadMessages(userId, nickname) {
-        if(userId){
-            this.otherUserID = userId
-        }
+        this.otherUserID = userId
         console.log('Loading messages for user: ', this.otherUserID);
         if(!nickname){
             const user = await this.usersRoutes.getUser(this.otherUserID)
             nickname = user.nickname
         }
         document.getElementById("nickname").textContent = nickname;
-        document.getElementById('userPhoto').src = await this.photosRoutes.getUserPhotos(this.otherUserID)
-
         const messages = await this.messagesRoutes.getMessages(this.userID, this.otherUserID);
+        document.getElementById('userPhoto').src = await this.photosRoutes.getUserPhotos(this.otherUserID)
 
         const messageContainer = document.getElementById('messageContainer');
 
         messageContainer.innerHTML = '';
-
-        if (messages.length == 0) {return}
 
         messages.forEach(message => {
             const messageElement = document.createElement('div');

@@ -14,11 +14,6 @@ module.exports = (app, svc, jwtFunc) => {
     app.get("/api/messages/:sender_id/:receiver_id", jwtFunc.validateJWT, async (req, res) => {
         try {
             const messages = await svc.dao.getMessages(req.params.sender_id, req.params.receiver_id);
-            console.log("messages/:id1/:id2 == ", messages);
-            if (!messages || messages.length === 0) {
-                console.log("messages/:id1/:id2 : no messages found");
-                return res.status(404).end();
-            }
             return res.json(messages);
         } catch (e) {
             console.error(e);
