@@ -1,13 +1,13 @@
 class MessagesRoutes {
     constructor(apiUrl, token) {
         console.log("MessagesRoute : apiUrl == " + apiUrl);
-        this.apiUrl = apiUrl + "/users";
+        this.apiUrl = apiUrl + "/messages";
         this.token = token
     }
 
     async getMessages(currentUser, otherUser) {
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/messages/${currentUser}/${otherUser}`, {
+            fetch(`${this.apiUrl}/${currentUser}/${otherUser}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + this.token
@@ -31,7 +31,7 @@ class MessagesRoutes {
         console.log("receiverID = ", receiverID);
 
         try {
-            const response = await fetch(`${this.apiUrl}/messages/${senderID}/${receiverID}`, {
+            const response = await fetch(`${this.apiUrl}/${senderID}/${receiverID}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
