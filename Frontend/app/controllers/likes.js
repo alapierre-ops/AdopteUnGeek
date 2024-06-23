@@ -99,6 +99,7 @@ class LikesController extends MainController {
     renderUsers(users, userGrid) {
         try {
             const usersPerRow = 3;
+            const numberOfRows = Math.ceil(users.length / usersPerRow);
             for (let i = 0; i < users.length; i += usersPerRow) {
                 const row = document.createElement('div');
                 row.classList.add('user-row');
@@ -147,6 +148,13 @@ class LikesController extends MainController {
                     });
                 }
                 userGrid.appendChild(row);
+
+                if (numberOfRows >= 2) {
+                    const rows = userGrid.getElementsByClassName('user-row');
+                    for (let i = 0; i < rows.length - 1; i++) {
+                        rows[i].style.marginBottom = '20px';
+                    }
+                }
             }
         }
         catch (e) {

@@ -136,10 +136,6 @@ class IndexController extends MainController{
                 }
             }
         } catch (error) {
-            if(!this.nextUser){
-                alert("Plus aucun profil ne correspond à vos filtres actuels.")
-                this.showModal()
-            }
             console.error("initialize(): ", error);
         }
     }
@@ -176,10 +172,6 @@ class IndexController extends MainController{
             if(!userID){
                 console.log("getUserInfo(): userID == ", this.currentUserID);
                 this.nextUser = await this.interactionsRoutes.getNextUser(this.currentUserID, this.alreadyFetchedUsers);
-                if(!this.nextUser.nickname){
-                    alert("Plus aucun profil ne correspond à vos filtres actuels.")
-                    this.showModal()
-                }
                 const isDistanceOk = await this.isDistanceOk()
                 if( isDistanceOk ){
                     await this.displayUserInfo()
@@ -326,6 +318,7 @@ class IndexController extends MainController{
     }
 
     changeFilters(){
+        this.alreadyFetchedUsers = ""
         if (!this.filters) {
             this.filters = {};
         }
