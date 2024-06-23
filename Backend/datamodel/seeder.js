@@ -3,6 +3,7 @@ const Interactions = require('../Tables/interactions')
 const Messages = require('../Tables/messages')
 const Photos = require('../Tables/photos')
 const axios = require('axios');
+const bcrypt = require('bcrypt');
 
 module.exports = (usersService, interactionsService, messagesService, photosService) => {
     return new Promise(async (resolve, reject) => {
