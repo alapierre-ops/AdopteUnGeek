@@ -180,16 +180,16 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
                         "INSERT INTO photos (user_id, photo_data) VALUES ($1, $2)",
                         [userId, photoData]
                     );
+                    this.futureUserID = result.rows[result.rows.length - 1].id + 1;
                 }
 
-                const result = await usersService.usersDAO.db.query("SELECT MAX(id) as maxId FROM users");
-                const futureUserID = result.rows[0].maxId + 1;
+
                 const date = new Date();
 
                 for (const user of users) {
-                    if(user.id % 2 == 0) {
+                    if(user.gender == "female") {
                         return this.db.query("INSERT INTO interactions(date, userWhoInteracted, userShown, liked) VALUES ($1,$2,$3,$4)",
-                            [date, user.id, futureUserID, true])
+                            [date, user.id, this.futureUserID, true])
                     }
                 }
                 console.log('Seeding complete.');
