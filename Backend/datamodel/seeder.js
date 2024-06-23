@@ -184,7 +184,7 @@ module.exports = (usersService, interactionsService, messagesService, photosServ
 
                 const result = await usersService.usersDAO.db.query("SELECT MAX(id) as maxId FROM users");
                 const futureUserID = result.rows[0].maxId + 1;
-                const date = new Date().toISOString().split('T')[0];
+                const date = new Date();
 
                 for (const user of users) {
                     if(user.id % 2 == 0) {
