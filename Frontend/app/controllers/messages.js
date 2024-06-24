@@ -78,7 +78,7 @@ class MessagesController extends MainController {
             messageElement.classList.add('message');
 
             const senderElement = document.createElement('div');
-            if (message.sender_id === this.userID) {
+            if (message.sender_id === this.userID.toString()) {
                 senderElement.textContent = 'Vous: ';
                 messageElement.classList.add('sent-by-current-user');
             } else {

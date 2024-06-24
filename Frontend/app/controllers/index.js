@@ -376,6 +376,9 @@ class IndexController extends MainController{
     }
 
     getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+        // Distance haversine:
+        // R * 2atan2(√sin^2(0,5ΔLat)+cos(Lat1)⋅cos(Lat2)⋅sin^2(0,5ΔLon),
+        // √1-sin^2(0,5ΔLat)+cos(Lat1)⋅cos(Lat2)⋅sin^2(0,5ΔLon))
         const R = 6371; // Radius of the Earth in km
         const dLat = this.deg2rad(lat2-lat1);
         const dLon = this.deg2rad(lon2-lon1);
